@@ -1,0 +1,21 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/IMS.Application/bin/Debug/net8.0
+/IMS.Application/obj
+/IMS.Core/bin/Debug/net8.0
+/IMS.Core/obj
+/IMS.Infrastructure/bin/Debug/net8.0
+/IMS.Infrastructure/obj
+/IMS.Mobile/bin/Debug
+/IMS.Mobile/obj
+/IMS.Shared/bin/Debug/net8.0
+/IMS.Shared/obj
+/IMS.WebAPI/bin/Debug/net8.0
+/IMS.WebAPI/obj
+/IMS.WebApp/IMS.WebApp/bin/Debug/net8.0
+/IMS.WebApp/IMS.WebApp/obj
+/IMS.WebApp/IMS.WebApp.Client/bin/Debug/net8.0
+/IMS.WebApp/IMS.WebApp.Client/obj
