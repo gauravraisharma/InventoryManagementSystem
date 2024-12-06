@@ -2,7 +2,6 @@
 using IMS.Application.Features.Products.Queries;
 using IMS.Core.RequestDto.Product;
 using IMS.Core.RequestDto.ProductDTOs;
-using IMS.WebAPI.Model;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,29 +19,6 @@ namespace IMS.WebAPI.Controllers
         {
             _mediator = mediator;
         }
-        //[HttpGet]
-        //public IActionResult GetProducts()
-        //{
-        //    var products = new List<string>
-        //{
-        //    "Product 1",
-        //    "Product 2",
-        //    "Product 3"
-        //};
-        //    return Ok(products);
-        //}
-
-        //[HttpGet]
-        //public IActionResult GetProducts()
-        //{
-        //    var products = new List<Product>
-        //{
-        //    new Product { Name = "Product 1" },
-        //    new Product { Name = "Product 2" },
-        //    new Product { Name = "Product 3" }
-        //};
-        //    return Ok(products);
-        //}
 
         [HttpGet]
         public async Task<IActionResult> GetAllProducts()

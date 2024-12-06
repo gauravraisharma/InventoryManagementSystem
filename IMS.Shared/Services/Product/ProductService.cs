@@ -80,33 +80,7 @@ namespace IMS.WebApp.Client.Services.Product
             }
         }
 
-        //public async Task<ApiResponse<ProductResponse>> AddProductAsync(AddProductDto formData)
-        //{
-        //    try
-        //    {
-        //        var response = await _httpClient.PostAsJsonAsync(ApiEndpoints.Product.SaveProducts, formData);
-        //        if (response.IsSuccessStatusCode)
-        //        {
-        //            var rawResponseContent = await response.Content.ReadAsStringAsync();
-        //            Console.WriteLine("Raw response content: " + rawResponseContent);
-        //            var result = await response.Content.ReadFromJsonAsync<ApiResponse<ProductResponse>>();
-        //            return result;
-        //        }
-        //        return new ApiResponse<ProductResponse>
-        //        {
-        //            IsSuccess = false,
-        //            Message = "Failed to add Prod"
-        //        };
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return new ApiResponse<ProductResponse>
-        //        {
-        //            IsSuccess = false,
-        //            Message = ex.Message
-        //        };
-        //    }
-        //}
+       
         public async Task<ApiResponse<ProductResponse>> UpdateProductAsync(AddProductDto addProductDto)
         {
             try

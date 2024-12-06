@@ -1,5 +1,3 @@
-//using IMS.Shared.Interface;
-//using IMS.WebApp.Client.Services.Product;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.Http.Features;
 using MudBlazor.Services;
