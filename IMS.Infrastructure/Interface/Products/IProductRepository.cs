@@ -1,0 +1,20 @@
+﻿using IMS.Core.Common.Helper;
+using IMS.Core.RequestDto.Product;
+using IMS.Core.RequestDto.ProductDTOs;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace IMS.Infrastructure.Interface.Products
+{
+    public interface IProductRepository
+    {
+        Task<GenericBaseResult<List<GetProductRequestDto>>> GetAllProductsAsync();
+        Task<GenericBaseResult<GetProductRequestDto>> GetProductByIdAsync(string productId);
+        Task<GenericBaseResult<AddProductRequestDto>> AddAsync(AddProductRequestDto product);
+       Task<GenericBaseResult<AddProductRequestDto>> UpdateAsync(AddProductRequestDto product);
+        
+    }
+}

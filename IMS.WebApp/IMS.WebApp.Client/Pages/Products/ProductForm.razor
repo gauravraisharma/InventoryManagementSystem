@@ -1,0 +1,468 @@
+﻿@page "/product/add"
+@page "/product/edit/{Id}"
+@using System.ComponentModel.DataAnnotations
+ @rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+@inject IProductService ProductService
+@inject IDepartmentService DepartmentService
+@inject ICategoryService CategoryService
+@using IMS.Shared.Interface.Category
+@using IMS.Shared.Interface.Department
+@using IMS.Shared.Interface.Product
+@using IMS.Shared.RequestDto.DepartmentDTOs
+@using IMS.Shared.RequestDto.ProductDTOs
+@using MudBlazor
+@using System.Text.Json
+
+
+
+
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="mt-6">
+    <MudCard Elevation="0">
+        <MudCardHeader>
+            <MudText Typo="Typo.h5">@(Id == null ? "Add New Product" : "Edit Product")</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <EditForm Model="product" OnValidSubmit="HandleSubmit" FormName="ProductForm">
+                <DataAnnotationsValidator />
+                <MudGrid>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="product.Title"
+                        Label="Product Title"
+                        Variant="Variant.Filled"
+                        For="@(() => product.Title)"
+                        Placeholder="e.g Blue Jeans" />
+                    </MudItem>
+
+                    <MudItem xs="12" md="6">
+                        <MudSelect T="string"
+                        Label="Department"
+                        Variant="Variant.Outlined"
+                        @bind-Value="selectedDepartment"
+                        Dense="true">
+                            <MudSelectItem Value="@("all")">Pick a Department</MudSelectItem>
+
+                            @foreach (var department in _departments)
+                            {
+                                <MudSelectItem Value="@department.DepartmentId">@department.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+
+                    <MudItem xs="12" md="6">
+                        <MudSelect T="string"
+                        Label="Category"
+                        Variant="Variant.Outlined"
+                        @bind-Value="selectedCategory"
+                        Dense="true">
+                            <MudSelectItem Value="@("all")">Pick a Category</MudSelectItem>
+
+                            @foreach (var category in _categories)
+                            {
+                                <MudSelectItem Value="@category.CategoryId">@category.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="product.Description"
+                        Label="Product Description"
+                        Variant="Variant.Filled"
+                        Lines="3"
+                        For="@(() => product.Description)"
+                        Placeholder="e.g., Blue jeans, regular fit, 100% cotton" />
+                    </MudItem>
+
+                    <MudItem xs="12" Class="mt-4">
+                        <MudText>Product Images</MudText>
+
+                        <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles" AllowMultiple="true">
+                            <ActivatorContent>
+                                <MudButton Variant="Variant.Filled"
+                                Color="Color.Primary"
+                                StartIcon="@Icons.Material.Filled.CloudUpload">
+                                    Upload Pictures
+                                </MudButton>
+                            </ActivatorContent>
+                        </MudFileUpload>
+
+                        @if (_uploadedFiles != null)
+                        {
+                            <MudText Typo="@Typo.h6">@_uploadedFiles.Count() File@(_uploadedFiles.Count() == 1 ? "" : "s"):</MudText>
+                            <MudList T="string">
+                                @foreach (var file in _uploadedFiles)
+                                {
+                                    <MudListItem Icon="@Icons.Material.Filled.AttachFile" @key="@file">
+                                        @file.FileName @* <code>@file.Data bytes</code> *@
+                                    </MudListItem>
+                                }
+                            </MudList>
+                        }
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudNumericField @bind-Value="product.UnitPrice"
+                        Label="Unit Price"
+                        Variant="Variant.Filled"
+                        For="@(() => product.UnitPrice)" />
+                    </MudItem>
+
+                    <MudItem xs="12" md="4">
+                        <MudNumericField @bind-Value="product.UnitsInStock"
+                        Label="Units in Stock"
+                        Variant="Variant.Filled"
+                        For="@(() => product.UnitsInStock)" />
+                    </MudItem>
+
+                    <MudItem xs="12" md="4">
+                        <MudTextField @bind-Value="product.ProductCode"
+                        Label="Product #"
+                        Variant="Variant.Filled"
+                        For="@(() => product.ProductCode)" />
+                    </MudItem>
+
+                    <MudItem xs="12">
+                        <MudText Typo="Typo.subtitle1">Select available sizes:</MudText>
+                        <div class="size-checkbox-group">
+                            @foreach (var size in AvailableSizes)
+                            {
+                                <label class="size-checkbox">
+                                    <input type="checkbox"
+                                    checked="@product.ProductSizes?.Contains(size)"
+                                    @onchange="@((ChangeEventArgs e) => ToggleSize(size, e.Value))" />
+                                    <span>@size</span>
+                                </label>
+                            }
+                        </div>
+                    </MudItem>
+
+                    @* Debug section to show selected sizes (you can remove this in production) *@
+                    <MudItem xs="12">
+                        <MudText>Selected sizes: @string.Join(", ", product.ProductSizes)</MudText>
+                    </MudItem>
+                </MudGrid>
+
+                <div class="d-flex justify-end mt-6">
+                    <MudButton Variant="Variant.Text"
+                    Color="Color.Default"
+                    Class="mx-2"
+                    OnClick="Cancel">
+                        Cancel
+                    </MudButton>
+                    <MudButton ButtonType="ButtonType.Submit"
+                    Variant="Variant.Filled"
+                    Color="Color.Primary">
+                        @(Id == null ? "Add Product" : "Save Changes")
+                    </MudButton>
+                </div>
+            </EditForm>
+        </MudCardContent>
+    </MudCard>
+</MudContainer>
+
+<style>
+    .mud-input.mud-input-filled {
+    background-color: #f5f5f5;
+    }
+
+    .mud-input.mud-input-filled:hover {
+    background-color: #ebebeb;
+    }
+
+    .mud-input.mud-input-filled.mud-input-focused {
+    background-color: #e0e0e0;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+    private string selectedDepartment = "";
+    private string selectedCategory = "";
+    private List<GetAllDepartmentDto> _departments = new();
+    private List<Shared.RequestDto.CategoryDTOs.GetAllCategoryDto> _categories = new();
+    private string errorMessage;
+    private AddProductDto? product { get; set; }
+    public List<IBrowserFile> ImageFiles { get; set; } = new List<IBrowserFile>();
+    public List<string> ImageUrls { get; set; } = new List<string>();
+    private List<string> AvailableSizes = new List<string> { "S", "M", "L", "XL", "XXL" };
+    private Dictionary<string, bool> SelectedSizes = new Dictionary<string, bool>();
+    IList<IBrowserFile> _files = new List<IBrowserFile>();
+    // private List<FileDto> _imageFiles = new();
+
+    private List<UploadedFile> _uploadedFiles = new(); // Holds processed file data
+
+    private async Task UploadFiles(IBrowserFile file)
+    {
+        if(file!=null)
+        {
+            var buffer = new byte[file.Size];
+            await file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024).ReadAsync(buffer); // Read file data into byte array
+            _uploadedFiles.Add(new UploadedFile
+                {
+                    FileName = file.Name,
+                    ContentType = file.ContentType,
+                    Data = buffer
+                });
+        }
+      
+    }
+    // private void UploadFiles(IBrowserFile file)
+    // {
+    //     _files.Add(file);
+
+    // }
+    private void ToggleSize(string size, object isChecked)
+    {
+        Console.WriteLine("Toggle Function clicked.");
+
+        if (bool.TryParse(isChecked?.ToString(), out bool checkedState))
+        {
+            if (checkedState && !product.ProductSizes.Contains(size))
+            {
+                product.ProductSizes.Add(size);
+            }
+            else if (!checkedState && product.ProductSizes.Contains(size))
+            {
+                product.ProductSizes.Remove(size);
+            }
+        }
+        SelectedSizes[size] = checkedState;
+    }
+    protected override async Task OnInitializedAsync()
+    {
+
+        product ??= new AddProductDto();
+        foreach (var size in AvailableSizes)
+        {
+            SelectedSizes[size] = false;
+        }
+
+        if (!string.IsNullOrEmpty(Id))
+        {
+
+        }
+
+        var departmentResponse = await DepartmentService.GetAllDepartmentAsync();
+        if (departmentResponse.IsSuccess)
+        {
+            _departments = departmentResponse.Result;
+        }
+        else
+        {
+            errorMessage = departmentResponse.Message;
+        }
+        var categoryResponse = await CategoryService.GetAllCategoryAsync();
+        if (categoryResponse.IsSuccess)
+        {
+            _categories = categoryResponse.Result;
+        }
+        else
+        {
+            errorMessage = categoryResponse.Message;
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+
+            using var content = new MultipartFormDataContent();
+
+            // Add other product fields
+            content.Add(new StringContent(product.Title), "Title");
+            content.Add(new StringContent(product.Description), "Description");
+            content.Add(new StringContent(product.UnitPrice.ToString()), "UnitPrice");
+            content.Add(new StringContent(product.UnitsInStock.ToString()), "UnitsInStock");
+            content.Add(new StringContent(product.ProductCode), "ProductCode");
+            content.Add(new StringContent(string.Join(",", selectedCategory)), "CategoryIds");
+            content.Add(new StringContent(string.Join(",", selectedDepartment)), "DepartmentIds");
+            content.Add(new StringContent(string.Join(",", product.ProductSizes ?? new List<string>())), "ProductSizes");
+
+
+            // Add files to the form data
+            // foreach (var file in _files)
+            // {
+            //     var streamContent = new StreamContent(file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024)); // 10 MB max size
+            //     streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
+            //     content.Add(streamContent, "ImageFiles", file.Name);
+            // }
+
+            foreach (var uploadedFile in _uploadedFiles)
+            {
+                var fileContent = new ByteArrayContent(uploadedFile.Data);
+                fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(uploadedFile.ContentType);
+                content.Add(fileContent, "ImageFiles", uploadedFile.FileName);
+            }
+
+            var response = await ProductService.AddProductAsync(content);
+
+
+           //var response = await ProductService.AddProductAsync(productData);
+
+            if (response.IsSuccess)
+            {
+                
+                Snackbar.Add("Product added successfully!", Severity.Success);
+                NavigationManager.NavigateTo("/products");
+            }
+            else
+            {
+                Snackbar.Add($"Error: {response.Message}", Severity.Error);
+            }
+
+            // Snackbar.Add("Product saved successfully!", Severity.Success);
+            NavigationManager.NavigateTo("/product");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Error saving product!", Severity.Error);
+        }
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/product");
+    }
+
+   
+
+    private void OnSizeChanged(bool isChecked, string size)
+    {
+        if (isChecked)
+        {
+            if (!product.ProductSizes.Contains(size))
+            {
+                product.ProductSizes.Add(size);
+            }
+        }
+        else
+        {
+            product.ProductSizes.Remove(size);
+        }
+    }
+
+}
+
+
+
+         
+
+
+
+@* 
+
+             try
+        {
+
+            foreach (var file in _files)
+            {
+                using (var stream = new MemoryStream())
+                {
+                    // Open the file and copy the stream to a memory stream
+                    file.OpenReadStream().CopyToAsync(stream);
+
+                    // Convert the stream to a Base64 string
+                    var base64String = Convert.ToBase64String(stream.ToArray());
+
+                    // Create a FileDto for each file
+                    var fileDto = new FileDto
+                        {
+                            Base64Image = base64String,  // Set the base64 image content
+                            FileName = file.Name         // Set the file name
+                        };
+
+                    // Add the FileDto to the imageFiles list
+                    _imageFiles.Add(fileDto);
+                }
+            }
+            var productData = new AddProductDto
+                {
+                    Id = "",
+                    Title = product.Title,
+                    Description = product.Description,
+                    UnitPrice = product.UnitPrice,
+                    UnitsInStock = product.UnitsInStock,
+                    ProductCode = product.ProductCode,
+                    CategoryIds = new List<string> { selectedCategory },
+                    DepartmentIds = new List<string> { selectedDepartment },
+                    ImageFiles = _imageFiles,
+                    // ProductSizes = SelectedSizes.Where(x => x.Value).Select(x => x.Key).ToList()
+                    ProductSizes = SelectedSizes.Where(x => x.Value).Select(x => x.Key).ToList()
+                };
+
+
+            var response = await ProductService.AddProductAsync(productData);
+
+            if (response.IsSuccess)
+            {
+                
+                Snackbar.Add("Product added successfully!", Severity.Success);
+                NavigationManager.NavigateTo("/products");
+            }
+            else
+            {
+                Snackbar.Add($"Error: {response.Message}", Severity.Error);
+            }
+
+            // Snackbar.Add("Product saved successfully!", Severity.Success);
+            NavigationManager.NavigateTo("/product");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Error saving product!", Severity.Error);
+        } *@
+
+
+@* <h3>ProductForm</h3>
+@page "/addEidtProduct"
+@code {
+
+}   
+ *@
+
+
+    @*  // private async Task UploadFiles(IBrowserFile file)
+    // {
+    //     product.ImageFiles = file.Name;
+    // }
+
+
+    // private void UploadFiles(IBrowserFile[] files)
+    // {
+    //     try
+    //     {
+    //         ImageFiles.Clear();
+    //         ImageUrls.Clear();
+
+    //         foreach (var file in files)
+    //         {
+    //             if (file.Size > 5120000) // 5MB max file size
+    //             {
+    //                 Snackbar.Add("File size too large. Maximum size is 5MB.", Severity.Error);
+    //                 continue;
+    //             }
+
+    //             ImageFiles.Add(file);
+
+    //             // Create a temporary URL for preview
+    //             var buffer = new byte[file.Size];
+    //             file.OpenReadStream(5120000).ReadAsync(buffer);
+    //             var imageBase64 = Convert.ToBase64String(buffer);
+    //             var imageUrl = $"data:{file.ContentType};base64,{imageBase64}";
+    //             ImageUrls.Add(imageUrl);
+    //         }
+
+    //         StateHasChanged();
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         Snackbar.Add($"Error uploading files: {ex.Message}", Severity.Error);
+    //     }
+    // } *@

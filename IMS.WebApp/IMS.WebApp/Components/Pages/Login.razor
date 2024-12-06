@@ -1,0 +1,49 @@
+﻿@* 
+@page "/login"
+@using IMS.WebApp.Components.Layout
+@layout PublicLayout
+@inject NavigationManager NavigationManager
+
+<MudContainer MaxWidth="MaxWidth.Small">
+    <MudPaper Class="pa-4">
+        <MudText Typo="Typo.h4" Class="mb-4">Login</MudText>
+
+        <MudForm @ref="form" @bind-IsValid="@success">
+            <MudTextField T="string"
+                          Label="Username"
+                          @bind-Value="model.Username"
+                          Required="true" />
+
+            <MudTextField T="string"
+                          Label="Password"
+                          @bind-Value="model.Password"
+                          Required="true"
+                          InputType="InputType.Password" />
+
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Class="mt-4"
+                       OnClick="HandleLogin"
+                       Disabled="@(!success)">
+                Login
+            </MudButton>
+        </MudForm>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private MudForm form;
+    private bool success;
+    private LoginModel model = new();
+
+    private async Task HandleLogin()
+    {
+       
+    }
+
+    public class LoginModel
+    {
+        public string Username { get; set; }
+        public string Password { get; set; }
+    }
+} *@

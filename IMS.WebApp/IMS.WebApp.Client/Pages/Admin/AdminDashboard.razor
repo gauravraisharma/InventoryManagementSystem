@@ -1,0 +1,137 @@
+﻿@page "/admin/dashboard"
+@rendermode InteractiveAuto
+<MudText Typo="Typo.h4">Dashboard</MudText>
+<MudGrid>
+    <MudItem xs="12" sm="6" md="3">
+        <MudCard Style="background-color:white; height: 300px; display: flex; flex-direction: column;">
+            <MudCardContent Style="flex-grow: 1;">
+                <MudText>Story of the day</MudText>
+                <MudText Typo="Typo.body2">The quick, brown fox jumps over a lazy dog.</MudText>
+            </MudCardContent>
+            <MudCardActions Class="d-flex justify-end">
+                <MudButton Variant="Variant.Text" Color="Color.Primary">View Report</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+
+    <MudItem xs="12" sm="6" md="3">
+        <MudCard Style="background-color:white; height: 300px; display: flex; flex-direction: column;">
+            <MudCardContent Style="flex-grow: 1;">
+                <MudText>Featured Article</MudText>
+                <MudText Typo="Typo.body2">A wonderful serenity has taken possession.</MudText>
+            </MudCardContent>
+            <MudCardActions Class="d-flex justify-end">
+                <MudButton Variant="Variant.Text" Color="Color.Primary">View Report</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+
+    <MudItem xs="12" sm="6" md="3">
+        <MudCard Style="background-color:white; height: 300px; display: flex; flex-direction: column;">
+            <MudCardContent Style="flex-grow: 1;">
+                <MudText>Top News</MudText>
+                <MudText Typo="Typo.body2">Far far away, behind the word mountains.</MudText>
+            </MudCardContent>
+            <MudCardActions Class="d-flex justify-end">
+                <MudButton Variant="Variant.Text" Color="Color.Primary">View Report</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+
+    <MudItem xs="12" sm="6" md="3">
+        <MudCard Style="background-color:white; height: 300px; display: flex; flex-direction: column;">
+            <MudCardContent Style="flex-grow: 1;">
+                <MudText>Editor's Pick</MudText>
+                <MudText Typo="Typo.body2">One morning, when Gregor Samsa woke up.</MudText>
+            </MudCardContent>
+            <MudCardActions Class="d-flex justify-end">
+                <MudButton Variant="Variant.Text" Color="Color.Primary">View Report</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+</MudGrid>
+
+<MudGrid Class="mt-4">
+    <!-- Scrollable List Card -->
+    <MudItem xs="12" md="4">
+        <MudCard Style="height: 400px;">
+            <MudCardHeader>
+                <MudText Typo="Typo.h6">New Products</MudText>
+            </MudCardHeader>
+            <MudCardContent Style="height: 300px; overflow-y: auto;">
+                @foreach (var i in Enumerable.Range(1, 15))
+                {
+                    <MudPaper Class="pa-4 my-2" Elevation="0">
+                        <div class="d-flex gap-4">
+                            <MudAvatar Color="Color.Primary">@i</MudAvatar>
+                            <div>
+                                <MudText Typo="Typo.body1">Product @i</MudText>
+                                <MudText Typo="Typo.caption">This is a description for Product @i</MudText>
+                            </div>
+                        </div>
+                    </MudPaper>
+                }
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+
+    <!-- Pie Chart Card -->
+    <MudItem xs="12" md="4">
+        <MudCard Style="height: 400px;">
+            <MudCardHeader>
+                <MudText Typo="Typo.h6">Sales By Category</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudChart ChartType="ChartType.Pie"
+                          InputData="@_pieData"
+                          InputLabels="@_pieLabels"
+                          Width="300px"
+                          Height="300px" />
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+
+    <!-- Bar Chart Card -->
+    <MudItem xs="12" md="4">
+        <MudCard Style="height: 400px;">
+            <MudCardHeader>
+                <MudText Typo="Typo.h6">Total Sales</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudChart ChartType="ChartType.Bar"
+                          ChartSeries="@_barChartSeries"
+                          XAxisLabels="@_monthLabels"
+                          Width="100%"
+                          Height="300px"
+                          DisableLegend="true"
+                          Color="Color.Warning"
+                          XAxisLines="true"
+                          YAxisLines="true" />
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+
+
+</MudGrid>
+
+
+@code {
+    // Pie Chart Data
+    private double[] _pieData = new double[] { 30, 25, 20, 15, 10 };
+    private string[] _pieLabels = new[] { "Tops", "Bottoms", "Dresses", "Shoes", "Accessories" };
+
+    // Bar Chart Data
+    private List<ChartSeries> _barChartSeries = new List<ChartSeries>()
+    {
+        new ChartSeries()
+        {
+            Name = "Sales",
+            Data = new double[] { 400, 350, 380, 400, 420, 500, 700, 600, 550, 650, 620, 640 }
+        }
+    };
+
+    private string[] _monthLabels = new[] { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
+    // Custom colors for the chart
+    private string[] _chartColors = new[] { "#FF7043" };
+}

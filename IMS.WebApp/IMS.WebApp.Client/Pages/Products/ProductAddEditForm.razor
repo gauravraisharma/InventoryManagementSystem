@@ -1,0 +1,478 @@
+﻿@* @page "/product/add"
+@page "/product/edit/{Id}" *@
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManagers
+@inject ISnackbar Snackbar
+@inject IProductService ProductService
+@inject IDepartmentService DepartmentService
+@inject ICategoryService CategoryService
+@using System.ComponentModel.DataAnnotations
+@using IMS.Shared.Interface.Category
+@using IMS.Shared.Interface.Department
+@using IMS.WebApp.Client.Services.Category
+@using MudBlazor
+@using IMS.Shared.RequestDto.DepartmentDTOs
+@using IMS.Shared.RequestDto.ProductDTOs
+@using IMS.Shared.RequestDto.CategoryDTOs
+@using IMS.Shared.Interface.Product
+@using System.Text.Json
+
+
+<MudDialogProvider />
+<MudSnackbarProvider />
+<MudPopoverProvider />
+
+<div class="form-container">
+    <div class="card">
+        <div class="card-header">
+            <h2>@(Id == null ? "Add New Product" : "Edit Product")</h2>
+        </div>
+        <div class="card-body">
+            <EditForm Model="product" OnValidSubmit="HandleSubmit" FormName="ProduAddEditForm">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="form-row form-row-cols-2">
+                    <div class="form-group">
+                        <label class="form-label" for="title">Product Title</label>
+                        <InputText @bind-Value="product.Title"
+                        class="form-control"
+                        placeholder="e.g Blue Jeans"
+                        id="title" />
+                        <ValidationMessage For="@(() => product.Title)" class="validation-message" />
+                    </div>
+                </div>
+
+                <div class="form-row form-row-cols-2">
+                    <!-- Department Selection -->
+                    <div class="form-group">
+                        <label class="form-label" for="department">Department</label>
+                        <InputSelect @onselectionchange="AlertMethod" @bind-Value="product.DepartmentIds" class="form-control" id="department" aria-describedby="departmentHelp">
+                            <option value="">Pick a Department</option>
+                            @foreach (var department in _departments)
+                            {
+                                <option value="@department.DepartmentId">@department.Name</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => selectedDepartmentId)" class="validation-message" />
+                    </div>
+
+                    <!-- Category Selection -->
+                    <div class="form-group">
+                        <label class="form-label" for="category">Category</label>
+                        <InputSelect  @bind-Value="product.CategoryIds" class="form-control" id="category" aria-describedby="categoryHelp">
+                            <option value="">Choose a category</option>
+                            @foreach (var category in _categories)
+                            {
+                                <option value="@category.CategoryId">@category.Name</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => selectedCategoryId)" class="validation-message" />
+                    </div>
+                </div>
+
+                <!-- Product Description -->
+                <div class="form-group">
+                    <label class="form-label" for="description">Product Description</label>
+                    <InputTextArea @bind-Value="product.Description" class="form-control" rows="3" placeholder="e.g., Blue jeans, regular fit, 100% cotton" id="description" />
+                    <ValidationMessage For="@(() => product.Description)" class="validation-message" />
+                </div>
+
+                <!-- Multiple Images -->
+                @* <div class="form-group">
+                    <label class="form-label">Images</label>
+                    <InputFile OnChange="UploadFiles" class="form-control" accept="image/*" multiple />
+                    @if (product.ImageFiles != null && product.ImageFiles.Count > 0)
+                    {
+                        <div class="image-preview-grid">
+                            @foreach (var imageFile in product.ImageFiles)
+                            {
+                                <img src="@imageFile.Name" alt="Product Image" class="image-preview" />
+                            }
+                        </div>
+                    }
+                </div> *@
+                <h3>Upload  Images</h3>
+                <div class="form-group">
+                    <label class="form-label">Images</label>
+                    <InputFile OnChange="UploadFiles" class="form-control" accept="image/*" multiple />
+                </div>
+
+                @if (product.ImageFiles != null && product.ImageFiles.Count > 0)
+                {
+                    <div class="image-preview-grid">
+                        @foreach (var imageUrl in product.ImageFiles)
+                        {
+                            <img src="@imageUrl" alt="Product Image" class="image-preview" />
+                        }
+                    </div>
+                }
+
+                <!-- Price, Stock, and Product Number -->
+                <div class="form-row form-row-cols-3">
+                    <div class="form-group">
+                        <label class="form-label" for="price">Unit Price</label>
+                        <InputNumber @bind-Value="product.UnitPrice" class="form-control" id="price" />
+                        <ValidationMessage For="@(() => product.UnitPrice)" class="validation-message" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="stock">Units in Stock</label>
+                        <InputNumber @bind-Value="product.UnitsInStock" class="form-control" id="stock" />
+                        <ValidationMessage For="@(() => product.UnitsInStock)" class="validation-message" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="productNumber">Product #</label>
+                        <InputText @bind-Value="product.ProductCode" class="form-control" id="productNumber" />
+                        <ValidationMessage For="@(() => product.ProductCode)" class="validation-message" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Product Sizes</label>
+                    <div class="size-checkbox-group">
+                        @foreach (var size in AvailableSizes)
+                        {
+                            <label class="size-checkbox">
+                                <input type="checkbox"
+                                checked="@product.ProductSizes?.Contains(size)"
+                                       @onchange="@((ChangeEventArgs e) => ToggleSize(size, e.Value))" />
+                                <span>@size</span>
+                            </label>
+                        }
+                    </div>
+                    <ValidationMessage For="@(() => product.ProductSizes)" class="validation-message" />
+                </div>
+
+
+
+                <!-- Buttons -->
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" @onclick="Cancel">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        @(Id == null ? "Add Product" : "Save Changes")
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    .form-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
+    }
+
+    .card {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .card-header {
+    padding: 1rem;
+    border-bottom: 1px solid #ddd;
+    }
+
+    .card-body {
+    padding: 1.5rem;
+    }
+
+    .form-grid {
+    display: grid;
+    gap: 1rem;
+    }
+
+    .form-row {
+    display: grid;
+    gap: 1rem;
+    }
+
+    @* Use @@ for CSS at-rules in Blazor *@
+    @@media (min-width: 768px) {
+    .form-row-cols-2
+
+    {
+    grid-template-columns: 1fr 1fr;
+    }
+
+    }
+
+    .form-row-cols-3 {
+    grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    }
+
+    .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    }
+
+    .form-label {
+    font-weight: 500;
+    color: #333;
+    }
+
+    .form-control {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    }
+
+    .form-control:focus {
+    outline: none;
+    border-color: #0066cc;
+    box-shadow: 0 0 0 2px rgba(0,102,204,0.2);
+    }
+
+    .validation-message {
+    color: #dc3545;
+    font-size: 0.875rem;
+    }
+
+    .checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    }
+
+    .checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    }
+
+    .button-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+    }
+
+    .btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    }
+
+    .btn-primary {
+    background-color: #0066cc;
+    color: white;
+    }
+
+    .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    }
+
+    .btn:hover {
+    opacity: 0.9;
+    }
+
+    .image-preview {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    margin-top: 0.5rem;
+    border-radius: 4px;
+    }
+</style>
+
+
+@code {
+    [Parameter]
+    public string? Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private AddProductDto? product{ get; set; }
+    private string[] Sizes = new[] { "XS", "S", "M", "L", "XL", "XXL" };
+    private List<GetAllProductDto> _products = new();
+    private List<GetAllDepartmentDto> _departments = new();
+    private List<GetAllCategoryDto> _categories = new();
+    private string errorMessage;
+    private EditForm editForm;
+    private List<string> imagePreviewUrls = new(); 
+     private string? selectedDepartmentId;
+    private string? selectedCategoryId;
+    private void AlertMethod()
+    {
+        Console.WriteLine("Alert");
+    }
+    protected override void OnInitialized()
+    {
+
+        product ??= new AddProductDto();
+
+        // if (product.ProductSizes == null)
+        // {
+        //     Console.WriteLine("ProductSizes is null! Initializing...");
+        //     product.ProductSizes = new List<string>();
+        // }
+        // if(!string.IsNullOrEmpty(product.Id))
+        // {
+        //     product.Id = " ";
+        // }
+    }
+
+    private List<string> AvailableSizes = new List<string> { "XS", "S", "M", "L", "XL", "XXL" };
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        var departmentResponse = await DepartmentService.GetAllDepartmentAsync();
+        if (departmentResponse.IsSuccess)
+        {
+            _departments = departmentResponse.Result;
+        }
+        else
+        {
+            errorMessage = departmentResponse.Message;
+        }
+        var categoryResponse = await CategoryService.GetAllCategoryAsync();
+        if (categoryResponse.IsSuccess)
+        {
+            _categories = categoryResponse.Result;
+        }
+        else
+        {
+            errorMessage = categoryResponse.Message;
+        }
+    }
+    private void ToggleSize(string size, object isChecked)
+    {
+        Console.WriteLine("Toggle Function clicked.");
+
+        if (bool.TryParse(isChecked?.ToString(), out bool checkedState))
+        {
+            if (checkedState && !product.ProductSizes.Contains(size))
+            {
+                product.ProductSizes.Add(size);
+            }
+            else if (!checkedState && product.ProductSizes.Contains(size))
+            {
+                product.ProductSizes.Remove(size);
+            }
+        }
+    }
+
+    
+      
+    // }
+    private async Task HandleSubmit()
+    {
+        if (string.IsNullOrEmpty(product.Id))
+        {
+            // Create the product data in the backend format
+            var productData = new AddProductDto
+                {
+                    Id = "",
+                    Title = product.Title,
+                    Description = product.Description,
+                    UnitPrice = product.UnitPrice,
+                    UnitsInStock = product.UnitsInStock,
+                    ProductCode = product.ProductCode,
+                    CategoryIds = product.CategoryIds,
+                    DepartmentIds = product.DepartmentIds,
+                   
+                    // ImageFiles = imagePreviewUrls
+                };
+
+
+            var productJson = JsonSerializer.Serialize(productData);
+            // var response = await ProductService.AddProdc(uctAsynproductData);
+
+        }
+        else
+        {
+            var productData = new AddProductDto
+                {
+                    Id = product.Id,
+                    Title = product.Title,
+                    Description = product.Description,
+                    UnitPrice = product.UnitPrice,
+                    UnitsInStock = product.UnitsInStock,
+                    ProductCode = product.ProductCode,
+                    CategoryIds = product.CategoryIds,
+                    DepartmentIds = product.DepartmentIds,
+                    ProductSizes = product.ProductSizes,
+                    // ImageFiles = imagePreviewUrls (Optional if required)
+                };
+
+            var productJson = JsonSerializer.Serialize(productData);
+            var response = await ProductService.UpdateProductAsync(productData);
+        }
+    }
+
+     void Cancel()
+    {
+        NavigationManagers.NavigateTo("/product");
+
+    }
+
+    private async Task UploadFiles(InputFileChangeEventArgs e)
+    {
+        foreach (var file in e.GetMultipleFiles())
+        {
+            using var stream = file.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024); 
+            using var memoryStream = new MemoryStream();
+            await stream.CopyToAsync(memoryStream);
+            var base64Image = Convert.ToBase64String(memoryStream.ToArray());
+            var imageDataUrl = $"data:{file.ContentType};base64,{base64Image}";
+            imagePreviewUrls.Add(imageDataUrl);
+        }
+    }
+
+
+}
+
+
+
+
+       @*    // private async Task HandleSubmit()
+    // {
+
+    //     if (!string.IsNullOrEmpty(product.Id))
+    //     {
+           
+
+    //         // Create the product data
+    //         var productData = new AddProductDto
+    //             {
+    //                 Id="",
+    //                 Title = product.Title,
+    //                 Description = product.Description,
+    //                 UnitPrice = product.UnitPrice,
+    //                 UnitsInStock = product.UnitsInStock,
+    //                 ProductCode = product.ProductCode,
+    //                 // Convert single selections to lists
+    //                 DepartmentIds = new List<string> { product.DepartmentIds.ToString() },
+    //                 CategoryIds = new List<string> { product.CategoryIds.ToString() },
+    //                 ProductSizes = product.ProductSizes
+    //             };
+
+    //         // Add the product data as JSON
+    //         var productJson = JsonSerializer.Serialize(productData);
+           
+    //     }
+    //     else
+    //     {
+           
+
+    //     }
+     
+
+    //     product.CategoryIds = new List<string> { selectedCategoryId };
+    //     product.DepartmentIds = new List<string> { selectedDepartmentId };
+    //    // var productJson = JsonSerializer.Serialize(product); *@

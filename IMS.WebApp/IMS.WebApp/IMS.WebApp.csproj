@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\IMS.WebApp.Client\Pages\Products\MudSnackbarProvider.razor" Link="MudSnackbarProvider.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\IMS.Shared\IMS.Shared.csproj" />
+    <ProjectReference Include="..\..\IMS.WebAPI\IMS.WebAPI.csproj" />
+    <ProjectReference Include="..\IMS.WebApp.Client\IMS.WebApp.Client.csproj" />
+    <PackageReference Include="Blazor.Bootstrap" Version="3.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.10" />
+    <PackageReference Include="MudBlazor" Version="7.15.0" />
+  </ItemGroup>
+
+</Project>

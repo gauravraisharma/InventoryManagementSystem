@@ -1,0 +1,370 @@
+﻿@* @page "/product" *@
+@* @inject IProductService ProductService *@
+@using IMS.Shared.Common
+@using IMS.Shared.Interface
+@using IMS.Shared.RequestDto.ProductDTOs
+@* @rendermode InteractiveAuto *@
+@inject IHttpClientFactory HttpClientFactory
+@inject IDialogService DialogService
+
+@* <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
+    <!-- Header Section -->
+    <MudGrid>
+        <MudItem xs="12" Class="d-flex justify-space-between align-center">
+            <MudText Typo="Typo.h5">Products</MudText>
+            <div class="d-flex gap-2">
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Add"
+                           Href="/product/add">
+                    ADD NEW PRODUCT
+                </MudButton>
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Upload">
+                    IMPORT PRODUCT
+                </MudButton>
+            </div>
+        </MudItem>
+    </MudGrid>
+
+    <!-- Filters Section -->
+    <MudGrid Class="mt-4">
+        <MudItem xs="12" md="3">
+            <MudSelect T="string"
+                       Label="Department"
+                       Variant="Variant.Outlined"
+                       @bind-Value="selectedDepartment"
+                       Dense="true">
+                <MudSelectItem Value="@("all")">Pick a Department</MudSelectItem>
+                <MudSelectItem Value="@("men")">Men</MudSelectItem>
+                <MudSelectItem Value="@("women")">Women</MudSelectItem>
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" md="3">
+            <MudSelect T="string"
+                       Label="Category"
+                       Variant="Variant.Outlined"
+                       @bind-Value="selectedCategory"
+                       Dense="true">
+                <MudSelectItem Value="@("all")">Choose categories</MudSelectItem>
+                <MudSelectItem Value="@("jeans")">Jeans</MudSelectItem>
+                <MudSelectItem Value="@("shirts")">Shirts</MudSelectItem>
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" md="4">
+            <MudTextField T="string"
+                          Label="Search"
+                          Variant="Variant.Outlined"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          @bind-Value="searchText"
+                          Dense="true" />
+        </MudItem>
+        <MudItem xs="12" md="2">
+            <MudSelect T="string"
+                       Label="Sort By"
+                       Variant="Variant.Outlined"
+                       @bind-Value="selectedSort"
+                       Dense="true">
+                <MudSelectItem Value="@("newest")">Newest First</MudSelectItem>
+                <MudSelectItem Value="@("oldest")">Oldest First</MudSelectItem>
+            </MudSelect>
+        </MudItem>
+    </MudGrid>
+
+
+    <!-- Products Grid -->
+    <MudGrid Class="mt-4">
+        @foreach (var product in _products)
+        {
+            <MudItem xs="12" sm="6" md="4">
+                <MudCard>
+                    <MudCardMedia Image="@product.ImageUrl" Height="200" />
+                    <MudCardContent>
+                        <MudText Typo="Typo.h6">@product.Name</MudText>
+                        <MudText Typo="Typo.body2">@product.Category</MudText>
+                        <MudText Typo="Typo.body2" Class="mt-2">
+                            @product.Description
+                        </MudText>
+                    </MudCardContent>
+                    <MudCardActions Class="d-flex justify-space-between">
+                        <MudButton Variant="Variant.Text"
+                                   Color="Color.Primary">EDIT</MudButton>
+                        <div>
+                            <MudIconButton Icon="@Icons.Material.Filled.Visibility"
+                                           Color="Color.Default" />
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                           Color="Color.Error" />
+                        </div>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+        }
+    </MudGrid>
+</MudContainer>
+
+@code {
+
+
+
+        private string selectedDepartment = "all";
+        private string selectedCategory = "all";
+        private string selectedSort = "newest";
+        private string searchText = "";
+
+        private void OnDepartmentChanged(string value)
+        {
+            selectedDepartment = value;
+            // Add your filter logic here
+        }
+
+        private void OnCategoryChanged(string value)
+        {
+            selectedCategory = value;
+            // Add your filter logic here
+        }
+
+        private void OnSortChanged(string value)
+        {
+            selectedSort = value;
+            // Add your sorting logic here
+        }
+
+    private List<ProductItem> _products = new()
+    {
+        new()
+        {
+            Name = "Ripped Jeans",
+            Category = "Women",
+            Description = "Classic blue ripped jeans with a modern twist. Perfect for casual wear.",
+            // ImageUrl = "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?ixlib=rb-4.0.3"
+        },
+        new()
+        {
+            Name = "White T-Shirt",
+            Category = "Unisex",
+            Description = "Essential cotton white t-shirt for everyday comfort.",
+            // ImageUrl = "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-4.0.3"
+        },
+        new()
+        {
+            Name = "Denim Jacket",
+            Category = "Men",
+            Description = "Stylish denim jacket that goes well with any outfit.",
+            // ImageUrl = "https://images.unsplash.com/photo-1551537482-f2075a1d41f2?ixlib=rb-4.0.3"
+        },
+        new()
+        {
+            Name = "Summer Dress",
+            Category = "Women",
+            Description = "Light and breezy summer dress with floral pattern.",
+            // ImageUrl = "https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?ixlib=rb-4.0.3"
+        },
+        new()
+        {
+            Name = "Casual Sneakers",
+            Category = "Footwear",
+            Description = "Comfortable sneakers perfect for daily wear.",
+            // ImageUrl = "https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-4.0.3"
+        },
+        new()
+        {
+            Name = "Leather Backpack",
+            Category = "Accessories",
+            Description = "Durable leather backpack with multiple compartments.",
+            // ImageUrl = "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?ixlib=rb-4.0.3"
+        }
+    };
+
+    public class ProductItem
+    {
+        public string Name { get; set; }
+        public string Category { get; set; }
+        public string Description { get; set; }
+        public string ImageUrl { get; set; }
+    }
+}
+ *@
+
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
+    <!-- Header Section -->
+    <MudGrid>
+        <MudItem xs="12" Class="d-flex justify-space-between align-center">
+            <MudText Typo="Typo.h5">Products</MudText>
+            <div class="d-flex gap-2">
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Add"
+                           Href="/product/add">
+                    ADD NEW PRODUCT
+                </MudButton>
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Upload">
+                    IMPORT PRODUCT
+                </MudButton>
+            </div>
+        </MudItem>
+    </MudGrid>
+
+    <MudButton @onclick="OpenDialogAsync" Variant="Variant.Filled" Color="Color.Primary">
+        Open Simple Dialog
+    </MudButton>
+
+    <!-- Filters Section -->
+    <MudGrid Class="mt-4">
+        <MudItem xs="12" md="3">
+            <MudSelect T="string"
+                       Label="Department"
+                       Variant="Variant.Outlined"
+                       @bind-Value="selectedDepartment"
+                       Dense="true">
+                <MudSelectItem Value="@("all")">Pick a Department</MudSelectItem>
+                <MudSelectItem Value="@("men")">Men</MudSelectItem>
+                <MudSelectItem Value="@("women")">Women</MudSelectItem>
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" md="3">
+            <MudSelect T="string"
+                       Label="Category"
+                       Variant="Variant.Outlined"
+                       @bind-Value="selectedCategory"
+                       Dense="true">
+                <MudSelectItem Value="@("all")">Choose categories</MudSelectItem>
+                <MudSelectItem Value="@("jeans")">Jeans</MudSelectItem>
+                <MudSelectItem Value="@("shirts")">Shirts</MudSelectItem>
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" md="4">
+            <MudTextField T="string"
+                          Label="Search"
+                          Variant="Variant.Outlined"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          @bind-Value="searchText"
+                          Dense="true" />
+        </MudItem>
+        <MudItem xs="12" md="2">
+            <MudSelect T="string"
+                       Label="Sort By"
+                       Variant="Variant.Outlined"
+                       @bind-Value="selectedSort"
+                       Dense="true">
+                <MudSelectItem Value="@("newest")">Newest First</MudSelectItem>
+                <MudSelectItem Value="@("oldest")">Oldest First</MudSelectItem>
+            </MudSelect>
+        </MudItem>
+    </MudGrid>
+    <!-- Products Grid -->
+    <MudGrid Class="mt-4">
+        @if (_products.Count == 0)
+        {
+            <MudItem xs="12">
+                <MudText Typo="Typo.body1">No products available.</MudText>
+            </MudItem>
+        }
+        else
+        {
+            @foreach (var product in _products)
+            {
+                <MudItem xs="12" sm="6" md="3">
+                    <MudCard>
+                        <MudCardContent Style="height: 400px; overflow: hidden;">
+                            <!-- Displaying Product Images from Base64 in Fixed Image Size -->
+                            @if (product.ProductImages?.Any() == true)
+                            {
+                                <div style="height: 200px; overflow: hidden;">
+                                    <img src="@($"data:image/jpeg;base64,{product.ProductImages.First()}")"
+                                         alt="Product Image"
+                                         class="mt-2"
+                                         style="width: 100%; height: 100%; object-fit: cover;" />
+                                </div>
+                            }
+                            else
+                            {
+                                <MudText Typo="Typo.body2" Class="mt-2">No image available</MudText>
+                            }
+
+                            <MudText Typo="Typo.h6">@product.Title</MudText>
+                           @*  <MudText Typo="Typo.body2">@product.DepartmentName</MudText> *@
+
+                            <!-- Fixed height for description section -->
+                            <div style="max-height: 100px; overflow-y: auto;">
+                                <MudText Typo="Typo.body2" Class="mt-4">@product.Description</MudText>
+                            </div>
+                        </MudCardContent>
+                        <MudCardActions Class="d-flex justify-space-between">
+                            <MudButton Variant="Variant.Text" Color="Color.Primary">EDIT</MudButton>
+                            <div>
+                                <MudIconButton Icon="@Icons.Material.Filled.Visibility" Color="Color.Default" />
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" />
+                            </div>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            }
+        }
+    </MudGrid>
+
+
+
+</MudContainer>
+
+@code {
+    
+    private string selectedDepartment = "all";
+    private string selectedCategory = "all";
+    private string selectedSort = "newest";
+    private string searchText = "";
+
+    private void OnDepartmentChanged(string value)
+    {
+        selectedDepartment = value;
+        // Add your filter logic here
+    }
+
+    private void OnCategoryChanged(string value)
+    {
+        selectedCategory = value;
+        // Add your filter logic here
+    }
+
+    private void OnSortChanged(string value)
+    {
+        selectedSort = value;
+        // Add your sorting logic here
+    }
+    private Task OpenDialogAsync()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+
+        return DialogService.ShowAsync<DialogUsageExample_Dialog>("Simple Dialog", options);
+    }
+
+    private List<GetAllProductDto> _products = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var httpClient = HttpClientFactory.CreateClient("APIClient");
+        var apiResponse = await httpClient.GetFromJsonAsync<ApiResponse<List<Shared.RequestDto.ProductDTOs.GetAllProductDto>>>("https://localhost:44317/api/products");
+
+
+        if (apiResponse != null && apiResponse.IsSuccess)
+        {
+            _products = apiResponse.Result;
+        }
+        else
+        {
+           
+
+        }
+    }
+
+
+}
+
+
+
+

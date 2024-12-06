@@ -1,0 +1,258 @@
+﻿@page "/product"
+ @rendermode InteractiveAuto
+@inject IProductService ProductService 
+@inject IDepartmentService DepartmentService
+@inject ICategoryService CategoryService
+@* @inject IDialogService DialogService *@
+@inject IDialogService DialogService
+@using IMS.Shared.Common
+@using IMS.Shared.Interface
+@using IMS.Shared.Interface.Category
+@using IMS.Shared.Interface.Department
+@using IMS.Shared.Interface.Product
+@using IMS.Shared.RequestDto.DepartmentDTOs
+@using IMS.Shared.RequestDto.ProductDTOs
+@using IMS.Shared.RequestDto.DepartmentDTOs
+@using IMS.Shared.RequestDto.CategoryDTOs
+
+
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
+    <!-- Header Section -->
+    <MudGrid>
+        <MudItem xs="12" Class="d-flex justify-space-between align-center">
+            <MudText Typo="Typo.h5">Products</MudText>
+            <div class="d-flex gap-2">
+                <MudButton Variant="Variant.Filled"
+                Color="Color.Primary"
+                StartIcon="@Icons.Material.Filled.Add"
+                Href="/product/add">
+                    ADD NEW PRODUCT
+                </MudButton>
+                <MudButton @onclick="OpenDialogAsync" Variant="Variant.Filled" Color="Color.Primary">
+                    Open Simple Dialog
+                </MudButton>
+                <MudButton Variant="Variant.Outlined"
+                Color="Color.Primary"
+                StartIcon="@Icons.Material.Filled.Upload"
+                           Href="/export">
+                    IMPORT PRODUCT
+                </MudButton>
+            </div>
+        </MudItem>
+    </MudGrid>
+
+    @* Href="/product"> *@
+
+    <!-- Filters Section -->
+    <MudGrid Class="mt-4">
+        @* <MudItem xs="12" md="3">
+            <MudSelect T="string"
+            Label="Department"
+            Variant="Variant.Outlined"
+            @bind-Value="selectedDepartment"
+            Dense="true">
+                <MudSelectItem Value="@("all")">Pick a Department</MudSelectItem>
+                <MudSelectItem Value="@("men")">Men</MudSelectItem>
+                <MudSelectItem Value="@("women")">Women</MudSelectItem>
+            </MudSelect>
+        </MudItem> *@
+       
+
+       @*  <MudItem xs="12" md="3">
+            <MudSelect T="string"
+            Label="Category"
+            Variant="Variant.Outlined"
+            @bind-Value="selectedCategory"
+            Dense="true">
+                <MudSelectItem Value="@("all")">Choose categories</MudSelectItem>
+                <MudSelectItem Value="@("jeans")">Jeans</MudSelectItem>
+                <MudSelectItem Value="@("shirts")">Shirts</MudSelectItem>
+            </MudSelect>
+        </MudItem> *@
+        <MudItem xs="12" md="3">
+            <MudSelect T="string"
+                       Label="Department"
+                       Variant="Variant.Outlined"
+                       @bind-Value="selectedDepartment"
+                       Dense="true">
+                <MudSelectItem Value="@("all")">Pick a Department</MudSelectItem>
+
+                @foreach (var department in _departments)
+                {
+                    <MudSelectItem Value="@department.Name">@department.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" md="3">
+            <MudSelect T="string"
+                       Label="Category"
+                       Variant="Variant.Outlined"
+                       @bind-Value="selectedCategory"
+                       Dense="true">
+                <MudSelectItem Value="@("all")">Pick a Category</MudSelectItem>
+
+                @foreach (var category in _categories)
+                {
+                    <MudSelectItem Value="@category.Name">@category.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" md="4">
+            <MudTextField T="string"
+            Label="Search"
+            Variant="Variant.Outlined"
+            Adornment="Adornment.Start"
+            AdornmentIcon="@Icons.Material.Filled.Search"
+            @bind-Value="searchText"
+            Dense="true" />
+        </MudItem>
+        <MudItem xs="12" md="2">
+            <MudSelect T="string"
+            Label="Sort By"
+            Variant="Variant.Outlined"
+            @bind-Value="selectedSort"
+            Dense="true">
+                <MudSelectItem Value="@("newest")">Newest First</MudSelectItem>
+                <MudSelectItem Value="@("oldest")">Oldest First</MudSelectItem>
+            </MudSelect>
+        </MudItem>
+    </MudGrid>
+    <!-- Products Grid -->
+    <MudGrid Class="mt-4">
+        @if (_products.Count == 0)
+        {
+            <MudItem xs="12">
+                <MudText Typo="Typo.body1">No products available.</MudText>
+            </MudItem>
+        }
+        else
+        {
+            @foreach (var product in _products)
+            {
+                <MudItem xs="12" sm="6" md="3">
+                    <MudCard>
+                        <MudCardContent Style="height: 400px; overflow: hidden;">
+                            <!-- Displaying Product Images from Base64 in Fixed Image Size -->
+                            @if (product.ProductImages?.Any() == true)
+                            {
+                                <div style="height: 200px; overflow: hidden;">
+                                    <img src="@($"data:image/jpeg;base64,{product.ProductImages.First()}")"
+                                    alt="Product Image"
+                                    class="mt-2"
+                                    style="width: 100%; height: 100%; object-fit: cover;" />
+                                </div>
+                            }
+                            else
+                            {
+                                <MudText Typo="Typo.body2" Class="mt-2">No image available</MudText>
+                            }
+
+                            <MudText Typo="Typo.h6">@product.Title</MudText>
+                            <MudText Typo="Typo.body2">
+                                @string.Join(", ", product.DepartmentNames)
+                            </MudText>
+
+
+                            <!-- Fixed height for description section -->
+                            <div style="max-height: 100px; overflow-y: auto;">
+                                <MudText Typo="Typo.body2" Class="mt-4">@product.Description</MudText>
+                            </div>
+                        </MudCardContent>
+                        <MudCardActions Class="d-flex justify-space-between">
+                            <MudButton Variant="Variant.Text" Color="Color.Primary">EDIT</MudButton>
+                            <div>
+                                <MudIconButton Icon="@Icons.Material.Filled.Visibility" Color="Color.Default" />
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" />
+                            </div>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            }
+        }
+    </MudGrid>
+
+
+
+</MudContainer>
+
+@code {
+
+    private string selectedDepartment = "all";
+    private string selectedCategory = "all";
+    private string selectedSort = "newest";
+    private string searchText = "";
+    private List<GetAllProductDto> _products = new();
+    private List<GetAllDepartmentDto> _departments = new();
+    private List<GetAllCategoryDto> _categories = new();
+    private string errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await ProductService.GetAllProductsAsync();
+        if (response.IsSuccess)
+        {
+            _products = response.Result;
+        }
+        else
+        {
+            errorMessage = response.Message;
+        }
+        var departmentResponse = await DepartmentService.GetAllDepartmentAsync();
+        if (departmentResponse.IsSuccess)
+        {
+            _departments = departmentResponse.Result;
+        }
+        else
+        {
+            errorMessage = response.Message;
+        }
+        var categoryResponse = await CategoryService.GetAllCategoryAsync();
+        if (categoryResponse.IsSuccess)
+        {
+            _categories = categoryResponse.Result;
+        }
+        else
+        {
+            errorMessage = response.Message;
+        }
+    }
+
+    // private Task OpenDialogAsync()
+    // {
+    //     var options = new DialogOptions { CloseOnEscapeKey = true };
+
+    //     return DialogService.ShowAsync<DialogUsageExample_Dialog>("Simple Dialog", options);
+    // }
+
+    private Task OpenDialogAsync()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+
+        return DialogService.ShowAsync<DialogUsageExample_Dialog>("", options);
+    }
+    private void OnDepartmentChanged(string value)
+    {
+        selectedDepartment = value;
+      
+    }
+
+    private void OnCategoryChanged(string value)
+    {
+        selectedCategory = value;
+        
+    }
+
+    private void OnSortChanged(string value)
+    {
+        selectedSort = value;
+        
+    }
+
+  
+
+        
+}

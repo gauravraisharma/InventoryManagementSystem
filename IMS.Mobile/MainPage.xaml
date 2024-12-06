@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:IMS.Mobile.Service"
+             x:Class="IMS.Mobile.MainPage" 
+             BackgroundColor="{DynamicResource PageBackgroundColor}">
+
+    <StackLayout Padding="10">
+        <Label Text="Product List" FontSize="24" HorizontalOptions="Center" />
+
+        <!-- ListView to show products -->
+        <ListView x:Name="ProductListView">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextCell Text="{Binding Name}" Detail="{Binding Price}" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </StackLayout>
+</ContentPage>
