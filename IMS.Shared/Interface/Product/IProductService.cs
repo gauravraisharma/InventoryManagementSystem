@@ -12,7 +12,6 @@ namespace IMS.Shared.Interface.Product
     {
         Task<ApiResponse<List<GetAllProductDto>>> GetAllProductsAsync();
         Task<ApiResponse<ProductResponse>> AddProductAsync(MultipartFormDataContent addProductDto);
-       // Task<ApiResponse<ProductResponse>> AddProductAsync(AddProductDto addProductDto);
         Task<ApiResponse<ProductResponse>> UpdateProductAsync(AddProductDto addProductDto);
     }
 }

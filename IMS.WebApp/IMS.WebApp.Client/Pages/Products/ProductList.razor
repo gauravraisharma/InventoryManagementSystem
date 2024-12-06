@@ -33,7 +33,7 @@
                     ADD NEW PRODUCT
                 </MudButton>
                 <MudButton @onclick="OpenDialogAsync" Variant="Variant.Filled" Color="Color.Primary">
-                    Open Simple Dialog
+                    Open Product Dialog
                 </MudButton>
                 <MudButton Variant="Variant.Outlined"
                 Color="Color.Primary"
@@ -44,9 +44,6 @@
             </div>
         </MudItem>
     </MudGrid>
-
-    @* Href="/product"> *@
-
     <!-- Filters Section -->
     <MudGrid Class="mt-4">
         @* <MudItem xs="12" md="3">
@@ -232,7 +229,7 @@
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
 
-        return DialogService.ShowAsync<DialogUsageExample_Dialog>("", options);
+        return DialogService.ShowAsync<ProductFormDialog>("", options);
     }
     private void OnDepartmentChanged(string value)
     {

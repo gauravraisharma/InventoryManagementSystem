@@ -29,4 +29,8 @@
     <ProjectReference Include="..\IMS.Infrastructure\IMS.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Model\" />
+  </ItemGroup>
+
 </Project>
