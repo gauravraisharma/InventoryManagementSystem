@@ -15,7 +15,9 @@
     <ProjectReference Include="..\..\IMS.WebAPI\IMS.WebAPI.csproj" />
     <ProjectReference Include="..\IMS.WebApp.Client\IMS.WebApp.Client.csproj" />
     <PackageReference Include="Blazor.Bootstrap" Version="3.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="MudBlazor" Version="7.15.0" />
   </ItemGroup>
 
