@@ -3,23 +3,23 @@ using IMS.Core.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace IMS.Infrastructure.Persistence
 {
-    public class ApplicationDbContext:IdentityDbContext< 
-        ApplicationUser , ApplicationRole, string, ApplicationUserClaim, ApplicationUserRole, ApplicationUserLogin, ApplicationRoleClaim, ApplicationUserToken>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string,
+                                                IdentityUserClaim<string>, ApplicationUserRole,
+                                                IdentityUserLogin<string>, IdentityRoleClaim<string>,
+                                                IdentityUserToken<string>>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
        : base(options)
         {
         }
-
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+        }
         public DbSet<Product> Products { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<Category> Categories { get; set; }
@@ -29,69 +29,31 @@ namespace IMS.Infrastructure.Persistence
         public DbSet<ProductSize> ProductSizes { get; set; }
         public DbSet<DepartmentProductMapping> DepartmentProductMappings { get; set; }
         public DbSet<CategoryProductMapping> CategoryProductMappings { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            // Identity Tables Configuration
             builder.Entity<ApplicationUser>().ToTable("AspNetUser").Property(p => p.Id).HasColumnName("Id");
             builder.Entity<ApplicationUserRole>().ToTable("AspNetUserRole");
-            builder.Entity<ApplicationUserLogin>().ToTable("AspNetUserLogin");
-            builder.Entity<ApplicationUserClaim>().ToTable("AspNetUserClaim");
             builder.Entity<ApplicationRole>().ToTable("AspNetRole");
-            builder.Entity<ApplicationRoleClaim>().ToTable("AspNetRoleClaim");
-            builder.Entity<ApplicationUserToken>().ToTable("AspNetUserToken");
 
-            builder.Entity<ApplicationUserRole>(userRole =>
+            builder.Entity<ApplicationUserRole>(entity =>
             {
-                userRole.HasKey(ur => new { ur.UserId, ur.RoleId });
+                entity.HasKey(e => new { e.UserId, e.RoleId });
+                entity.HasOne(e => e.User)
+                      .WithMany(u => u.UserRoles)
+                      .HasForeignKey(e => e.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
 
-                userRole.HasOne(ur => ur.Role)
-                    .WithMany(r => r.UserRoles)
-                    .HasForeignKey(ur => ur.RoleId)
-                    .IsRequired();
-
-                userRole.HasOne(ur => ur.User)
-                    .WithMany(r => r.UserRoles)
-                    .HasForeignKey(ur => ur.UserId)
-                    .IsRequired();
+                entity.HasOne(e => e.Role)
+                      .WithMany()
+                      .HasForeignKey(e => e.RoleId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
-                    builder.Entity<ApplicationRoleClaim>()
-                    .HasOne<ApplicationRole>()
-                    .WithMany()
-                    .HasForeignKey(rc => rc.RoleId)
-                    .OnDelete(DeleteBehavior.Restrict); 
 
-                    builder.Entity<ApplicationUserClaim>()
-                    .HasOne<ApplicationUser>()
-                    .WithMany()
-                    .HasForeignKey(uc => uc.UserId)
-                    .OnDelete(DeleteBehavior.Restrict); 
-
-                    builder.Entity<ApplicationUserLogin>()
-                    .HasOne<ApplicationUser>()
-                    .WithMany()
-                    .HasForeignKey(login => login.UserId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                    builder.Entity<ApplicationUserRole>()
-                   .HasOne<ApplicationRole>()
-                   .WithMany()
-                   .HasForeignKey(userRole => userRole.RoleId)
-                   .OnDelete(DeleteBehavior.Restrict);
-
-                    builder.Entity<ApplicationUserRole>()
-                   .HasOne<ApplicationUser>()
-                   .WithMany()
-                   .HasForeignKey(userRole => userRole.UserId)
-                   .OnDelete(DeleteBehavior.Restrict);
-
-                    builder.Entity<ApplicationUserToken>()
-                    .HasOne<ApplicationUser>()
-                    .WithMany()
-                    .HasForeignKey(userToken => userToken.UserId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-
-            // Product to CategoryProductMapping (Many-to-Many)
+            // CategoryProductMapping Configuration (Many-to-Many)
             builder.Entity<CategoryProductMapping>()
                 .HasKey(cpm => new { cpm.CategoryId, cpm.ProductId });
 
@@ -101,42 +63,39 @@ namespace IMS.Infrastructure.Persistence
                 .HasForeignKey(cpm => cpm.CategoryId);
 
             builder.Entity<CategoryProductMapping>()
-        .HasOne(cpm => cpm.Product)
-        .WithMany()  
-        .HasForeignKey(cpm => cpm.ProductId)
-        .OnDelete(DeleteBehavior.Restrict);
-
-            
-            builder.Entity<DepartmentProductMapping>()
-                .HasKey(dpm => new { dpm.DepartmentId, dpm.ProductId }); 
-
-            builder.Entity<DepartmentProductMapping>()
-                .HasOne(dpm => dpm.Department) 
-                .WithMany(d => d.DepartmentProductMapping) 
-                .HasForeignKey(dpm => dpm.DepartmentId); 
-
-            builder.Entity<DepartmentProductMapping>()
-                .HasOne(dpm => dpm.Product) 
-                .WithMany() 
-                .HasForeignKey(dpm => dpm.ProductId) 
+                .HasOne(cpm => cpm.Product)
+                .WithMany()
+                .HasForeignKey(cpm => cpm.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // DepartmentProductMapping Configuration (Many-to-Many)
+            builder.Entity<DepartmentProductMapping>()
+                .HasKey(dpm => new { dpm.DepartmentId, dpm.ProductId });
 
+            builder.Entity<DepartmentProductMapping>()
+                .HasOne(dpm => dpm.Department)
+                .WithMany(d => d.DepartmentProductMapping)
+                .HasForeignKey(dpm => dpm.DepartmentId);
 
+            builder.Entity<DepartmentProductMapping>()
+                .HasOne(dpm => dpm.Product)
+                .WithMany()
+                .HasForeignKey(dpm => dpm.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // ProductImages entity configuration
+            // ProductImages Relationships
             builder.Entity<ProductImages>()
                 .HasOne(pi => pi.Product)
                 .WithMany(p => p.ProductImages)
                 .HasForeignKey(pi => pi.ProductId);
 
-            // ProductSize entity configuration
+            // ProductSize Relationships
             builder.Entity<ProductSize>()
                 .HasOne(ps => ps.Product)
                 .WithMany(p => p.ProductSizes)
                 .HasForeignKey(ps => ps.ProductId);
 
-            // Orders entity configuration
+            // Orders Relationships
             builder.Entity<Orders>()
                 .HasOne(o => o.Product)
                 .WithMany()
@@ -148,18 +107,37 @@ namespace IMS.Infrastructure.Persistence
                 .WithMany()
                 .HasForeignKey(o => o.CustomerId)
                 .OnDelete(DeleteBehavior.Cascade);
-            base.OnModelCreating(builder);
+
+            // Decimal Precision Configuration
+            builder.Entity<Orders>()
+                .Property(o => o.Amount)
+                .HasPrecision(18, 2);
+
+            builder.Entity<Product>()
+                .Property(p => p.UnitPrice)
+                .HasPrecision(18, 2);
+
+            // Seed Roles
+            SeedRoles(builder);
         }
 
+        private void SeedRoles(ModelBuilder builder)
+        {
+            var adminRole = new ApplicationRole
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "admin",
+                NormalizedName = "ADMIN"
+            };
+
+            var userRole = new ApplicationRole
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "user",
+                NormalizedName = "USER"
+            };
+
+            builder.Entity<ApplicationRole>().HasData(adminRole, userRole);
+        }
     }
 }
-
-
-
-
-
-
-
-
-
-
