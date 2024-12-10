@@ -12,6 +12,10 @@ namespace IMS.Application.Features.Products.Queries
 {
     public class GetAllProductsQuery : IRequest<GenericBaseResult<List<GetProductRequestDto>>>
     {
+        public string? Department { get; set; }
+        public string? Category { get; set; }
+        public string? SearchText { get; set; }
+        public string? SortBy { get; set; }
     }
 
     public class GetAllProductsQueryHandler : IRequestHandler<GetAllProductsQuery, GenericBaseResult<List<GetProductRequestDto>>>
@@ -23,9 +27,19 @@ namespace IMS.Application.Features.Products.Queries
             _productRepository = productRepository;
         }
 
+        //public async Task<GenericBaseResult<List<GetProductRequestDto>>> Handle(GetAllProductsQuery request, CancellationToken cancellationToken)
+        //{
+        //    var products = await _productRepository.GetAllProductsAsync();
+        //    return products;
+        //}
         public async Task<GenericBaseResult<List<GetProductRequestDto>>> Handle(GetAllProductsQuery request, CancellationToken cancellationToken)
         {
-            var products = await _productRepository.GetAllProductsAsync();
+            var products = await _productRepository.GetAllProductsAsync(
+                request.Department,
+                request.Category,
+                request.SearchText,
+                request.SortBy);
+
             return products;
         }
     }

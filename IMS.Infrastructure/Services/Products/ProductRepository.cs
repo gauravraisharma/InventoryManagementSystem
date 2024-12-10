@@ -25,41 +25,69 @@ namespace IMS.Infrastructure.Services.Product
             context = dbContext;
         }
 
-
-        public async Task<GenericBaseResult<List<GetProductRequestDto>>> GetAllProductsAsync()
+        public async Task<GenericBaseResult<List<GetProductRequestDto>>> GetAllProductsAsync(string department = null, string category = null, string searchText = null, string sortBy = null)
         {
             try
             {
                 var response = new GenericBaseResult<List<GetProductRequestDto>>(new List<GetProductRequestDto>());
 
-                var products = await (from p in context.Products
-                                      select new GetProductRequestDto
-                                      {
-                                          Id = p.Id,
-                                          Title = p.Title,
-                                          Description = p.Description,
-                                          UnitPrice = p.UnitPrice,
-                                          UnitsInStock = p.UnitsInStock,
-                                          ProductCode = p.ProductCode,
-                                          DepartmentIds = context.DepartmentProductMappings
-                                            .Where(mapping => mapping.ProductId == p.Id)
-                                            .Select(mapping => mapping.DepartmentId)
-                                            .ToList(),
-                                           DepartmentNames = context.DepartmentProductMappings
-                                            .Where(mapping => mapping.ProductId == p.Id)
-                                            .Select(mapping => mapping.Department.Name)
-                                            .ToList(),
-                                          CategoryNames = context.CategoryProductMappings
-                                             .Where(mapping => mapping.ProductId == p.Id)
-                                             .Select(mapping => mapping.Category.Name)
-                                             .ToList(),
-                                          CategoryIds = context.CategoryProductMappings
-                                             .Where(mapping => mapping.ProductId == p.Id)
-                                             .Select(mapping => mapping.CategoryId)
-                                             .ToList(),
-                                          ProductImages = p.ProductImages.Select(i => i.Base64Image).ToList(),
-                                          ProductSizes = p.ProductSizes.Select(s => s.Size).ToList()
-                                      }).ToListAsync();
+                var query = context.Products.AsQueryable();
+                if (!string.IsNullOrEmpty(department) && department != "all")
+                {
+                    query = query.Where(p => context.DepartmentProductMappings
+                                    .Where(mapping => mapping.Department.Name == department)
+                                    .Select(mapping => mapping.ProductId)
+                                    .Contains(p.Id));
+                }
+
+                if (!string.IsNullOrEmpty(category) && category != "all")
+                {
+                    query = query.Where(p => context.CategoryProductMappings
+                                    .Where(mapping => mapping.Category.Name == category)
+                                    .Select(mapping => mapping.ProductId)
+                                    .Contains(p.Id));
+                }
+
+                if (!string.IsNullOrEmpty(searchText))
+                {
+                    query = query.Where(p => p.Title.Contains(searchText) || p.Description.Contains(searchText));
+                }
+
+                
+                query = sortBy switch
+                {
+                    "newest" => query.OrderByDescending(p => p.Created),
+                    "oldest" => query.OrderBy(p => p.Created),
+                    _ => query
+                };
+
+                var products = await query.Select(p => new GetProductRequestDto
+                {
+                    Id = p.Id,
+                    Title = p.Title,
+                    Description = p.Description,
+                    UnitPrice = p.UnitPrice,
+                    UnitsInStock = p.UnitsInStock,
+                    ProductCode = p.ProductCode,
+                    DepartmentIds = context.DepartmentProductMappings
+                                    .Where(mapping => mapping.ProductId == p.Id)
+                                    .Select(mapping => mapping.DepartmentId)
+                                    .ToList(),
+                    DepartmentNames = context.DepartmentProductMappings
+                                    .Where(mapping => mapping.ProductId == p.Id)
+                                    .Select(mapping => mapping.Department.Name)
+                                    .ToList(),
+                    CategoryNames = context.CategoryProductMappings
+                                    .Where(mapping => mapping.ProductId == p.Id)
+                                    .Select(mapping => mapping.Category.Name)
+                                    .ToList(),
+                    CategoryIds = context.CategoryProductMappings
+                                    .Where(mapping => mapping.ProductId == p.Id)
+                                    .Select(mapping => mapping.CategoryId)
+                                    .ToList(),
+                    ProductImages = p.ProductImages.Select(i => i.Base64Image).ToList(),
+                    ProductSizes = p.ProductSizes.Select(s => s.Size).ToList()
+                }).ToListAsync();
 
                 response.Message = ResponseMessage.Success;
                 response.Result = products;
@@ -72,6 +100,7 @@ namespace IMS.Infrastructure.Services.Product
                 return result;
             }
         }
+
 
         public async Task<GenericBaseResult<GetProductRequestDto>> GetProductByIdAsync(string productId)
         {
@@ -195,7 +224,7 @@ namespace IMS.Infrastructure.Services.Product
 
 
                 await context.Products.AddAsync(product);
-                await context.SaveChangesAsync(); 
+                await context.SaveChangesAsync();
                 if (addProductRequestDto.CategoryIds != null && addProductRequestDto.CategoryIds.Any())
                 {
                     var categoryProductMappings = addProductRequestDto.CategoryIds.Select(categoryId => new CategoryProductMapping
@@ -240,103 +269,124 @@ namespace IMS.Infrastructure.Services.Product
 
         public async Task<GenericBaseResult<AddProductRequestDto>> UpdateAsync(AddProductRequestDto addProductRequestDto)
         {
-            var product = await context.Products
+            var response = new GenericBaseResult<AddProductRequestDto>(null);
+            try
+            {
+                var sizes = addProductRequestDto.ProductSizes.FirstOrDefault();
+                if (sizes != null)
+                {
+                    addProductRequestDto.ProductSizes = sizes.Split(",").ToList();
+                }
+                var product = await context.Products
                 .Include(p => p.ProductImages)
                 .Include(p => p.ProductSizes)
                 .FirstOrDefaultAsync(p => p.Id == addProductRequestDto.Id);
 
-            if (product == null)
-            {
-                throw new KeyNotFoundException($"Product with Id {addProductRequestDto.Id} not found.");
-            }
-
-            product.Title = addProductRequestDto.Title;
-            product.Description = addProductRequestDto.Description;
-            product.UnitPrice = addProductRequestDto.UnitPrice;
-            product.UnitsInStock = addProductRequestDto.UnitsInStock;
-            product.ProductCode = addProductRequestDto.ProductCode;
-            //product.Department = addProductRequestDto.Department;
-            product.LastModifiedBy = "Admin";
-            product.LastModified = DateTime.Now;
-
-        
-            if (addProductRequestDto.ImageFiles != null && addProductRequestDto.ImageFiles.Any())
-            {
-                
-                product.ProductImages.Clear();
-
-               
-                var productImages = new List<ProductImages>();
-                foreach (var file in addProductRequestDto.ImageFiles)
+                if (product == null)
                 {
-                    using var memoryStream = new MemoryStream();
-                    await file.CopyToAsync(memoryStream);
-                    var base64Image = Convert.ToBase64String(memoryStream.ToArray());
+                    throw new KeyNotFoundException($"Product with Id {addProductRequestDto.Id} not found.");
+                }
 
-                    productImages.Add(new ProductImages
+                product.Title = addProductRequestDto.Title;
+                product.Description = addProductRequestDto.Description;
+                product.UnitPrice = addProductRequestDto.UnitPrice;
+                product.UnitsInStock = addProductRequestDto.UnitsInStock;
+                product.ProductCode = addProductRequestDto.ProductCode;
+                //product.Department = addProductRequestDto.Department;
+                product.LastModifiedBy = "Admin";
+                product.LastModified = DateTime.Now;
+
+
+                if (addProductRequestDto.ImageFiles != null && addProductRequestDto.ImageFiles.Any())
+                {
+
+                    product.ProductImages.Clear();
+
+
+                    var productImages = new List<ProductImages>();
+                    foreach (var file in addProductRequestDto.ImageFiles)
                     {
-                        Base64Image = base64Image,
-                        Name = file.FileName,
+                        using var memoryStream = new MemoryStream();
+                        await file.CopyToAsync(memoryStream);
+                        var base64Image = Convert.ToBase64String(memoryStream.ToArray());
+
+                        productImages.Add(new ProductImages
+                        {
+                            Base64Image = base64Image,
+                            Name = file.FileName,
+                            Product = product,
+                            CreatedBy = "Admin",
+                            Created = DateTime.Now
+                        });
+                    }
+
+                    product.ProductImages = productImages;
+                }
+
+
+                if (addProductRequestDto.ProductSizes != null && addProductRequestDto.ProductSizes.Any())
+                {
+                    product.ProductSizes.Clear();
+
+                    var productSizes = addProductRequestDto.ProductSizes.Select(size => new ProductSize
+                    {
+                        Size = size,
                         Product = product,
                         CreatedBy = "Admin",
                         Created = DateTime.Now
-                    });
+                    }).ToList();
+
+                    product.ProductSizes = productSizes;
                 }
 
-                product.ProductImages = productImages;
-            }
 
-          
-            if (addProductRequestDto.ProductSizes != null && addProductRequestDto.ProductSizes.Any())
-            {
-                product.ProductSizes.Clear();
-
-                var productSizes = addProductRequestDto.ProductSizes.Select(size => new ProductSize
+                if (addProductRequestDto.CategoryIds != null && addProductRequestDto.CategoryIds.Any())
                 {
-                    Size = size,
-                    Product = product,
-                    CreatedBy = "Admin",
-                    Created = DateTime.Now
-                }).ToList();
+                    var existingCategoryMappings = context.CategoryProductMappings
+                        .Where(mapping => mapping.ProductId == product.Id)
+                        .ToList();
+                    context.CategoryProductMappings.RemoveRange(existingCategoryMappings);
 
-                product.ProductSizes = productSizes;
-            }
+                    var categoryProductMappings = addProductRequestDto.CategoryIds.Select(categoryId => new CategoryProductMapping
+                    {
+                        CategoryId = categoryId,
+                        ProductId = product.Id,
+                        CreatedBy = "Admin",
+                        Created = DateTime.Now
+                    }).ToList();
+                    await context.CategoryProductMappings.AddRangeAsync(categoryProductMappings);
+                }
 
-        
-            if (addProductRequestDto.CategoryIds != null && addProductRequestDto.CategoryIds.Any())
-            {
-                var existingCategoryMappings = context.CategoryProductMappings
-                    .Where(mapping => mapping.ProductId == product.Id)
-                    .ToList();
-                context.CategoryProductMappings.RemoveRange(existingCategoryMappings);
-
-                var categoryProductMappings = addProductRequestDto.CategoryIds.Select(categoryId => new CategoryProductMapping
+                if (addProductRequestDto.DepartmentIds != null && addProductRequestDto.DepartmentIds.Any())
                 {
-                    CategoryId = categoryId,
-                    ProductId = product.Id,
-                    CreatedBy = "Admin",
-                    Created = DateTime.Now
-                }).ToList();
-                await context.CategoryProductMappings.AddRangeAsync(categoryProductMappings);
-            }
+                    var existingDepartmentMappings = context.DepartmentProductMappings
+                        .Where(mapping => mapping.ProductId == product.Id)
+                        .ToList();
+                    context.DepartmentProductMappings.RemoveRange(existingDepartmentMappings);
 
-            if (addProductRequestDto.DepartmentIds != null && addProductRequestDto.DepartmentIds.Any())
+                    var departmentProductMappings = addProductRequestDto.DepartmentIds.Select(departmentId => new DepartmentProductMapping
+                    {
+                        DepartmentId = departmentId,
+                        ProductId = product.Id,
+                        CreatedBy = "Admin",
+                        Created = DateTime.Now
+                    }).ToList();
+                    await context.DepartmentProductMappings.AddRangeAsync(departmentProductMappings);
+                }
+                await context.SaveChangesAsync();
+                response.Message = ResponseMessage.RecordSaved;
+                return response;
+            }
+            catch (Exception ex)
             {
-                var existingDepartmentMappings = context.DepartmentProductMappings
-                    .Where(mapping => mapping.ProductId == product.Id)
-                    .ToList();
-                context.DepartmentProductMappings.RemoveRange(existingDepartmentMappings);
+                var result = new GenericBaseResult<AddProductRequestDto>(null);
+                result.AddExceptionLog(ex);
+                return result;
 
-                var departmentProductMappings = addProductRequestDto.DepartmentIds.Select(departmentId => new DepartmentProductMapping
-                {
-                    DepartmentId = departmentId,
-                    ProductId = product.Id,
-                    CreatedBy = "Admin",
-                    Created = DateTime.Now
-                }).ToList();
-                await context.DepartmentProductMappings.AddRangeAsync(departmentProductMappings);
             }
-            await context.SaveChangesAsync();
+            return response;
+
+
 
             return new GenericBaseResult<AddProductRequestDto>(null)
             {

@@ -37,10 +37,13 @@ namespace IMS.Shared.RequestDto.ProductDTOs
         public List<string> DepartmentIds { get; set; } = new List<string>();
 
         public List<IBrowserFile> ImageFiles { get; set; } = new List<IBrowserFile>();
+
+        public List<string> ProductImages { get; set; } = new List<string>();
         //public List<FileDto> ImageFiles { get; set; }
 
         public List<string> ProductSizes { get; set; } = new List<string>();
     }
+
     //public class FileDto
     //{
     //    public string Base64Image { get; set; }

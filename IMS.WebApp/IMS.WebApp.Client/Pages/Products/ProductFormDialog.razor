@@ -11,7 +11,7 @@
 @using System.ComponentModel.DataAnnotations
 
 <MudDialog>
-  @*   <TitleContent>
+    @*   <TitleContent>
         Add PRODUCTS
     </TitleContent> *@
     <DialogContent>
@@ -26,18 +26,18 @@
                         <MudGrid>
                             <MudItem xs="12">
                                 <MudTextField @bind-Value="product.Title"
-                                              Label="Product Title"
-                                              Variant="Variant.Filled"
-                                              For="@(() => product.Title)"
-                                              Placeholder="e.g Blue Jeans" />
+                                Label="Product Title"
+                                Variant="Variant.Filled"
+                                For="@(() => product.Title)"
+                                Placeholder="e.g Blue Jeans" />
                             </MudItem>
 
                             <MudItem xs="12" md="6">
                                 <MudSelect T="string"
-                                           Label="Department"
-                                           Variant="Variant.Outlined"
-                                           @bind-Value="selectedDepartment"
-                                           Dense="true">
+                                Label="Department"
+                                Variant="Variant.Outlined"
+                                @bind-Value="selectedDepartment"
+                                Dense="true">
                                     <MudSelectItem Value="@("all")">Pick a Department</MudSelectItem>
 
                                     @foreach (var department in _departments)
@@ -49,10 +49,10 @@
 
                             <MudItem xs="12" md="6">
                                 <MudSelect T="string"
-                                           Label="Category"
-                                           Variant="Variant.Outlined"
-                                           @bind-Value="selectedCategory"
-                                           Dense="true">
+                                Label="Category"
+                                Variant="Variant.Outlined"
+                                @bind-Value="selectedCategory"
+                                Dense="true">
                                     <MudSelectItem Value="@("all")">Pick a Category</MudSelectItem>
 
                                     @foreach (var category in _categories)
@@ -64,12 +64,31 @@
 
                             <MudItem xs="12">
                                 <MudTextField @bind-Value="product.Description"
-                                              Label="Product Description"
-                                              Variant="Variant.Filled"
-                                              Lines="3"
-                                              For="@(() => product.Description)"
-                                              Placeholder="e.g., Blue jeans, regular fit, 100% cotton" />
+                                Label="Product Description"
+                                Variant="Variant.Filled"
+                                Lines="3"
+                                For="@(() => product.Description)"
+                                Placeholder="e.g., Blue jeans, regular fit, 100% cotton" />
                             </MudItem>
+                            <MudItem xs="12" Class="mt-4">
+                                <MudText>Product Images</MudText>
+                                @if (product?.ProductImages != null && product.ProductImages.Any())
+                                {
+                                    <div class="image-row">
+                                        @foreach (var base64Image in product.ProductImages)
+                                        {
+                                            <div class="square-box">
+                                                <img src="@($"data:image/jpeg;base64,{base64Image}")" alt="Product Image" />
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                @if (Id != null && (product?.ProductImages == null || !product.ProductImages.Any()) && (_uploadedFiles == null || !_uploadedFiles.Any()))
+                                {
+                                    <MudText>No existing product images found.</MudText>
+                                }
+                            </MudItem>
+
 
                             <MudItem xs="12" Class="mt-4">
                                 <MudText>Product Images</MudText>
@@ -77,8 +96,8 @@
                                 <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles" AllowMultiple="true">
                                     <ActivatorContent>
                                         <MudButton Variant="Variant.Filled"
-                                                   Color="Color.Primary"
-                                                   StartIcon="@Icons.Material.Filled.CloudUpload">
+                                        Color="Color.Primary"
+                                        StartIcon="@Icons.Material.Filled.CloudUpload">
                                             Upload Pictures
                                         </MudButton>
                                     </ActivatorContent>
@@ -99,23 +118,23 @@
                             </MudItem>
                             <MudItem xs="12" md="4">
                                 <MudNumericField @bind-Value="product.UnitPrice"
-                                                 Label="Unit Price"
-                                                 Variant="Variant.Filled"
-                                                 For="@(() => product.UnitPrice)" />
+                                Label="Unit Price"
+                                Variant="Variant.Filled"
+                                For="@(() => product.UnitPrice)" />
                             </MudItem>
 
                             <MudItem xs="12" md="4">
                                 <MudNumericField @bind-Value="product.UnitsInStock"
-                                                 Label="Units in Stock"
-                                                 Variant="Variant.Filled"
-                                                 For="@(() => product.UnitsInStock)" />
+                                Label="Units in Stock"
+                                Variant="Variant.Filled"
+                                For="@(() => product.UnitsInStock)" />
                             </MudItem>
 
                             <MudItem xs="12" md="4">
                                 <MudTextField @bind-Value="product.ProductCode"
-                                              Label="Product #"
-                                              Variant="Variant.Filled"
-                                              For="@(() => product.ProductCode)" />
+                                Label="Product #"
+                                Variant="Variant.Filled"
+                                For="@(() => product.ProductCode)" />
                             </MudItem>
 
                             <MudItem xs="12">
@@ -125,8 +144,8 @@
                                     {
                                         <label class="size-checkbox">
                                             <input type="checkbox"
-                                                   checked="@product.ProductSizes?.Contains(size)"
-                                                   @onchange="@((ChangeEventArgs e) => ToggleSize(size, e.Value))" />
+                                            checked="@product.ProductSizes?.Contains(size)"
+                                            @onchange="@((ChangeEventArgs e) => ToggleSize(size, e.Value))" />
                                             <span>@size</span>
                                         </label>
                                     }
@@ -141,14 +160,14 @@
 
                         <div class="d-flex justify-end mt-6">
                             <MudButton Variant="Variant.Text"
-                                       Color="Color.Default"
-                                       Class="mx-2"
-                                       OnClick="Cancel">
+                            Color="Color.Default"
+                            Class="mx-2"
+                            OnClick="Cancel">
                                 Cancel
                             </MudButton>
                             <MudButton ButtonType="ButtonType.Submit"
-                                       Variant="Variant.Filled"
-                                       Color="Color.Primary">
+                            Variant="Variant.Filled"
+                            Color="Color.Primary">
                                 @(Id == null ? "Add Product" : "Save Changes")
                             </MudButton>
                         </div>
@@ -159,16 +178,37 @@
 
         <style>
             .mud-input.mud-input-filled {
-                background-color: #f5f5f5;
+            background-color: #f5f5f5;
             }
 
-                .mud-input.mud-input-filled:hover {
-                    background-color: #ebebeb;
-                }
+            .mud-input.mud-input-filled:hover {
+            background-color: #ebebeb;
+            }
 
-                .mud-input.mud-input-filled.mud-input-focused {
-                    background-color: #e0e0e0;
-                }
+            .mud-input.mud-input-filled.mud-input-focused {
+            background-color: #e0e0e0;
+            }
+
+            .image-row {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 10px;
+            overflow-x: auto;
+            white-space: nowrap;
+            }
+
+            .square-box {
+            width: 200px;
+            height: 200px;
+            overflow: hidden;
+            border: 1px solid #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            }
+
+
         </style>
     </DialogContent>
     @* <DialogActions>
@@ -183,6 +223,8 @@
     public string Id { get; set; }
     private string selectedDepartment = "";
     private string selectedCategory = "";
+    private string selectedSort = "newest";
+    private string searchText = "";
     private List<GetAllDepartmentDto> _departments = new();
     private List<Shared.RequestDto.CategoryDTOs.GetAllCategoryDto> _categories = new();
     private string errorMessage;
@@ -191,9 +233,7 @@
     public List<string> ImageUrls { get; set; } = new List<string>();
     private List<string> AvailableSizes = new List<string> { "S", "M", "L", "XL", "XXL" };
     private Dictionary<string, bool> SelectedSizes = new Dictionary<string, bool>();
-    IList<IBrowserFile> _files = new List<IBrowserFile>();
-    // private List<FileDto> _imageFiles = new();
-
+    private List<GetAllProductDto> _products = new();
     private List<UploadedFile> _uploadedFiles = new(); // Holds processed file data
 
     private async Task UploadFiles(IBrowserFile file)
@@ -211,11 +251,7 @@
         }
 
     }
-    // private void UploadFiles(IBrowserFile file)
-    // {
-    //     _files.Add(file);
 
-    // }
     private void ToggleSize(string size, object isChecked)
     {
         Console.WriteLine("Toggle Function clicked.");
@@ -237,6 +273,7 @@
     {
 
         product ??= new AddProductDto();
+
         foreach (var size in AvailableSizes)
         {
             SelectedSizes[size] = false;
@@ -245,6 +282,34 @@
         if (!string.IsNullOrEmpty(Id))
         {
 
+            var response = await ProductService.GetProductByIdAsync(Id);
+
+            if (response.IsSuccess)
+            {
+
+                var fetchedProduct = response;
+                if (fetchedProduct != null)
+                {
+                    product = new AddProductDto
+                        {
+                            Title = fetchedProduct.Result.Title,
+                            Description = fetchedProduct.Result.Description,
+                            UnitPrice = fetchedProduct.Result.UnitPrice,
+                            UnitsInStock = fetchedProduct.Result.UnitsInStock,
+                            ProductCode = fetchedProduct.Result.ProductCode,
+                            CategoryIds = fetchedProduct.Result.CategoryIds,
+                            DepartmentIds = fetchedProduct.Result.DepartmentIds,
+                            ProductSizes=fetchedProduct.Result.ProductSizes,
+                            ProductImages = fetchedProduct.Result.ProductImages
+                        };
+                    selectedDepartment = string.Join(",", fetchedProduct.Result.DepartmentIds);
+                    selectedCategory = string.Join(",", fetchedProduct.Result.CategoryIds);
+                }
+            }
+            else
+            {
+                errorMessage = response.Message ?? "Failed to fetch product details.";
+            }
         }
 
         var departmentResponse = await DepartmentService.GetAllDepartmentAsync();
@@ -285,13 +350,11 @@
             content.Add(new StringContent(string.Join(",", product.ProductSizes ?? new List<string>())), "ProductSizes");
 
 
-            // Add files to the form data
-            // foreach (var file in _files)
-            // {
-            //     var streamContent = new StreamContent(file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024)); // 10 MB max size
-            //     streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
-            //     content.Add(streamContent, "ImageFiles", file.Name);
-            // }
+
+            if (!string.IsNullOrEmpty(Id))
+            {
+                content.Add(new StringContent(Id), "Id");
+            }
 
             foreach (var uploadedFile in _uploadedFiles)
             {
@@ -300,16 +363,20 @@
                 content.Add(fileContent, "ImageFiles", uploadedFile.FileName);
             }
 
-            var response = await ProductService.AddProductAsync(content);
+            //var response = await ProductService.AddProductAsync(content);
 
-
+            var response = Id == null
+            ? await ProductService.AddProductAsync(content)  
+            : await ProductService.UpdateProductAsync( content);  
             //var response = await ProductService.AddProductAsync(productData);
 
             if (response.IsSuccess)
             {
 
-                Snackbar.Add("Product added successfully!", Severity.Success);
-                NavigationManager.NavigateTo("/products");
+                Snackbar.Add("Product Saved successfully!", Severity.Success);
+                NavigationManager.NavigateTo("/product");
+                this.GetAllProducts();
+                CancelDialog();
             }
             else
             {
@@ -325,6 +392,18 @@
         }
     }
 
+    public async Task GetAllProducts()
+    {
+        var response = await ProductService.GetAllProductsAsync(selectedDepartment, selectedCategory, searchText, selectedSort);
+        if (response.IsSuccess)
+        {
+            _products = response.Result;
+        }
+        else
+        {
+            errorMessage = response.Message;
+        }
+    }
     private void Cancel()
     {
         NavigationManager.NavigateTo("/product");
