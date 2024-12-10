@@ -27,11 +27,15 @@ namespace IMS.WebApp.Client.Services.Product
             _httpClient = httpClient;
         }
 
-        public async Task<ApiResponse<List<GetAllProductDto>>> GetAllProductsAsync()
+
+        public async Task<ApiResponse<List<GetAllProductDto>>> GetAllProductsAsync(string department, string category,string searchText, string sortBy)
         {
             try
             {
-                var response = await _httpClient.GetAsync(ApiEndpoints.Products.Get);
+                // Construct the query string
+                var query = $"?department={department}&category={category}&searchText={searchText}&sortBy={sortBy}";
+
+                var response = await _httpClient.GetAsync($"{ApiEndpoints.Products.Get}{query}");
                 if (response.IsSuccessStatusCode)
                 {
                     var result = await response.Content.ReadFromJsonAsync<ApiResponse<List<GetAllProductDto>>>();
@@ -46,6 +50,34 @@ namespace IMS.WebApp.Client.Services.Product
             catch (Exception ex)
             {
                 return new ApiResponse<List<GetAllProductDto>>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message
+                };
+            }
+        }
+
+
+        public async Task<ApiResponse<GetAllProductDto>> GetProductByIdAsync(string Id)
+        {
+            try
+            {
+                var requestUrl = $"{ApiEndpoints.Products.GetById}?id={Id}";
+                var response = await _httpClient.GetAsync(requestUrl);
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<ApiResponse<GetAllProductDto>>();
+                    return result;
+                }
+                return new ApiResponse<GetAllProductDto>
+                {
+                    IsSuccess = false,
+                    Message = "Failed to fetch products"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<GetAllProductDto>
                 {
                     IsSuccess = false,
                     Message = ex.Message
@@ -80,18 +112,20 @@ namespace IMS.WebApp.Client.Services.Product
             }
         }
 
-       
-        public async Task<ApiResponse<ProductResponse>> UpdateProductAsync(AddProductDto addProductDto)
+
+        public async Task<ApiResponse<ProductResponse>> UpdateProductAsync( MultipartFormDataContent content)
         {
             try
             {
-                var response = await _httpClient.PostAsJsonAsync(ApiEndpoints.Product.UpdateProducts, addProductDto);
+                // Build the URL for the update operation (e.g., "api/products/{id}")
+                var response = await _httpClient.PostAsync(ApiEndpoints.Product.UpdateProducts, content);
 
                 if (response.IsSuccessStatusCode)
                 {
                     var result = await response.Content.ReadFromJsonAsync<ApiResponse<ProductResponse>>();
-                    return result;
+                    return result; // Return the updated product details
                 }
+
                 return new ApiResponse<ProductResponse>
                 {
                     IsSuccess = false,
@@ -107,6 +141,7 @@ namespace IMS.WebApp.Client.Services.Product
                 };
             }
         }
+
 
 
     }

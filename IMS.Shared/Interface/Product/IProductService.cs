@@ -10,9 +10,12 @@ namespace IMS.Shared.Interface.Product
 {
     public interface IProductService
     {
-        Task<ApiResponse<List<GetAllProductDto>>> GetAllProductsAsync();
+        Task<ApiResponse<GetAllProductDto>> GetProductByIdAsync(string Id);
+      
+        Task<ApiResponse<List<GetAllProductDto>>> GetAllProductsAsync(string department,string category,string searchText,string sortBy);
         Task<ApiResponse<ProductResponse>> AddProductAsync(MultipartFormDataContent addProductDto);
-        Task<ApiResponse<ProductResponse>> UpdateProductAsync(AddProductDto addProductDto);
+    
+        Task<ApiResponse<ProductResponse>> UpdateProductAsync( MultipartFormDataContent content);
     }
 }
     
