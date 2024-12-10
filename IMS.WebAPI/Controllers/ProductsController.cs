@@ -21,16 +21,24 @@ namespace IMS.WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllProducts()
+        public async Task<IActionResult> GetAllProducts( string? department = null,string? category = null,string? searchText = null,string? sortBy = null)
         {
-            var query = new GetAllProductsQuery();
+            var query = new GetAllProductsQuery
+            {
+                Department = department,
+                Category = category,
+                SearchText = searchText,
+                SortBy = sortBy
+            };
+
             var products = await _mediator.Send(query);
             return Ok(products);
         }
 
 
 
-        [HttpGet("{id}")]
+        [HttpGet]
+        [Route("GetProductById")]
         public async Task<IActionResult> GetProductById(string id)
         {
             var query = new GetProductByIdQuery(id);

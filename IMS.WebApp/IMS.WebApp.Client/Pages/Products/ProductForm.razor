@@ -193,9 +193,8 @@
     private List<string> AvailableSizes = new List<string> { "S", "M", "L", "XL", "XXL" };
     private Dictionary<string, bool> SelectedSizes = new Dictionary<string, bool>();
     IList<IBrowserFile> _files = new List<IBrowserFile>();
-    // private List<FileDto> _imageFiles = new();
 
-    private List<UploadedFile> _uploadedFiles = new(); // Holds processed file data
+    private List<UploadedFile> _uploadedFiles = new(); 
 
     private async Task UploadFiles(IBrowserFile file)
     {
@@ -212,11 +211,7 @@
         }
       
     }
-    // private void UploadFiles(IBrowserFile file)
-    // {
-    //     _files.Add(file);
-
-    // }
+    
     private void ToggleSize(string size, object isChecked)
     {
         Console.WriteLine("Toggle Function clicked.");
@@ -285,15 +280,6 @@
             content.Add(new StringContent(string.Join(",", selectedDepartment)), "DepartmentIds");
             content.Add(new StringContent(string.Join(",", product.ProductSizes ?? new List<string>())), "ProductSizes");
 
-
-            // Add files to the form data
-            // foreach (var file in _files)
-            // {
-            //     var streamContent = new StreamContent(file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024)); // 10 MB max size
-            //     streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
-            //     content.Add(streamContent, "ImageFiles", file.Name);
-            // }
-
             foreach (var uploadedFile in _uploadedFiles)
             {
                 var fileContent = new ByteArrayContent(uploadedFile.Data);
@@ -304,7 +290,6 @@
             var response = await ProductService.AddProductAsync(content);
 
 
-           //var response = await ProductService.AddProductAsync(productData);
 
             if (response.IsSuccess)
             {
