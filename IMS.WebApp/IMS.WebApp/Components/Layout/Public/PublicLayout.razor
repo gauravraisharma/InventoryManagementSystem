@@ -1,43 +1,7 @@
 ﻿@using IMS.WebApp.Components.Layout.Shared
 @inherits LayoutComponentBase
 
-@* <MudThemeProvider/>
-    <div class="public-page">
-        <header>
-        <MudAppBar Color="Color.Primary" Elevation="2">
-            <div class="d-flex align-items-center justify-content-between w-100">
-                <!-- Left Section -->
-                <div class="d-flex align-items-center">
-                    <MudText Typo="Typo.h6" Class="ml-2">amazon.in</MudText>
-                    <MudText Typo="Typo.body1" Class="ml-2">Delivering to Dehradun 248001</MudText>
-                </div>
 
-                <!-- Center Section -->
-                <div class="flex-grow-1 mx-4">
-                    <MudTextField T="string" Placeholder="Search Amazon.in" Class="w-100" />
-                </div>
-
-                <!-- Right Section -->
-                <div class="d-flex align-items-center">
-                    <MudText Typo="Typo.body1" Class="ml-4">Hello, sign in</MudText>
-                    <MudText Typo="Typo.body1" Class="ml-4">Cart (0)</MudText>
-                </div>
-            </div>
-        </MudAppBar>
-
-        </header>
-
-        <main>
-            @Body
-        </main>
-
-        <footer>
-            <MudPaper Elevation="2" Class="p-2 text-center">
-                <MudText Typo="Typo.body2">© 2024 Your Company</MudText>
-            </MudPaper>
-        </footer>
-    </div>
- *@
    <MudThemeProvider />
 <div class="public-page">
     <!-- Fixed Header -->

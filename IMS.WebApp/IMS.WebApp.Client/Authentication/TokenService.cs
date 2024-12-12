@@ -1,4 +1,5 @@
-﻿using Blazored.LocalStorage;
+﻿using System.IdentityModel.Tokens.Jwt;
+using Blazored.LocalStorage;
 
 namespace IMS.WebApp.Client.Authentication
 {
@@ -36,6 +37,35 @@ namespace IMS.WebApp.Client.Authentication
         public async Task RemoveTokenAsync()
         {
             await _localStorage.RemoveItemAsync(TokenKey);
+        }
+
+        /// <summary>
+        /// Extracts the role from the JWT stored in local storage.
+        /// </summary>
+        /// <returns>The role if present, otherwise null.</returns>
+        public async Task<string?> GetRoleFromTokenAsync()
+        {
+            var token = await GetTokenAsync();
+            if (string.IsNullOrWhiteSpace(token))
+                return null;
+
+            try
+            {
+                var jwtHandler = new JwtSecurityTokenHandler();
+
+                if (!jwtHandler.CanReadToken(token))
+                    return null;
+
+                var jwtToken = jwtHandler.ReadJwtToken(token);
+
+                var role = jwtToken.Claims.FirstOrDefault(c => c.Type.Contains("role")).Value;
+
+                return role;
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

@@ -18,7 +18,20 @@
             }
         }
 
+        private string _userRole;
+        public string UserRole
+        {
+            get => _userRole;
+            set
+            {
+                if (_userRole != value)
+                {
+                    _userRole = value;
+                    NotifyStateChanged();
+                }
+            }
+        }
+
         private void NotifyStateChanged() => OnChange?.Invoke();
     }
-
 }
