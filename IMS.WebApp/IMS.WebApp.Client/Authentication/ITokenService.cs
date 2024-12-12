@@ -4,6 +4,7 @@
     {
         Task SetTokenAsync(string token);
         Task<string?> GetTokenAsync();
+        Task<string?> GetRoleFromTokenAsync();
         Task RemoveTokenAsync();
     }
 }
