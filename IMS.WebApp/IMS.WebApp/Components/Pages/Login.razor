@@ -1,31 +1,46 @@
-﻿@* 
-@page "/login"
+﻿@using IMS.Shared.Interface.Auth
+@using IMS.WebApp.Client.Authentication
 @using IMS.WebApp.Components.Layout
-@layout PublicLayout
 @inject NavigationManager NavigationManager
+@inject IAuthService AuthService
+@inject ITokenService TokenService
+@rendermode InteractiveServer
+@inject AuthStateService AuthStateService
 
-<MudContainer MaxWidth="MaxWidth.Small">
+<MudContainer MaxWidth="MaxWidth.Small" Class="mt-4">
     <MudPaper Class="pa-4">
         <MudText Typo="Typo.h4" Class="mb-4">Login</MudText>
 
-        <MudForm @ref="form" @bind-IsValid="@success">
+        <MudForm @ref="form">
             <MudTextField T="string"
-                          Label="Username"
-                          @bind-Value="model.Username"
-                          Required="true" />
+            Label="Username"
+            @bind-Value="model.Username"
+            Required="true"
+            RequiredError="Username is required." />
 
             <MudTextField T="string"
-                          Label="Password"
-                          @bind-Value="model.Password"
-                          Required="true"
-                          InputType="InputType.Password" />
+            Label="Password"
+            @bind-Value="model.Password"
+            Required="true"
+            InputType="InputType.Password"
+            RequiredError="Password is required." />
+
+            <MudText Typo="Typo.body2" Color="Color.Error" Class="mt-2">
+                @errorMessage
+            </MudText>
 
             <MudButton Variant="Variant.Filled"
-                       Color="Color.Primary"
-                       Class="mt-4"
-                       OnClick="HandleLogin"
-                       Disabled="@(!success)">
+            Color="Color.Primary"
+            Class="mt-4"
+            OnClick="HandleLogin">
                 Login
+            </MudButton>
+
+            <MudButton Variant="Variant.Outlined"
+            Color="Color.Secondary"
+            Class="mt-2"
+            OnClick="NavigateToSignup">
+                Sign Up
             </MudButton>
         </MudForm>
     </MudPaper>
@@ -33,12 +48,33 @@
 
 @code {
     private MudForm form;
-    private bool success;
+    private string errorMessage = string.Empty;
     private LoginModel model = new();
 
     private async Task HandleLogin()
     {
-       
+        await form.Validate();
+
+        if (form.IsValid)
+        {
+
+            var res = await AuthService.Login(model.Username, model.Password);
+            if (res.IsSuccess)
+            {
+                await TokenService.SetTokenAsync(res.Result);
+                AuthStateService.IsLoggedIn = true;
+                NavigationManager.NavigateTo("/");
+            }
+            else
+            {
+                errorMessage = "Invalid username or password.";
+            }
+        }
+    }
+
+    private void NavigateToSignup()
+    {
+        NavigationManager.NavigateTo("/signup");
     }
 
     public class LoginModel
@@ -46,4 +82,4 @@
         public string Username { get; set; }
         public string Password { get; set; }
     }
-} *@
+}

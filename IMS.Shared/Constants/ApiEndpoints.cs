@@ -37,5 +37,12 @@ namespace IMS.Shared.Constants
             public const string SaveProducts = Base + "api/Products/add-edit";
             public const string UpdateProducts = Base + "api/Products/add-edit";
         }
+
+        public static class Auth
+        {
+            public const string Base = "https://localhost:44317/";
+            public const string Login = Base + "api/auth/Login";
+            public const string Register = Base + "api/auth/register";
+        }
     }
 }

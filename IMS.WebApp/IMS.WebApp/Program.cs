@@ -1,6 +1,10 @@
+using Blazored.LocalStorage;
+using IMS.Shared.Interface.Auth;
 using IMS.Shared.Interface.Category;
 using IMS.Shared.Interface.Department;
 using IMS.Shared.Interface.Product;
+using IMS.Shared.Services.Auth;
+using IMS.WebApp.Client.Authentication;
 using IMS.WebApp.Client.Pages;
 using IMS.WebApp.Client.Services.Category;
 using IMS.WebApp.Client.Services.Department;
@@ -20,6 +24,10 @@ builder.Services.AddRazorComponents()
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddScoped<AuthStateService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddMudServices();
 //builder.Services.AddMudServices(config =>
 //{

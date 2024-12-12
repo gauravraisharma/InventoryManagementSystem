@@ -1,22 +1,35 @@
-﻿@inherits LayoutComponentBase
+﻿@using Microsoft.AspNetCore.Components.Routing
+@using IMS.WebApp.Client.Authentication
+@using IMS.WebApp.Components.Pages
+@inherits LayoutComponentBase
+@inject ITokenService TokenService
+@inject AuthStateService AuthStateService
+@inject NavigationManager NavigationManager
 
 <MudThemeProvider />
-@* <MudDialogProvider />
-<MudSnackbarProvider />
-<MudPopoverProvider />
- *@
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-      
-    </div>
-
-    <main>
-        
-        <article class="content px-4">
-            @Body
-        </article>
-    </main> 
+    @if (AuthStateService.IsLoggedIn)
+    {
+        <div class="sidebar">
+            <NavMenu />
+        </div>
+        <main>
+            <article class="content px-4">
+                @Body
+            </article>
+        </main>
+    }
+    else
+    {
+        @if (IsSignupUrl)
+        {
+            <Signup />
+        }
+        else
+        {
+            <Login />
+        }
+    }
 </div>
 
 <div id="blazor-error-ui">
@@ -25,3 +38,12 @@
     <a class="dismiss">🗙</a>
 </div>
 
+@code {
+    private bool IsSignupUrl => NavigationManager.Uri.EndsWith("/signup", StringComparison.OrdinalIgnoreCase);
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        // Optional: Handle redirection or additional initialization logic here
+    }
+}

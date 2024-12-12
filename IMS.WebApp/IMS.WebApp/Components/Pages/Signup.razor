@@ -1,0 +1,147 @@
+﻿@page "/signup"
+@inject NavigationManager NavigationManager
+@using IMS.Shared.Interface.Auth
+@inject IAuthService AuthService
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="mt-4">
+    <MudPaper Class="pa-4">
+        <MudText Typo="Typo.h4" Class="mb-4">Sign Up</MudText>
+
+        <MudForm @ref="form">
+            <MudTextField T="string"
+                          Label="Username"
+                          @bind-Value="model.Username"
+                          Required="true"
+                          RequiredError="Username is required." />
+
+            <MudTextField T="string"
+                          Label="First Name"
+                          @bind-Value="model.FirstName"
+                          Required="true"
+                          RequiredError="First name is required." />
+
+            <MudTextField T="string"
+                          Label="Last Name"
+                          @bind-Value="model.LastName"
+                          Required="true"
+                          RequiredError="Last name is required." />
+
+            <MudTextField T="string"
+                          Label="Email"
+                          @bind-Value="model.Email"
+                          Required="true"
+                          RequiredError="Email is required."
+                          InputType="InputType.Email"
+                          Immediate="true"
+                          ErrorText="@errorMessage"
+                          HelperText="Email must not contain spaces and must be valid." />
+
+            <MudTextField T="string"
+                          Label="Password"
+                          @bind-Value="model.Password"
+                          Required="true"
+                          InputType="InputType.Password"
+                          RequiredError="Password is required."
+                          Immediate="true"
+                          HelperText="Password must be at least 8 characters long and include uppercase, lowercase, and a digit."
+                          ErrorText="@errorMessage" />
+
+            <MudText Typo="Typo.body2" Color="Color.Error" Class="mt-2">
+                @errorMessage
+            </MudText>
+
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Class="mt-4"
+                       OnClick="HandleSignup">
+                Sign Up
+            </MudButton>
+
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Secondary"
+                       Class="mt-2"
+                       OnClick="NavigateToLogin">
+                Back to Login
+            </MudButton>
+        </MudForm>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private MudForm form;
+    private string errorMessage = string.Empty;
+    private SignupModel model = new();
+
+    private async Task HandleSignup()
+    {
+        await form.Validate();
+        if (!form.IsValid)
+        {
+            errorMessage = "Please fix the validation errors.";
+            return;
+        }
+
+        var res = await AuthService.Register(model.FirstName, model.LastName, model.Username, model.Email, model.Password);
+        if (res.IsSuccess)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            errorMessage = "User is not registered.";
+        }
+    }
+
+    private void NavigateToLogin()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+
+    private string ValidateEmail(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return "Email is required.";
+
+        if (email.Contains(" "))
+            return "Email cannot contain spaces.";
+
+        try
+        {
+            var addr = new System.Net.Mail.MailAddress(email);
+            return addr.Address == email ? null : "Invalid email format.";
+        }
+        catch
+        {
+            return "Invalid email format.";
+        }
+    }
+
+    private string ValidatePassword(string password)
+    {
+        if (string.IsNullOrWhiteSpace(password))
+            return "Password is required.";
+
+        if (password.Length < 8)
+            return "Password must be at least 8 characters long.";
+
+        if (!password.Any(char.IsUpper))
+            return "Password must contain at least one uppercase letter.";
+
+        if (!password.Any(char.IsLower))
+            return "Password must contain at least one lowercase letter.";
+
+        if (!password.Any(char.IsDigit))
+            return "Password must contain at least one number.";
+
+        return null;
+    }
+
+    public class SignupModel
+    {
+        public string Username { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+    }
+}
