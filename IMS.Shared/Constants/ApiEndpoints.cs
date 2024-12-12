@@ -29,5 +29,12 @@ namespace IMS.Shared.Constants
             public const string DeleteById = Base + "api/Products/DeleteProductById";
             public const string Get = Base + "api/Products";
         }
+
+        public static class Auth
+        {
+            public const string Base = "https://localhost:44317/";
+            public const string Login = Base + "api/auth/Login";
+            public const string Register = Base + "api/auth/register";
+        }
     }
 }
