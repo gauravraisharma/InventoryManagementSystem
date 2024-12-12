@@ -15,5 +15,6 @@ namespace IMS.Core.Common.ResponseModel
         public const string ValidUser = "Valid User";
         public const string Error = "Some internal error occured";
         public const string UserExist = "UserName Already Exists";
+        public const string ReecordDeleted = " Record Deleted Successfully";
     }
 }

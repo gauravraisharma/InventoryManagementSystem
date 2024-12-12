@@ -1,10 +1,12 @@
 ﻿@page "/product"
  @rendermode InteractiveServer
-@inject IProductService ProductService 
+@inject IProductService ProductService
 @inject IDepartmentService DepartmentService
 @inject ICategoryService CategoryService
 @* @inject IDialogService DialogService *@
 @inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
 @using IMS.Shared.Common
 @using IMS.Shared.Interface
 @using IMS.Shared.Interface.Category
@@ -14,11 +16,12 @@
 @using IMS.Shared.RequestDto.ProductDTOs
 @using IMS.Shared.RequestDto.DepartmentDTOs
 @using IMS.Shared.RequestDto.CategoryDTOs
+@using System.Text
 
 
 <MudPopoverProvider />
-<MudDialogProvider  />
-<MudSnackbarProvider />F
+<MudDialogProvider />
+<MudSnackbarProvider />
 
 
 
@@ -29,13 +32,13 @@
             <MudItem xs="12" Class="d-flex justify-space-between align-center">
                 <MudText Typo="Typo.h5">Products</MudText>
                 <div class="d-flex gap-2">
-                    <MudButton @onclick="OpenDialogAsync" Variant="Variant.Filled" Color="Color.Primary">
+                    <MudButton @onclick="OpenAddProductDialogAsync" Variant="Variant.Filled" Color="Color.Primary">
                         Add Product
                     </MudButton>
                     <MudButton Variant="Variant.Outlined"
-                               Color="Color.Primary"
-                               StartIcon="@Icons.Material.Filled.Upload"
-                               Href="/export">
+                    Color="Color.Primary"
+                    StartIcon="@Icons.Material.Filled.Upload"
+                    Href="/export">
                         IMPORT PRODUCT
                     </MudButton>
                 </div>
@@ -45,11 +48,11 @@
         <MudGrid Class="mt-4">
             <MudItem xs="12" md="3">
                 <MudSelect T="string"
-                           Label="Department"
-                           Variant="Variant.Outlined"
-                           @bind-Value="selectedDepartment"
-                           @bind-Value:after="@(() => GetAllProducts())"
-                           Dense="true">
+                Label="Department"
+                Variant="Variant.Outlined"
+                @bind-Value="selectedDepartment"
+                @bind-Value:after="@(() => GetAllProducts())"
+                Dense="true">
                     <MudSelectItem Value="@("all")">Pick a Department</MudSelectItem>
                     @foreach (var department in _departments)
                     {
@@ -59,11 +62,11 @@
             </MudItem>
             <MudItem xs="12" md="3">
                 <MudSelect T="string"
-                           Label="Category"
-                           Variant="Variant.Outlined"
-                           @bind-Value="selectedCategory"
-                           @bind-Value:after="@(() => GetAllProducts())"
-                           Dense="true">
+                Label="Category"
+                Variant="Variant.Outlined"
+                @bind-Value="selectedCategory"
+                @bind-Value:after="@(() => GetAllProducts())"
+                Dense="true">
                     <MudSelectItem Value="@("all")">Pick a Category</MudSelectItem>
                     @foreach (var category in _categories)
                     {
@@ -73,21 +76,21 @@
             </MudItem>
             <MudItem xs="12" md="4">
                 <MudTextField T="string"
-                              Label="Search"
-                              Variant="Variant.Outlined"
-                              Adornment="Adornment.Start"
-                              AdornmentIcon="@Icons.Material.Filled.Search"
-                              @bind-Value="searchText"
-                              @bind-Value:after="@(() => GetAllProducts())"
-                              Dense="true" />
+                Label="Search"
+                Variant="Variant.Outlined"
+                Adornment="Adornment.Start"
+                AdornmentIcon="@Icons.Material.Filled.Search"
+                @bind-Value="searchText"
+                @bind-Value:after="@(() => GetAllProducts())"
+                Dense="true" />
             </MudItem>
             <MudItem xs="12" md="2">
                 <MudSelect T="string"
-                           Label="Sort By"
-                           Variant="Variant.Outlined"
-                           @bind-Value="selectedSort"
-                           @bind-Value:after="@(() => GetAllProducts())"
-                           Dense="true">
+                Label="Sort By"
+                Variant="Variant.Outlined"
+                @bind-Value="selectedSort"
+                @bind-Value:after="@(() => GetAllProducts())"
+                Dense="true">
                     <MudSelectItem Value="@("newest")">Newest First</MudSelectItem>
                     <MudSelectItem Value="@("oldest")">Oldest First</MudSelectItem>
                 </MudSelect>
@@ -114,9 +117,9 @@
                             {
                                 <div style="height: 200px; overflow: hidden;">
                                     <img src="@($"data:image/jpeg;base64,{product.ProductImages.First()}")"
-                                         alt="Product Image"
-                                         class="mt-2"
-                                         style="width: 100%; height: 100%; object-fit: cover;" />
+                                    alt="Product Image"
+                                    class="mt-2"
+                                    style="width: 100%; height: 100%; object-fit: cover;" />
                                 </div>
                             }
                             else
@@ -134,12 +137,15 @@
                             </div>
                         </MudCardContent>
                         <MudCardActions Class="d-flex justify-space-between">
-                            <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="() => OpenEditDialog(product.Id)">
+                            <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="() => OpenEditProductDialogAsync(product.Id)">
                                 EDIT
                             </MudButton>
                             <div>
-                                <MudIconButton Icon="@Icons.Material.Filled.Visibility" Color="Color.Default" />
-                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" />
+                                @* <MudIconButton Icon="@Icons.Material.Filled.Visibility" Color="Color.Default" /> *@
+                                <MudIconButton Icon="@Icons.Material.Filled.Visibility"
+                                Color="Color.Default"
+                                OnClick="@(() => NavigateToProductDetails(product.Id))" />
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => DeleteProductDetails(product.Id))" />
                             </div>
                         </MudCardActions>
                     </MudCard>
@@ -159,7 +165,8 @@
 
 
 @code {
-
+    [Parameter]
+    public string productId { get; set; }
     private string selectedDepartment = "all";
     private string selectedCategory = "all";
     private string selectedSort = "newest";
@@ -205,58 +212,90 @@
             }
 
             await GetAllProducts();
-            StateHasChanged();
         }
         catch (Exception ex)
         {
             errorMessage = ex.Message;
         }
     }
-    
+
     public async Task GetAllProducts()
     {
         var response = await ProductService.GetAllProductsAsync(selectedDepartment, selectedCategory, searchText, selectedSort);
         if (response.IsSuccess)
         {
             _products = response.Result;
+            StateHasChanged();
         }
         else
         {
             errorMessage = response.Message;
         }
     }
+    private void NavigateToProductDetails(string id)
+    {
+        var encodedId = Convert.ToBase64String(Encoding.UTF8.GetBytes(id));
+        NavigationManager.NavigateTo($"/product-details/{encodedId}");
+    }
+    private async Task DeleteProductDetails(string id)
+    {
+        var response = await ProductService.DeleteProductByIdAsync(id);
+        if (response.IsSuccess)
+        {
+            Snackbar.Add($"Product Deleted Successfully: {response.Message}", Severity.Success);
+            StateHasChanged();
+        }
+        else
+        {
+            Snackbar.Add($"Error: {response.Message}", Severity.Error);
+        }
+    }
 
-    private async Task OpenDialogAsync()
+    private async Task OpenAddProductDialogAsync()
     {
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium };
 
-        var dialog = DialogService.Show<ProductFormDialog>("Add Product", options);
+        var parameters = new DialogParameters
+    {
+        { "OnProductSaved", EventCallback.Factory.Create(this, RefreshProductList) }
+    };
+
+        var dialog = DialogService.Show<ProductFormDialog>("Add Product", parameters, options);
         var result = await dialog.Result;
 
         if (!result.Canceled)
         {
-            
-            await GetAllProducts();
+            await RefreshProductList();
         }
     }
 
-    private async Task OpenEditDialog(string productId)
+    private async Task OpenEditProductDialogAsync(string productId)
     {
-        var parameters = new DialogParameters { { "Id", productId } };
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium };
+
+        var parameters = new DialogParameters
+    {
+        { "Id", productId },
+        { "OnProductSaved", EventCallback.Factory.Create(this, RefreshProductList) }
+    };
 
         var dialog = DialogService.Show<ProductFormDialog>("Edit Product", parameters, options);
         var result = await dialog.Result;
 
         if (!result.Canceled)
         {
-            this.GetAllProducts();
+            await RefreshProductList();
         }
     }
 
-    
+    private async Task RefreshProductList()
+    {
+        await GetAllProducts();
+    }
 
-  
 
-        
+
+
+
+
 }
