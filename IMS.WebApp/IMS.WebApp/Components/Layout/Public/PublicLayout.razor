@@ -1,0 +1,91 @@
+﻿@using IMS.WebApp.Components.Layout.Shared
+@inherits LayoutComponentBase
+
+@* <MudThemeProvider/>
+    <div class="public-page">
+        <header>
+        <MudAppBar Color="Color.Primary" Elevation="2">
+            <div class="d-flex align-items-center justify-content-between w-100">
+                <!-- Left Section -->
+                <div class="d-flex align-items-center">
+                    <MudText Typo="Typo.h6" Class="ml-2">amazon.in</MudText>
+                    <MudText Typo="Typo.body1" Class="ml-2">Delivering to Dehradun 248001</MudText>
+                </div>
+
+                <!-- Center Section -->
+                <div class="flex-grow-1 mx-4">
+                    <MudTextField T="string" Placeholder="Search Amazon.in" Class="w-100" />
+                </div>
+
+                <!-- Right Section -->
+                <div class="d-flex align-items-center">
+                    <MudText Typo="Typo.body1" Class="ml-4">Hello, sign in</MudText>
+                    <MudText Typo="Typo.body1" Class="ml-4">Cart (0)</MudText>
+                </div>
+            </div>
+        </MudAppBar>
+
+        </header>
+
+        <main>
+            @Body
+        </main>
+
+        <footer>
+            <MudPaper Elevation="2" Class="p-2 text-center">
+                <MudText Typo="Typo.body2">© 2024 Your Company</MudText>
+            </MudPaper>
+        </footer>
+    </div>
+ *@
+   <MudThemeProvider />
+<div class="public-page">
+    <!-- Fixed Header -->
+    <header>
+        <Header />
+    </header>
+
+    <!-- Body Content -->
+    <main class="main-content">
+        @Body
+    </main>
+
+    <!-- Fixed Footer -->
+    <footer>
+        <Footer/>
+    </footer>
+</div>
+
+
+<style>
+    .public-page {
+        display: flex;
+        flex-direction: column;
+        height: 100vh; /* Full viewport height */
+    }
+
+    header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 10; /* Ensure header is above the body content */
+    }
+
+    footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 10; /* Ensure footer is above the body content */
+    }
+
+    .main-content {
+        flex: 1;
+        margin-top: 64px; /* Adjust based on header height */
+        margin-bottom: 48px; /* Adjust based on footer height */
+        overflow-y: auto; /* Ensure scrolling if content exceeds viewport height */
+        padding: 16px;
+    }
+
+</style>

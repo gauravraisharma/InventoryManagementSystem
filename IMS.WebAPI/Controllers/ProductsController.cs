@@ -55,6 +55,18 @@ namespace IMS.WebAPI.Controllers
             var response = await _mediator.Send(command);
             return Ok(response);
         }
-      
+
+        [HttpDelete]
+        [Route("DeleteProductById")]
+        public async Task<IActionResult> DeleteProductById(string id)
+        {
+            var command = new DeleteProductByIdCommand(id);
+            var product = await _mediator.Send(command);
+
+            return Ok(product);
+
+
+        }
+
     }
 }

@@ -16,6 +16,7 @@ namespace IMS.Shared.Interface.Product
         Task<ApiResponse<ProductResponse>> AddProductAsync(MultipartFormDataContent addProductDto);
     
         Task<ApiResponse<ProductResponse>> UpdateProductAsync( MultipartFormDataContent content);
+        Task<ApiResponse<DeleteProductDto>> DeleteProductByIdAsync(string Id);
     }
 }
     
