@@ -394,8 +394,58 @@ namespace IMS.Infrastructure.Services.Product
             };
         }
 
+        public async Task<GenericBaseResult<DeleteProductDto>> DeleteProductByIdAsync(string productId)
+        {
+            var response = new GenericBaseResult<DeleteProductDto>(null);
+            try
+            {
+                var product = await context.Products
+                    .Where(p => p.Id == productId)
+                    .Select(p => new
+                    {
+                        Product = p,
+                        ProductImages = context.ProductImages.Where(img => img.ProductId == productId).ToList(),
+                        ProductSizes = context.ProductSizes.Where(size => size.ProductId == productId).ToList(),
+                        DepartmentMappings = context.DepartmentProductMappings.Where(dpm => dpm.ProductId == productId).ToList(),
+                        CategoryMappings = context.CategoryProductMappings.Where(cpm => cpm.ProductId == productId).ToList()
+                    })
+                    .FirstOrDefaultAsync();
 
-       
+                if (product == null)
+                {
+                    response.Message = ResponseMessage.NotFound;
+                    return response;
+                }
+
+                if (product.ProductImages.Any())
+                    context.ProductImages.RemoveRange(product.ProductImages);
+
+                if (product.ProductSizes.Any())
+                    context.ProductSizes.RemoveRange(product.ProductSizes);
+
+                if (product.DepartmentMappings.Any())
+                    context.DepartmentProductMappings.RemoveRange(product.DepartmentMappings);
+
+                if (product.CategoryMappings.Any())
+                    context.CategoryProductMappings.RemoveRange(product.CategoryMappings);
+
+                context.Products.Remove(product.Product);
+
+                await context.SaveChangesAsync();
+
+                response.Message = ResponseMessage.ReecordDeleted;
+            }
+            catch (Exception ex)
+            {
+                response.AddExceptionLog(ex);
+            }
+
+            return response;
+
+        }
+
+
+
 
 
     }

@@ -1,51 +1,74 @@
 ﻿@page "/admin/dashboard"
 @rendermode InteractiveAuto
 <MudText Typo="Typo.h4">Dashboard</MudText>
+
 <MudGrid>
     <MudItem xs="12" sm="6" md="3">
-        <MudCard Style="background-color:white; height: 300px; display: flex; flex-direction: column;">
-            <MudCardContent Style="flex-grow: 1;">
-                <MudText>Story of the day</MudText>
-                <MudText Typo="Typo.body2">The quick, brown fox jumps over a lazy dog.</MudText>
+        <MudCard Style="background-color:white; height: 300px; display: flex; flex-direction: column; align-items: center;">
+            <MudCardContent Style="flex-grow: 1; text-align: center;">
+                <svg width="100" height="100" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="3" width="8" height="8" fill="#FF6B6B" />
+                    <rect x="13" y="3" width="8" height="8" fill="#4ECDC4" />
+                    <rect x="3" y="13" width="8" height="8" fill="#4ECDC4" />
+                    <rect x="13" y="13" width="8" height="8" fill="#FF6B6B" />
+                </svg>
+                <MudText Typo="Typo.h6" Class="mt-3">Products</MudText>
+                <MudText Typo="Typo.h4">1,236</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Success">Increased 75%</MudText>
             </MudCardContent>
-            <MudCardActions Class="d-flex justify-end">
-                <MudButton Variant="Variant.Text" Color="Color.Primary">View Report</MudButton>
+            <MudCardActions Class="d-flex justify-center pb-4">
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary">VIEW REPORT</MudButton>
             </MudCardActions>
         </MudCard>
     </MudItem>
 
     <MudItem xs="12" sm="6" md="3">
-        <MudCard Style="background-color:white; height: 300px; display: flex; flex-direction: column;">
-            <MudCardContent Style="flex-grow: 1;">
-                <MudText>Featured Article</MudText>
-                <MudText Typo="Typo.body2">A wonderful serenity has taken possession.</MudText>
+        <MudCard Style="background-color:white; height: 300px; display: flex; flex-direction: column; align-items: center;">
+            <MudCardContent Style="flex-grow: 1; text-align: center;">
+                <svg width="100" height="100" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 12V20H20V12" stroke="#4ECDC4" stroke-width="2" />
+                    <path d="M12 3L12 15M12 15L7 10M12 15L17 10" stroke="#FF6B6B" stroke-width="2" />
+                </svg>
+                <MudText Typo="Typo.h6" Class="mt-3">Orders</MudText>
+                <MudText Typo="Typo.h4">3,612</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Success">Increased 75%</MudText>
             </MudCardContent>
-            <MudCardActions Class="d-flex justify-end">
-                <MudButton Variant="Variant.Text" Color="Color.Primary">View Report</MudButton>
+            <MudCardActions Class="d-flex justify-center pb-4">
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary">VIEW REPORT</MudButton>
             </MudCardActions>
         </MudCard>
     </MudItem>
 
     <MudItem xs="12" sm="6" md="3">
-        <MudCard Style="background-color:white; height: 300px; display: flex; flex-direction: column;">
-            <MudCardContent Style="flex-grow: 1;">
-                <MudText>Top News</MudText>
-                <MudText Typo="Typo.body2">Far far away, behind the word mountains.</MudText>
+        <MudCard Style="background-color:white; height: 300px; display: flex; flex-direction: column; align-items: center;">
+            <MudCardContent Style="flex-grow: 1; text-align: center;">
+                <svg width="100" height="100" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 3V21M3 12L21 12" stroke="#4ECDC4" stroke-width="2" />
+                    <circle cx="12" cy="12" r="8" stroke="#FF6B6B" stroke-width="2" />
+                </svg>
+                <MudText Typo="Typo.h6" Class="mt-3">Sales</MudText>
+                <MudText Typo="Typo.h4">$35,000</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Success">Increased 15%</MudText>
             </MudCardContent>
-            <MudCardActions Class="d-flex justify-end">
-                <MudButton Variant="Variant.Text" Color="Color.Primary">View Report</MudButton>
+            <MudCardActions Class="d-flex justify-center pb-4">
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary">VIEW REPORT</MudButton>
             </MudCardActions>
         </MudCard>
     </MudItem>
 
     <MudItem xs="12" sm="6" md="3">
-        <MudCard Style="background-color:white; height: 300px; display: flex; flex-direction: column;">
-            <MudCardContent Style="flex-grow: 1;">
-                <MudText>Editor's Pick</MudText>
-                <MudText Typo="Typo.body2">One morning, when Gregor Samsa woke up.</MudText>
+        <MudCard Style="background-color:white; height: 300px; display: flex; flex-direction: column; align-items: center;">
+            <MudCardContent Style="flex-grow: 1; text-align: center;">
+                <svg width="100" height="100" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="8" r="5" stroke="#FF6B6B" stroke-width="2" />
+                    <path d="M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21" stroke="#4ECDC4" stroke-width="2" />
+                </svg>
+                <MudText Typo="Typo.h6" Class="mt-3">Customers</MudText>
+                <MudText Typo="Typo.h4">+10</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Success">Increased 75%</MudText>
             </MudCardContent>
-            <MudCardActions Class="d-flex justify-end">
-                <MudButton Variant="Variant.Text" Color="Color.Primary">View Report</MudButton>
+            <MudCardActions Class="d-flex justify-center pb-4">
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary">VIEW REPORT</MudButton>
             </MudCardActions>
         </MudCard>
     </MudItem>

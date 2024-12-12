@@ -1,8 +1,40 @@
-﻿<Router AppAssembly="typeof(Program).Assembly" AdditionalAssemblies="new[] { typeof(Client._Imports).Assembly }">
-    <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
-        <FocusOnNavigate RouteData="routeData" Selector="h1" />
-    </Found>
+﻿@inject NavigationManager NavigationManager
+@using IMS.WebApp.Client.Authentication
+@inject AuthStateService AuthStateService
+
+<Router AppAssembly="@typeof(Program).Assembly" AdditionalAssemblies="new[] { typeof(Client._Imports).Assembly }">
+	<Found Context="routeData">
+		@if (AuthStateService.IsLoggedIn)
+		{
+			@if (AuthStateService.UserRole != "user")
+			{
+				<RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
+			}
+			else
+			{
+				<RouteView RouteData="routeData" DefaultLayout="typeof(Layout.Public.PublicLayout)" />
+			}
+		}
+		else
+		{
+			@if (IsLoginUrl || IsSignupUrl)
+			{
+				<RouteView RouteData="routeData" DefaultLayout="typeof(Layout.Public.LoginLayout)" />
+			}
+			else
+			{
+				<RouteView RouteData="routeData" DefaultLayout="typeof(Layout.Public.PublicLayout)" />
+			}
+		}
+		<FocusOnNavigate RouteData="routeData" Selector="h1" />
+	</Found>
+
+	<NotFound>
+		<h1>Page not found</h1>
+	</NotFound>
 </Router>
 
-
+@code {
+	private bool IsLoginUrl => NavigationManager.Uri.EndsWith("/login", StringComparison.OrdinalIgnoreCase);
+	private bool IsSignupUrl => NavigationManager.Uri.EndsWith("/signup", StringComparison.OrdinalIgnoreCase);
+}

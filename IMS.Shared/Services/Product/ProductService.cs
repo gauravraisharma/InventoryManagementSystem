@@ -11,14 +11,7 @@ namespace IMS.WebApp.Client.Services.Product
 {
     public class ProductService : IProductService
     {
-        //public ProductService(HttpClient httpClient) : base(httpClient) { }
-
-
-        //public async Task<List<GetAllProductDto>> GetAllProductsAsync()
-        //{
-        //    var response = await GetAsync<List<GetAllProductDto>>(Products.Get);
-        //    return response?.Result ?? new List<GetAllProductDto>();
-        //}
+       
 
         private readonly HttpClient _httpClient;
 
@@ -35,7 +28,7 @@ namespace IMS.WebApp.Client.Services.Product
                 // Construct the query string
                 var query = $"?department={department}&category={category}&searchText={searchText}&sortBy={sortBy}";
 
-                var response = await _httpClient.GetAsync($"{ApiEndpoints.Products.Get}{query}");
+                var response = await _httpClient.GetAsync($"{ApiEndpoints.Product.Get}{query}");
                 if (response.IsSuccessStatusCode)
                 {
                     var result = await response.Content.ReadFromJsonAsync<ApiResponse<List<GetAllProductDto>>>();
@@ -62,7 +55,7 @@ namespace IMS.WebApp.Client.Services.Product
         {
             try
             {
-                var requestUrl = $"{ApiEndpoints.Products.GetById}?id={Id}";
+                var requestUrl = $"{ApiEndpoints.Product.GetById}?id={Id}";
                 var response = await _httpClient.GetAsync(requestUrl);
                 if (response.IsSuccessStatusCode)
                 {
@@ -78,6 +71,33 @@ namespace IMS.WebApp.Client.Services.Product
             catch (Exception ex)
             {
                 return new ApiResponse<GetAllProductDto>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message
+                };
+            }
+        }
+
+        public async Task<ApiResponse<DeleteProductDto>> DeleteProductByIdAsync(string Id)
+        {
+            try
+            {
+                var requestUrl = $"{ApiEndpoints.Product.DeleteById}?id={Id}";
+                var response = await _httpClient.DeleteAsync(requestUrl);
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<ApiResponse<DeleteProductDto>>();
+                    return result;
+                }
+                return new ApiResponse<DeleteProductDto>
+                {
+                    IsSuccess = false,
+                    Message = "Failed to Delete product"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<DeleteProductDto>
                 {
                     IsSuccess = false,
                     Message = ex.Message

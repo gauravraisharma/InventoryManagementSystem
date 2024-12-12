@@ -1,0 +1,242 @@
+﻿@page "/product-details/{EncodedId}"
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+@inject IProductService ProductService
+@using System.Text
+@using IMS.Shared.Interface.Product
+@using IMS.Shared.RequestDto.ProductDTOs
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
+    @if (product != null)
+    {
+        <MudPaper Elevation="3" Class="pa-8 product-container">
+            <MudGrid Spacing="6" Justify="Justify.Center" Style="height: 60vh;">
+                <!-- Left Column: Images -->
+                <MudItem xs="12" md="6" Style="height: 100%;">
+                    <MudCarousel TData="string"
+                                 Class="carousel-container custom-carousel"
+                                 ShowArrows="true"
+                                 AutoCycle="false"
+                                 Style="height: 100%;">
+                        @foreach (var image in product.ProductImages)
+                        {
+                            <MudCarouselItem Style="height: 100%;">
+                                <img src="data:image/jpeg;base64,@image"
+                                     alt="@product.Title"
+                                     style="width: 100%; height: 100%; object-fit: cover;" />
+                            </MudCarouselItem>
+                        }
+                    </MudCarousel>
+                </MudItem>
+
+                <!-- Right Column: Product Details -->
+                <MudItem xs="12" md="6" Class="details-column">
+                    <MudCard Elevation="0">
+                        <MudCardContent>
+                            <MudText Typo="Typo.h3" GutterBottom="true" Class="product-title">
+                                @product.Title
+                            </MudText>
+
+                            <MudText Typo="Typo.subtitle1" Color="Color.Primary" Class="mb-4">
+                                Category: @string.Join(", ", product.CategoryNames)
+                            </MudText>
+
+                            <MudText Typo="Typo.h4" Color="Color.Error" Class="mb-4 product-price">
+                                $@product.UnitPrice.ToString("N2")
+                            </MudText>
+
+                            <MudPaper Class="pa-4 mb-4 product-description" Elevation="0">
+                                <MudText Typo="Typo.body1" Class="description-text">
+                                    @product.Description
+                                </MudText>
+                            </MudPaper>
+
+                            <!-- Stock Status -->
+                            <MudChip T="string"
+                                     Color="@(product.UnitsInStock > 0 ? Color.Success : Color.Error)"
+                                     Variant="Variant.Filled"
+                                     Size="Size.Large"
+                                     Class="mb-4">
+                                @(product.UnitsInStock > 0 ? "In Stock" : "Out of Stock")
+                            </MudChip>
+
+                            <!-- Sizes -->
+                            @if (product.ProductSizes.Any())
+                            {
+                                <MudText Typo="Typo.h6" Class="mb-2">Available Sizes:</MudText>
+                                <MudChipSet T="string" Class="mb-6">
+                                    @foreach (var size in product.ProductSizes)
+                                    {
+                                        <MudChip Color="Color.Primary" Variant="Variant.Outlined">@size</MudChip>
+                                    }
+                                </MudChipSet>
+                            }
+
+                            <!-- Buttons -->
+                            <MudDivider Class="mb-4" />
+                            <MudGrid>
+                                <MudItem xs="6">
+                                    <MudButton Variant="Variant.Filled"
+                                               Color="Color.Primary"
+                                               Size="Size.Large"
+                                               Disabled="@(product.UnitsInStock <= 0)"
+                                               FullWidth="true">
+                                        Add to Cart
+                                    </MudButton>
+                                </MudItem>
+                                <MudItem xs="6">
+                                    <MudButton Variant="Variant.Outlined"
+                                               Color="Color.Secondary"
+                                               Size="Size.Large"
+                                               Disabled="@(product.UnitsInStock <= 0)"
+                                               FullWidth="true">
+                                        Buy Now
+                                    </MudButton>
+                                </MudItem>
+                            </MudGrid>
+                        </MudCardContent>
+                    </MudCard>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+    }
+    else
+    {
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+    }
+</MudContainer>
+
+<style>
+
+    .custom-carousel {
+        .mud-carousel-arrow
+
+    {
+        transform: scale(1.5);
+        background-color: rgba(255, 255, 255, 0.8);
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+        z-index: 1;
+    }
+
+    .mud-carousel-arrow:hover {
+        background-color: rgba(255, 255, 255, 0.95);
+        transform: scale(1.7);
+    }
+
+    .mud-carousel-arrow-icon {
+        font-size: 2rem;
+        color: rgba(0, 0, 0, 0.7);
+    }
+
+    }
+
+    .carousel-container {
+        width: 100%;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .product-container {
+        min-height: 70vh;
+    }
+
+    .image-column {
+        display: flex;
+        align-items: center;
+    }
+
+    .carousel-container {
+        width: 100%;
+        background-color: #f5f5f5;
+        border-radius: 8px;
+    }
+
+    .image-container {
+        height: 100%;
+    }
+
+    .product-image {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    .details-column {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .product-title {
+        font-weight: 600;
+    }
+
+    .product-price {
+        font-weight: 500;
+    }
+
+    .product-description {
+        background-color: #f5f5f5;
+    }
+
+    .description-text {
+        line-height: 1.6;
+    }
+</style>
+
+
+@code {
+    [Parameter]
+    public string EncodedId { get; set; }
+
+    private string ProductId { get; set; }
+    private string errorMessage;
+    private GetAllProductDto? product { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(EncodedId))
+            {
+                var base64EncodedBytes = Convert.FromBase64String(EncodedId);
+                ProductId = Encoding.UTF8.GetString(base64EncodedBytes);
+                var response = await ProductService.GetProductByIdAsync(ProductId);
+                if (response.IsSuccess)
+                {
+
+                    var fetchedProduct = response;
+                    if (fetchedProduct != null)
+                    {
+                        product = new GetAllProductDto
+                            {
+                                Title = fetchedProduct.Result.Title,
+                                Description = fetchedProduct.Result.Description,
+                                UnitPrice = fetchedProduct.Result.UnitPrice,
+                                UnitsInStock = fetchedProduct.Result.UnitsInStock,
+                                ProductCode = fetchedProduct.Result.ProductCode,
+                                CategoryIds = fetchedProduct.Result.CategoryIds,
+                                DepartmentIds = fetchedProduct.Result.DepartmentIds,
+                                ProductSizes = fetchedProduct.Result.ProductSizes,
+                                ProductImages = fetchedProduct.Result.ProductImages,
+                                DepartmentNames = fetchedProduct.Result.DepartmentNames,
+                                CategoryNames = fetchedProduct.Result.CategoryNames
+                            };
+
+                    }
+                }
+                else
+                {
+                    errorMessage = response.Message ?? "Failed to fetch product details.";
+                }
+            }
+        }
+        catch
+        {
+            // Handle invalid encoding
+            NavigationManager.NavigateTo("/"); // Redirect to home if decoding fails
+        }
+    }
+}
+
