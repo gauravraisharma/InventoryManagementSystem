@@ -6,7 +6,7 @@
 	<Found Context="routeData">
 		@if (AuthStateService.IsLoggedIn)
 		{
-			@if (AuthStateService.UserRole != "user")
+			@if (AuthStateService.UserRole == "admin")
 			{
 				<RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
 			}

@@ -37,5 +37,14 @@ namespace IMS.WebAPI.Controllers
             var cartItems = await _mediator.Send(query);
             return Ok(cartItems);
         }
+
+        [HttpDelete("{cartId}")]
+        public async Task<IActionResult> DeleteCartItem(string cartId)
+        {
+            var command = new DeleteCartItemCommand { CartId = cartId };
+            var success = await _mediator.Send(command);
+
+            return success ? Ok() : NotFound();
+        }
     }
 }
