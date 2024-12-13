@@ -1,5 +1,7 @@
 ﻿using IMS.Application.Features.Cart.Command;
 using IMS.Application.Features.Cart.Queries;
+using IMS.Core.Common.Helper;
+using IMS.Core.RequestDto;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,11 +33,11 @@ namespace IMS.WebAPI.Controllers
         }
 
         [HttpGet("user/{userId}")]
-        public async Task<IActionResult> GetCartItems(string userId)
+        public async Task<GenericBaseResult<List<CartDto>>> GetCartItems(string userId)
         {
             var query = new GetCartItemsQuery { UserId = userId };
             var cartItems = await _mediator.Send(query);
-            return Ok(cartItems);
+            return new GenericBaseResult<List<CartDto>>(cartItems);
         }
     }
 }
