@@ -59,9 +59,9 @@
 
         <!-- Logout Button -->
         <MudButton Variant="Variant.Text"
-                   Color="Color.Default"
-                   Class="mx-2"
-                   OnClick="HandleLogout">
+        Color="Color.Default"
+        Class="mx-2"
+        OnClick="HandleLogout">
             LogOut
         </MudButton>
 
@@ -76,5 +76,6 @@
         await TokenService.RemoveTokenAsync();
         NavigationManager.NavigateTo("/");
         AuthStateService.IsLoggedIn = false;
+        AuthStateService.UserRole = "";
     }
 }

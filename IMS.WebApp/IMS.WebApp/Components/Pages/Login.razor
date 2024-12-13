@@ -66,7 +66,14 @@
                 var role = await TokenService.GetRoleFromTokenAsync();
                 AuthStateService.IsLoggedIn = true;
                 AuthStateService.UserRole = role;
-                NavigationManager.NavigateTo("/");
+                if (AuthStateService.UserRole == "user")
+                {
+                    NavigationManager.NavigateTo("/product");
+                }
+                else{
+                    NavigationManager.NavigateTo("/");
+                }
+                
 
             }
             else
