@@ -1,0 +1,102 @@
+﻿@page "/view-cart"
+@using MudBlazor
+
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <MudGrid>
+        <!-- Product List -->
+        <MudItem xs="12" md="8">
+            <MudCard Class="p-3">
+                <MudText Typo="Typo.h5" Class="mb-3">Shopping Cart</MudText>
+                @foreach (var item in CartItems)
+                {
+                    <MudPaper Class="d-flex align-center p-2 mb-2">
+                        <MudImage Src="@item.ImageUrl" Alt="@item.Name" Class="mr-3" />
+                        <MudStack>
+                            <MudText Typo="Typo.h6">@item.Name</MudText>
+                            <MudText Typo="Typo.subtitle1">Size: @item.Size | Color: @item.Color</MudText>
+                            <MudText Typo="Typo.subtitle2" Class="text-success">In Stock</MudText>
+                            <MudText Typo="Typo.body1">
+                                <span class="font-weight-bold">@($"₹{item.OriginalPrice:0.00}")</span>
+                            </MudText>
+                            <MudGrid Justify="Justify.FlexStart" AlignItems="AlignItems.Center">
+                                <MudItem>
+                                    <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="() => UpdateQuantity(item, -1)">-</MudButton>
+                                </MudItem>
+                                <MudItem>
+                                    <MudText>@item.Quantity</MudText>
+                                </MudItem>
+                                <MudItem>
+                                    <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="() => UpdateQuantity(item, 1)">+</MudButton>
+                                </MudItem>
+                                <MudItem>
+                                    <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="() => RemoveItem(item)">Delete</MudButton>
+                                </MudItem>
+                                <MudItem>
+                                    <MudButton Variant="Variant.Text" Color="Color.Primary">Save for Later</MudButton>
+                                </MudItem>
+                            </MudGrid>
+
+                        </MudStack>
+                    </MudPaper>
+                }
+            </MudCard>
+        </MudItem>
+
+        <!-- Cart Summary -->
+        <MudItem xs="12" md="4">
+            <MudCard Class="p-3">
+                <MudText Typo="Typo.h6">Cart Summary</MudText>
+                <MudDivider Class="my-2" />
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.body1">
+                        Subtotal (@CartItems.Count items):
+                        <span class="text-danger">@($"₹{CartItems.Sum(i => i.OriginalPrice * i.Quantity):0.00}")</span>
+                    </MudText>
+                    <MudText Typo="Typo.subtitle2" Class="text-success">Free Delivery Available</MudText>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true">Proceed to Buy</MudButton>
+                </MudStack>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+
+
+</MudContainer>
+
+@code {
+    // Cart Items
+    private List<CartItem> CartItems = new()
+    {
+        new CartItem { Name = "Miss Ethnik Pink Suit", Size = "2XL", Color = "Pink", DiscountedPrice = 2373.00, OriginalPrice = 8199.00, Quantity = 1, ImageUrl = "https://via.placeholder.com/150" },
+        new CartItem { Name = "Grey Casual Dress", Size = "M", Color = "Grey", DiscountedPrice = 1199.00, OriginalPrice = 3999.00, Quantity = 2, ImageUrl = "https://via.placeholder.com/150" }
+    };
+   
+    private void UpdateQuantity(CartItem item, int change)
+    {
+        item.Quantity = Math.Max(1, item.Quantity + change);
+    }
+
+    private void RemoveItem(CartItem item)
+    {
+        CartItems.Remove(item);
+    }
+
+    // Models
+    public class CartItem
+    {
+        public string Name { get; set; }
+        public string Size { get; set; }
+        public string Color { get; set; }
+        public double DiscountedPrice { get; set; }
+        public double OriginalPrice { get; set; }
+        public int Quantity { get; set; }
+        public string ImageUrl { get; set; }
+    }
+
+    public class Product
+    {
+        public string Name { get; set; }
+        public double Price { get; set; }
+        public string ImageUrl { get; set; }
+    }
+}

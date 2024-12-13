@@ -1,58 +1,92 @@
-﻿<MudAppBar Color="Color.Primary" Elevation="2">
-    <div id="nav-belt" class="d-flex align-items-center justify-content-between w-100">
-        <!-- Left Section -->
-        <div class="nav-left d-flex align-items-center">
-            <MudText Typo="Typo.h6" Class="ml-2">tackingStuff.in</MudText>
-            <MudText Typo="Typo.body1" Class="ml-2">Delivering to Dehradun 248001</MudText>
-        </div>
+﻿@inject AuthStateService AuthStateService
+@inject ITokenService TokenService
+@inject NavigationManager NavigationManager
+@using IMS.WebApp.Client.Authentication
 
-        <!-- Center Section -->
-        <div class="nav-fill flex-grow-1 mx-4">
-            <MudTextField T="string" Placeholder="Search Amazon.in" Class="w-100" />
-        </div>
+<div id="nav-belt" class="d-flex align-items-center justify-content-between w-100">
+    <!-- Left Section -->
+    <div class="nav-left d-flex align-items-center">
+        <MudText Typo="Typo.h6" Class="ml-2" Style="color: white;">TrackingStuff.in</MudText>
+        <MudText Typo="Typo.body1" Style="color: white;" Class="ml-2">Delivering to Dehradun 248001</MudText>
+    </div>
 
-        <!-- Right Section -->
-        <div class="nav-right d-flex align-items-center">
-            <NavLink href="/login" class="ml-4 text-decoration-none">
+    <!-- Center Section -->
+    <div class="nav-fill flex-grow-1 mx-4">
+        <MudTextField T="string" Placeholder="Search" Class="w-100" Style="color: white;" />
+    </div>
+
+    <!-- Right Section -->
+    <div class="nav-right d-flex align-items-center">
+        @if (AuthStateService.IsLoggedIn)
+        {
+            <!-- Dropdown for Signed-In User -->
+            <MudMenu Class="custom-menu" AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopRight">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary">
+                    <MudIcon Icon="Icons.Material.Filled.AccountCircle" Class="mr-1" />
+                    @Username
+                </MudButton>
+
+                <!-- Sign Out Option -->
+                <MudMenuItem OnClick="SignOut" Class="mud-menu-item">Sign Out</MudMenuItem>
+            </MudMenu>
+        }
+        else
+        {
+            <!-- Sign In Link -->
+            <NavLink href="/login" class="ml-4 text-decoration-none" Style="color: aliceblue;">
                 <MudText Typo="Typo.body1">Hello, sign in</MudText>
             </NavLink>
-            <MudText Typo="Typo.body1" Class="ml-4">Cart (0)</MudText>
+        }
+
+        <!-- Cart Link -->
+        <div style="padding-right: 10px">
+            <NavLink href="/view-cart" class="ml-4 text-decoration-none" Style="color: aliceblue;">
+                <MudText Typo="Typo.body1">Cart</MudText>
+            </NavLink>
         </div>
     </div>
-</MudAppBar>
+</div>
 
 <style>
     #nav-belt {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
+        background-color: darkslateblue;
         height: 60px;
         font-size: 14px;
         position: relative;
-        z-index: 5;
     }
 
-        #nav-belt .nav-left {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            flex: 0 1 auto; /* Keeps it to the left and prevents it from growing */
-        }
-
-        #nav-belt .nav-fill {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex: 1 1 auto; /* Allows it to grow and take up the central space */
-            margin: 0 16px; /* Adds some spacing between left and right sections */
-        }
-
-        #nav-belt .nav-right {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            flex: 0 1 auto; /* Keeps it to the right and prevents it from growing */
-        }
-
+    .nav-right {
+        justify-content: flex-end;
+    }
 </style>
+
+@code {
+    private string Username { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        AuthStateService.OnChange += StateHasChanged;
+
+        var token = await TokenService.GetTokenAsync();
+        AuthStateService.IsLoggedIn = !string.IsNullOrEmpty(token);
+
+        if (AuthStateService.IsLoggedIn)
+        {
+            Username = await TokenService.GetUserNameFromTokenAsync();
+        }
+    }
+
+    public void Dispose()
+    {
+        AuthStateService.OnChange -= StateHasChanged;
+    }
+
+    private async Task SignOut()
+    {
+        await TokenService.RemoveTokenAsync();
+        AuthStateService.IsLoggedIn = false;
+        AuthStateService.UserRole = "";
+        Username = null;  
+        NavigationManager.NavigateTo("/");
+    }
+}
