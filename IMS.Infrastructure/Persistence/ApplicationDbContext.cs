@@ -1,9 +1,9 @@
-﻿using IMS.Core.Entities;
+﻿using System.Reflection.Emit;
+using IMS.Core.Entities;
 using IMS.Core.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace IMS.Infrastructure.Persistence
 {
@@ -26,6 +26,7 @@ namespace IMS.Infrastructure.Persistence
         public DbSet<ProductSize> ProductSizes { get; set; }
         public DbSet<DepartmentProductMapping> DepartmentProductMappings { get; set; }
         public DbSet<CategoryProductMapping> CategoryProductMappings { get; set; }
+        public DbSet<Cart> Carts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -116,6 +117,16 @@ namespace IMS.Infrastructure.Persistence
 
             // Seed Roles
             SeedRoles(builder);
+
+            builder.Entity<Cart>()
+         .HasIndex(c => new { c.UserId, c.ProductId, c.ProductSizeId })
+         .IsUnique(); 
+
+            builder.Entity<Cart>()
+                .HasOne(c => c.ProductSize)
+                .WithMany()
+                .HasForeignKey(c => c.ProductSizeId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
         private void SeedRoles(ModelBuilder builder)
