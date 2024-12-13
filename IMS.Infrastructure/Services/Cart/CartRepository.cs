@@ -117,5 +117,14 @@ namespace IMS.Infrastructure.Services.Cart
                 return result;
             }
         }
+
+        public async Task<bool> DeleteCartItemAsync(string cartId)
+        {
+            var cartItem = await _context.Carts.FindAsync(cartId);
+            if (cartItem == null) return false;
+            _context.Carts.Remove(cartItem);
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

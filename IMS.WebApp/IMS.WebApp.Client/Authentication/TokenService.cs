@@ -58,9 +58,62 @@ namespace IMS.WebApp.Client.Authentication
 
                 var jwtToken = jwtHandler.ReadJwtToken(token);
 
-                var role = jwtToken.Claims.FirstOrDefault(c => c.Type.Contains("role")).Value;
+                var role = jwtToken.Claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value;
 
                 return role;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public async Task<string?> GetUserIdFromTokenAsync()
+        {
+            var token = await GetTokenAsync();
+            if (string.IsNullOrWhiteSpace(token))
+                return null;
+
+            try
+            {
+                var jwtHandler = new JwtSecurityTokenHandler();
+
+                if (!jwtHandler.CanReadToken(token))
+                    return null;
+
+                var jwtToken = jwtHandler.ReadJwtToken(token);
+
+                var role = jwtToken.Claims.FirstOrDefault(c => c.Type.Contains("nameidentifier"))?.Value;
+
+                return role;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public async Task<string?> GetUserNameFromTokenAsync()
+        {
+            var token = await GetTokenAsync();
+            if (string.IsNullOrWhiteSpace(token))
+                return null;
+
+            try
+            {
+                var jwtHandler = new JwtSecurityTokenHandler();
+
+                if (!jwtHandler.CanReadToken(token))
+                    return null;
+
+                var jwtToken = jwtHandler.ReadJwtToken(token);
+
+                // Match the claim type exactly for "name"
+                var nameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name";
+                var userName = jwtToken.Claims
+                    .FirstOrDefault(c => string.Equals(c.Type, nameClaimType, StringComparison.OrdinalIgnoreCase))?.Value;
+
+                return userName;
             }
             catch
             {

@@ -9,5 +9,6 @@ namespace IMS.Infrastructure.Interface.Cart
         Task<GenericBaseResult<string>> AddToCartAsync(AddCartItemDto addCartItemDto);
         Task<GenericBaseResult<bool>> EditCartAsync(string cartId, int quantity);
         Task<GenericBaseResult<List<CartDto>>> GetCartItemsByUserIdAsync(string userId);
+        Task<bool> DeleteCartItemAsync(string cartId);
     }
 }

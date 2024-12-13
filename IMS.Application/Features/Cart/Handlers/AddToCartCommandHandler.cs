@@ -21,10 +21,11 @@ namespace IMS.Application.Features.Cart.Handlers
 
         public async Task<string> Handle(AddToCartCommand request, CancellationToken cancellationToken)
         {
+            var productSizeId = await _context.ProductSizes.Where(it => it.ProductId == request.ProductId && it.Size == request.ProductSizeName).FirstOrDefaultAsync();   
             var cartItem = await _context.Carts.FirstOrDefaultAsync
                 (c => c.UserId == request.UserId
                                         && c.ProductId == request.ProductId
-                                        && c.ProductSizeId == request.ProductSizeId, cancellationToken);
+                                        && c.ProductSizeId == productSizeId.Id, cancellationToken);
 
             if (cartItem == null)
             {
@@ -32,7 +33,7 @@ namespace IMS.Application.Features.Cart.Handlers
                 {
                     UserId = request.UserId,
                     ProductId = request.ProductId,
-                    ProductSizeId = request.ProductSizeId,
+                    ProductSizeId = productSizeId.Id,
                     Quantity = request.Quantity,
                     Created = DateTime.UtcNow,
                     CreatedBy = request.UserId
