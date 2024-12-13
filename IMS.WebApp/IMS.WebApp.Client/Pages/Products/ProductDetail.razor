@@ -2,10 +2,13 @@
 @rendermode InteractiveServer
 @inject NavigationManager NavigationManager
 @inject IProductService ProductService
+@inject ICartService CartService
 @inject AuthStateService AuthStateService
 @inject ISnackbar Snackbar
 @using System.Text
 @using IMS.Shared.Interface.Product
+@using IMS.Shared.Interface.Cart
+@using IMS.Shared.RequestDto.CartDTOs
 @using IMS.Shared.RequestDto.ProductDTOs
 @using IMS.WebApp.Client.Authentication
 
@@ -91,7 +94,7 @@
                                                Size="Size.Large"
                                                        Disabled="@(string.IsNullOrEmpty(SelectedSize) || product.UnitsInStock <= 0)"
                                                FullWidth="true"
-                                               OnClick="@(() =>NavigateToCartDetails())">
+                                               OnClick="@(() =>AddCartDetails())">
                                         Add to Cart
                                     </MudButton>
                                 </MudItem>
@@ -259,17 +262,36 @@
     {
         SelectedSize = size;
     }
-    private void NavigateToCartDetails()
+    private async Task AddCartDetails()
     {
         if (string.IsNullOrEmpty(SelectedSize))
         {
             Snackbar.Add("Select a Size", Severity.Error); 
             return;
         }
-        else{
+        var cartItem = new AddCartItemDto
+            {
+                UserId = "user-id", 
+                ProductId = product.Id, 
+                ProductSizeName = SelectedSize,
+                Quantity = 1 
+            };
 
-        NavigationManager.NavigateTo("/view-cart");
+        var result = await CartService.AddToCart(cartItem);
+
+        if (result.IsSuccess)
+        {
+            Snackbar.Add("Item added to cart successfully", Severity.Success);
+            NavigationManager.NavigateTo("/view-cart");
         }
+        else
+        {
+            Snackbar.Add(result.Message, Severity.Error);
+        }
+        // else{
+
+        // NavigationManager.NavigateTo("/view-cart");
+        // }
       
     }
     private void ProceedToBuy()

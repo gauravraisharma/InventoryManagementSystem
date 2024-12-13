@@ -1,9 +1,11 @@
 using Blazored.LocalStorage;
 using IMS.Shared.Interface.Auth;
+using IMS.Shared.Interface.Cart;
 using IMS.Shared.Interface.Category;
 using IMS.Shared.Interface.Department;
 using IMS.Shared.Interface.Product;
 using IMS.Shared.Services.Auth;
+using IMS.Shared.Services.Cart;
 using IMS.WebApp.Client.Authentication;
 using IMS.WebApp.Client.Pages;
 using IMS.WebApp.Client.Services.Category;
@@ -28,6 +30,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<AuthStateService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddMudServices();
 //builder.Services.AddMudServices(config =>
 //{

@@ -1,5 +1,8 @@
 ﻿@page "/view-cart"
+@using IMS.Shared.RequestDto.CartDTOs
 @using MudBlazor
+@inject ICartService CartService
+@using IMS.Shared.Interface.Cart
 
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
@@ -8,37 +11,43 @@
         <MudItem xs="12" md="8">
             <MudCard Class="p-3">
                 <MudText Typo="Typo.h5" Class="mb-3">Shopping Cart</MudText>
-                @foreach (var item in CartItems)
+                @if (cart != null && cart.Any())
                 {
-                    <MudPaper Class="d-flex align-center p-2 mb-2">
-                        <MudImage Src="@item.ImageUrl" Alt="@item.Name" Class="mr-3" />
-                        <MudStack>
-                            <MudText Typo="Typo.h6">@item.Name</MudText>
-                            <MudText Typo="Typo.subtitle1">Size: @item.Size | Color: @item.Color</MudText>
-                            <MudText Typo="Typo.subtitle2" Class="text-success">In Stock</MudText>
-                            <MudText Typo="Typo.body1">
-                                <span class="font-weight-bold">@($"₹{item.OriginalPrice:0.00}")</span>
-                            </MudText>
-                            <MudGrid Justify="Justify.FlexStart" AlignItems="AlignItems.Center">
-                                <MudItem>
-                                    <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="() => UpdateQuantity(item, -1)">-</MudButton>
-                                </MudItem>
-                                <MudItem>
-                                    <MudText>@item.Quantity</MudText>
-                                </MudItem>
-                                <MudItem>
-                                    <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="() => UpdateQuantity(item, 1)">+</MudButton>
-                                </MudItem>
-                                <MudItem>
-                                    <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="() => RemoveItem(item)">Delete</MudButton>
-                                </MudItem>
-                                <MudItem>
-                                    <MudButton Variant="Variant.Text" Color="Color.Primary">Save for Later</MudButton>
-                                </MudItem>
-                            </MudGrid>
-
-                        </MudStack>
-                    </MudPaper>
+                    @foreach (var item in cart)
+                    {
+                        <MudPaper Class="d-flex align-center p-2 mb-2">
+                            <MudImage Src="@item.ProductName" Alt="@item.ProductName" Class="mr-3" />
+                            <MudStack>
+                                <MudText Typo="Typo.h6">@item.ProductName</MudText>
+                                <MudText Typo="Typo.subtitle1">Size: @item.ProductSize</MudText>
+                                <MudText Typo="Typo.subtitle2" Class="text-success">In Stock</MudText>
+                                <MudText Typo="Typo.body1">
+                                    <span class="font-weight-bold">@($"₹{item.UnitPrice:0.00}")</span>
+                                </MudText>
+                                <MudGrid Justify="Justify.FlexStart" AlignItems="AlignItems.Center">
+                                    <MudItem>
+                                        <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="() => UpdateQuantity(item, -1)">-</MudButton>
+                                    </MudItem>
+                                    <MudItem>
+                                        <MudText>@item.Quantity</MudText>
+                                    </MudItem>
+                                    <MudItem>
+                                        <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="() => UpdateQuantity(item, 1)">+</MudButton>
+                                    </MudItem>
+                                    <MudItem>
+                                        <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="() => RemoveItem(item)">Delete</MudButton>
+                                    </MudItem>
+                                    <MudItem>
+                                        <MudButton Variant="Variant.Text" Color="Color.Primary">Save for Later</MudButton>
+                                    </MudItem>
+                                </MudGrid>
+                            </MudStack>
+                        </MudPaper>
+                    }
+                }
+                else
+                {
+                    <MudText Typo="Typo.subtitle1" Class="text-danger">No items in the cart</MudText>
                 }
             </MudCard>
         </MudItem>
@@ -48,37 +57,101 @@
             <MudCard Class="p-3">
                 <MudText Typo="Typo.h6">Cart Summary</MudText>
                 <MudDivider Class="my-2" />
-                <MudStack Spacing="2">
-                    <MudText Typo="Typo.body1">
-                        Subtotal (@CartItems.Count items):
-                        <span class="text-danger">@($"₹{CartItems.Sum(i => i.OriginalPrice * i.Quantity):0.00}")</span>
-                    </MudText>
-                    <MudText Typo="Typo.subtitle2" Class="text-success">Free Delivery Available</MudText>
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true">Proceed to Buy</MudButton>
-                </MudStack>
+                @if (cart != null && cart.Any())
+                {
+                    var totalItems = cart.Sum(i => i.Quantity);
+                    var totalPrice = cart.Sum(i => i.TotalPrice);
+                    <MudStack Spacing="2">
+                        <MudText Typo="Typo.body1">
+                            Subtotal (@totalItems item(s)):
+                            <span class="text-danger">@($"₹{totalPrice:0.00}")</span>
+                        </MudText>
+                        <MudText Typo="Typo.subtitle2" Class="text-success">Free Delivery Available</MudText>
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true">Proceed to Buy</MudButton>
+                    </MudStack>
+                }
+                else
+                {
+                    <MudText Typo="Typo.subtitle1" Class="text-danger">No items to summarize</MudText>
+                }
             </MudCard>
         </MudItem>
     </MudGrid>
-
-
 </MudContainer>
 
 @code {
     // Cart Items
-    private List<CartItem> CartItems = new()
+    private List<CartItem> CartItems;
+    private string errorMessage;
+    public string Id { get; set; }
+    private List<CartDto> cart = new List<CartDto>();
+    protected override async Task OnInitializedAsync()
     {
-        new CartItem { Name = "Miss Ethnik Pink Suit", Size = "2XL", Color = "Pink", DiscountedPrice = 2373.00, OriginalPrice = 8199.00, Quantity = 1, ImageUrl = "https://via.placeholder.com/150" },
-        new CartItem { Name = "Grey Casual Dress", Size = "M", Color = "Grey", DiscountedPrice = 1199.00, OriginalPrice = 3999.00, Quantity = 2, ImageUrl = "https://via.placeholder.com/150" }
-    };
+
+        try
+        {
+            Id = "16ebcafc-0d66-4c6a-8429-af16ce1697c7";
+            if (!string.IsNullOrEmpty(Id))
+            {
+
+                var response = await CartService.GetCartDetailsByUserIdAsync(Id);
+
+                if (response.IsSuccess)
+                {
+
+                    var fetchedProduct = response;
+                    if (fetchedProduct != null)
+                    {
+                        foreach(var items in fetchedProduct.Result)
+                        {
+                            
+                         var item = new CartDto
+                                {
+                                    ProductName = items.ProductName,
+                                    ProductDescription = items.ProductDescription,
+                                    Quantity = items.Quantity,
+                                    TotalPrice = items.TotalPrice,
+                                    UnitPrice = items.UnitPrice,
+                                    ProductImageUrls = items.ProductImageUrls,
+                                    ProductSize = items.ProductSize
+                                };
+                                cart.Add(item);
+                        }
+                       
+                       
+                    }
+                }
+                else
+                {
+                    errorMessage = response.Message ?? "Failed to fetch product details.";
+                }
+            }
+            // var response = await CartService.GetCartDetailsByUserIdAsync(UserId);
+
+            // if (response.IsSuccess)
+            // {
+            //     CartItems = response.Result;
+            // }
+            // else
+            // {
+            //     ErrorMessage = response.Message ?? "Failed to load cart details.";
+            // }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred: {ex.Message}";
+        }
+    }
    
-    private void UpdateQuantity(CartItem item, int change)
+    private void UpdateQuantity(CartDto item, int change)
     {
         item.Quantity = Math.Max(1, item.Quantity + change);
+
     }
 
-    private void RemoveItem(CartItem item)
+    private void RemoveItem(CartDto item)
     {
-        CartItems.Remove(item);
+        // CartItems.Remove(item);
     }
 
     // Models
