@@ -7,7 +7,9 @@
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 @inject NavigationManager NavigationManager
+@inject AuthStateService AuthStateService
 @using IMS.Shared.Common
+@using IMS.WebApp.Client.Authentication
 @using IMS.Shared.Interface
 @using IMS.Shared.Interface.Category
 @using IMS.Shared.Interface.Department
@@ -27,21 +29,25 @@
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
     <!-- Header Section -->
-    <div style="position: sticky; top: 0; z-index: 10; background-color: white; box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);">
+    <div style=" background-color: white; box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);">
         <MudGrid>
             <MudItem xs="12" Class="d-flex justify-space-between align-center">
                 <MudText Typo="Typo.h5">Products</MudText>
-                <div class="d-flex gap-2">
-                    <MudButton @onclick="OpenAddProductDialogAsync" Variant="Variant.Filled" Color="Color.Primary">
-                        Add Product
-                    </MudButton>
-                    <MudButton Variant="Variant.Outlined"
-                    Color="Color.Primary"
-                    StartIcon="@Icons.Material.Filled.Upload"
-                    Href="/export">
-                        IMPORT PRODUCT
-                    </MudButton>
-                </div>
+                @if (AuthStateService.UserRole == "admin")
+                {
+                    <div class="d-flex gap-2">
+                        <MudButton @onclick="OpenAddProductDialogAsync" Variant="Variant.Filled" Color="Color.Primary">
+                            Add Product
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.Upload"
+                                   Href="/export">
+                            IMPORT PRODUCT
+                        </MudButton>
+                    </div>
+                }
+               
             </MudItem>
         </MudGrid>
         <!-- Filters Section -->
@@ -137,16 +143,24 @@
                             </div>
                         </MudCardContent>
                         <MudCardActions Class="d-flex justify-space-between">
+                        @if (AuthStateService.UserRole == "admin")
+                        {
                             <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="() => OpenEditProductDialogAsync(product.Id)">
                                 EDIT
                             </MudButton>
+                        }
                             <div>
-                                @* <MudIconButton Icon="@Icons.Material.Filled.Visibility" Color="Color.Default" /> *@
-                                <MudIconButton Icon="@Icons.Material.Filled.Visibility"
-                                Color="Color.Default"
-                                OnClick="@(() => NavigateToProductDetails(product.Id))" />
-                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => DeleteProductDetails(product.Id))" />
+                                <MudTooltip Text="Preview">
+                                <MudIconButton Icon="@Icons.Material.Filled.Visibility"Color="Color.Default" OnClick="@(() => NavigateToProductDetails(product.Id))" />
+                                </MudTooltip>
                             </div>
+                            @if(AuthStateService.UserRole=="admin")
+                            {
+                                <div>
+                                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => DeleteProductDetails(product.Id))" />
+                                 </div>
+                            }
+                           
                         </MudCardActions>
                     </MudCard>
                 </MudItem>
@@ -242,8 +256,9 @@
         var response = await ProductService.DeleteProductByIdAsync(id);
         if (response.IsSuccess)
         {
-            Snackbar.Add($"Product Deleted Successfully: {response.Message}", Severity.Success);
-            StateHasChanged();
+            Snackbar.Add("Product Deleted Successfully", Severity.Success);
+            await RefreshProductList();
+            // StateHasChanged();
         }
         else
         {

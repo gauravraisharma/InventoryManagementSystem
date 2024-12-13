@@ -1,5 +1,9 @@
 ﻿@page "/"
+@using IMS.WebApp.Client.Pages.Products
+@using IMS.WebApp.Client.Authentication
+@inject AuthStateService AuthStateService
 
-<PageTitle>Home</PageTitle>
-
-<h1>Tacking Stuff</h1>
+@if(AuthStateService.UserRole != "admin")
+{
+    <ProductList />
+}

@@ -1,25 +1,66 @@
-﻿<MudAppBar Color="Color.Primary" Elevation="2">
+﻿@inject AuthStateService AuthStateService
+@inject ITokenService TokenService
+@inject NavigationManager NavigationManager
+@using IMS.WebApp.Client.Authentication
     <div id="nav-belt" class="d-flex align-items-center justify-content-between w-100">
         <!-- Left Section -->
         <div class="nav-left d-flex align-items-center">
-            <MudText Typo="Typo.h6" Class="ml-2">tackingStuff.in</MudText>
-            <MudText Typo="Typo.body1" Class="ml-2">Delivering to Dehradun 248001</MudText>
+            <MudText Typo="Typo.h6" Class="ml-2" Style="color: white;">tackingStuff.in</MudText>
+            <MudText Typo="Typo.body1" Style="color: white;"  Class="ml-2">Delivering to Dehradun 248001</MudText>
         </div>
 
         <!-- Center Section -->
         <div class="nav-fill flex-grow-1 mx-4">
-            <MudTextField T="string" Placeholder="Search Amazon.in" Class="w-100" />
+        <MudTextField T="string" Placeholder="Search Amazon.in" Class="w-100" Style="color: white;" />
         </div>
 
         <!-- Right Section -->
-        <div class="nav-right d-flex align-items-center">
-            <NavLink href="/login" class="ml-4 text-decoration-none">
+      @*   <div class="nav-right d-flex align-items-center">
+        <div style="padding-right:20px">
+            <NavLink href="/login" class="ml-4 text-decoration-none" Style="color: aliceblue;">
                 <MudText Typo="Typo.body1">Hello, sign in</MudText>
             </NavLink>
-            <MudText Typo="Typo.body1" Class="ml-4">Cart (0)</MudText>
+            </div>
+        <div style="padding-right:10px">
+            <NavLink href="/cart" class="ml-4 text-decoration-none" Style="color: aliceblue;">
+                <MudText Typo="Typo.body1">Cart</MudText>
+            </NavLink>
+        </div>
+        
+        </div> *@
+    <div class="nav-right d-flex align-items-center">
+        @if (AuthStateService.IsLoggedIn)
+        {
+            <!-- Dropdown for Signed-In User -->
+            <MudMenu Class="custom-menu" AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopRight">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="user-dropdown-button">
+                    <MudIcon Icon="Icons.Material.Filled.AccountCircle" Class="mr-1" />
+                    @AuthStateService.UserRole  <!-- Display User Name -->
+                </MudButton>
+                <!-- Sign Out Option -->
+                <MudMenuItem OnClick="SignOut" Class="mud-menu-item">Sign Out</MudMenuItem>
+            </MudMenu>
+        }
+        else
+        {
+            <!-- Sign In Link -->
+            <div style="padding-right:20px">
+                <NavLink href="/login" class="ml-4 text-decoration-none" Style="color: aliceblue;">
+                    <MudText Typo="Typo.body1">Hello, sign in</MudText>
+                </NavLink>
+            </div>
+        }
+
+        <!-- Cart Link -->
+        <div style="padding-right:10px">
+            <NavLink href="/cart" class="ml-4 text-decoration-none" Style="color: aliceblue;">
+                <MudText Typo="Typo.body1">Cart</MudText>
+            </NavLink>
         </div>
     </div>
-</MudAppBar>
+
+    </div>
+
 
 <style>
     #nav-belt {
@@ -31,6 +72,7 @@
         font-size: 14px;
         position: relative;
         z-index: 5;
+        background-color: darkslateblue;
     }
 
         #nav-belt .nav-left {
@@ -46,6 +88,7 @@
             justify-content: center;
             flex: 1 1 auto; /* Allows it to grow and take up the central space */
             margin: 0 16px; /* Adds some spacing between left and right sections */
+            color: bisque;
         }
 
         #nav-belt .nav-right {
@@ -56,3 +99,13 @@
         }
 
 </style>
+
+@code{
+    private async Task SignOut()
+    {
+        await TokenService.RemoveTokenAsync();
+        NavigationManager.NavigateTo("/");
+        AuthStateService.IsLoggedIn = false;
+        AuthStateService.UserRole = "";
+    }
+}
