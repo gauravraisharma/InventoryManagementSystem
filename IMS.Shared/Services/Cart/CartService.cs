@@ -25,7 +25,7 @@ namespace IMS.Shared.Services.Cart
         {
             try
             {
-                var requestUrl = $"{ApiEndpoints.Cart.GetByUserId}/{userId}";
+                var requestUrl = $"{ApiEndpoints.Cart.GetCartItems}/{userId}";
                 var response = await _httpClient.GetAsync(requestUrl);
 
                 if (response.IsSuccessStatusCode)
@@ -74,5 +74,73 @@ namespace IMS.Shared.Services.Cart
                 Message = "Failed to add item to cart"
             };
         }
+
+        public async Task<ApiResponse<bool>> UpdateCart(string CartItemId, int Quantity)
+        {
+            var loginPayload = new
+            {
+                CartId = CartItemId,
+                Quantity = Quantity
+            };
+
+            var content = new StringContent(JsonSerializer.Serialize(loginPayload), Encoding.UTF8, "application/json");
+            var response = await _httpClient.PutAsync(ApiEndpoints.Cart.UpdateCart, content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var apiResponse = JsonSerializer.Deserialize<ApiResponse<bool>>(responseContent, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                return apiResponse;
+            }
+
+            return new ApiResponse<bool>
+            {
+                IsSuccess = false,
+                Message = "Failed to add item to cart"
+            };
+        }
+
+        public async Task<ApiResponse<bool>> DeleteCartItem(string cartItemId)
+        {
+            try
+            {
+                var requestUrl = $"{ApiEndpoints.Cart.DeleteCartItem}/{cartItemId}";
+                var response = await _httpClient.DeleteAsync(requestUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var apiResponse = JsonSerializer.Deserialize<ApiResponse<bool>>(responseContent, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+
+                    return apiResponse ?? new ApiResponse<bool>
+                    {
+                        IsSuccess = false,
+                        Message = "No response content from server"
+                    };
+                }
+
+                return new ApiResponse<bool>
+                {
+                    IsSuccess = false,
+                    Message = "Failed to delete cart item"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<bool>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message
+                };
+            }
+        }
+
     }
 }
