@@ -18,21 +18,24 @@ namespace IMS.WebAPI.Controllers
             _mediator = mediator;
         }
 
-        [HttpPost("add")]
-        public async Task<IActionResult> AddToCart(AddToCartCommand command)
+        [HttpPost]
+        [Route("AddToCart")]
+        public async Task<GenericBaseResult<string>> AddToCart(AddToCartCommand command)
         {
             var cartId = await _mediator.Send(command);
-            return Ok(new { CartId = cartId });
+            return new GenericBaseResult<string>(cartId);
         }
 
-        [HttpPut("edit")]
-        public async Task<IActionResult> EditCart(EditCartCommand command)
+        [HttpPut]
+        [Route("EditCart")]
+        public async Task<GenericBaseResult<bool>> EditCart(EditCartCommand command)
         {
             var success = await _mediator.Send(command);
-            return success ? Ok() : NotFound();
+            return success ? new GenericBaseResult<bool>(true) : new GenericBaseResult<bool>(false);
         }
 
-        [HttpGet("user/{userId}")]
+        [HttpGet]
+        [Route("GetCartItems/{userId}")]
         public async Task<GenericBaseResult<List<CartDto>>> GetCartItems(string userId)
         {
             var query = new GetCartItemsQuery { UserId = userId };
@@ -40,13 +43,13 @@ namespace IMS.WebAPI.Controllers
             return new GenericBaseResult<List<CartDto>>(cartItems);
         }
 
-        [HttpDelete("{cartId}")]
-        public async Task<IActionResult> DeleteCartItem(string cartId)
+        [HttpDelete]
+        [Route("DeleteCartItem/{cartId}")]
+        public async Task<GenericBaseResult<bool>> DeleteCartItem(string cartId)
         {
             var command = new DeleteCartItemCommand { CartId = cartId };
             var success = await _mediator.Send(command);
-
-            return success ? Ok() : NotFound();
+            return new GenericBaseResult<bool>(success);
         }
     }
 }

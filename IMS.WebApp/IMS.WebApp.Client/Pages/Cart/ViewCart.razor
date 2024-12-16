@@ -1,8 +1,13 @@
 ﻿@page "/view-cart"
 @using IMS.Shared.RequestDto.CartDTOs
+@using IMS.WebApp.Client.Authentication
 @using MudBlazor
 @inject ICartService CartService
 @using IMS.Shared.Interface.Cart
+@inject ITokenService TokenService
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+
 
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
@@ -16,8 +21,21 @@
                     @foreach (var item in cart)
                     {
                         <MudPaper Class="d-flex align-center p-2 mb-2">
-                            <MudImage Src="@item.ProductName" Alt="@item.ProductName" Class="mr-3" />
+                           <MudCarousel TData="string" AutoCycle="true" Class="mr-3" Style="height: 200px; width: 200px;">
+                            <Items>
+                                @foreach (var imageUrl in item.ProductImageUrls)
+                                {
+                                    <MudCarouselItem>
+                                        <MudImage Src="@($"data:image/jpeg;base64,{imageUrl}")" 
+                                                  Alt="@item.ProductName" 
+                                                  Style="width: 100%; height: 100%; object-fit: cover;" />
+                                    </MudCarouselItem>
+                                }
+                            </Items>
+                        </MudCarousel>
+
                             <MudStack>
+                                <MudText Typo="Typo.h6" hidden >@item.CartId</MudText>
                                 <MudText Typo="Typo.h6">@item.ProductName</MudText>
                                 <MudText Typo="Typo.subtitle1">Size: @item.ProductSize</MudText>
                                 <MudText Typo="Typo.subtitle2" Class="text-success">In Stock</MudText>
@@ -35,10 +53,7 @@
                                         <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="() => UpdateQuantity(item, 1)">+</MudButton>
                                     </MudItem>
                                     <MudItem>
-                                        <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="() => RemoveItem(item)">Delete</MudButton>
-                                    </MudItem>
-                                    <MudItem>
-                                        <MudButton Variant="Variant.Text" Color="Color.Primary">Save for Later</MudButton>
+                                        <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="() => RemoveItem(item.CartId)">Delete</MudButton>
                                     </MudItem>
                                 </MudGrid>
                             </MudStack>
@@ -80,8 +95,6 @@
 </MudContainer>
 
 @code {
-    // Cart Items
-    private List<CartItem> CartItems;
     private string errorMessage;
     public string Id { get; set; }
     private List<CartDto> cart = new List<CartDto>();
@@ -90,86 +103,123 @@
 
         try
         {
-            Id = "16ebcafc-0d66-4c6a-8429-af16ce1697c7";
-            if (!string.IsNullOrEmpty(Id))
-            {
-
-                var response = await CartService.GetCartDetailsByUserIdAsync(Id);
-
-                if (response.IsSuccess)
+                Id = await TokenService.GetUserIdFromTokenAsync();
+                if (!string.IsNullOrEmpty(Id))
                 {
 
-                    var fetchedProduct = response;
-                    if (fetchedProduct != null)
+                    var response = await CartService.GetCartDetailsByUserIdAsync(Id);
+
+                    if (response.IsSuccess)
                     {
-                        foreach(var items in fetchedProduct.Result)
-                        {
-                            
-                         var item = new CartDto
-                                {
-                                    ProductName = items.ProductName,
-                                    ProductDescription = items.ProductDescription,
-                                    Quantity = items.Quantity,
-                                    TotalPrice = items.TotalPrice,
-                                    UnitPrice = items.UnitPrice,
-                                    ProductImageUrls = items.ProductImageUrls,
-                                    ProductSize = items.ProductSize
-                                };
-                                cart.Add(item);
-                        }
-                       
-                       
-                    }
-                }
-                else
-                {
-                    errorMessage = response.Message ?? "Failed to fetch product details.";
-                }
-            }
-            // var response = await CartService.GetCartDetailsByUserIdAsync(UserId);
 
-            // if (response.IsSuccess)
-            // {
-            //     CartItems = response.Result;
-            // }
-            // else
-            // {
-            //     ErrorMessage = response.Message ?? "Failed to load cart details.";
-            // }
+                        var fetchedProduct = response;
+                        if (fetchedProduct != null)
+                        {
+                            foreach (var items in fetchedProduct.Result)
+                            {
+
+                                var item = new CartDto
+                                    {
+                                        CartId = items.CartId,
+                                        ProductName = items.ProductName,
+                                        ProductDescription = items.ProductDescription,
+                                        Quantity = items.Quantity,
+                                        TotalPrice = items.TotalPrice,
+                                        UnitPrice = items.UnitPrice,
+                                        ProductImageUrls = items.ProductImageUrls,
+                                        ProductSize = items.ProductSize
+                                    };
+                                cart.Add(item);
+                            }
+
+
+                        }
+                    }
+                    else
+                    {
+                        errorMessage = response.Message ?? "Failed to fetch product details.";
+                    }
+            }
+            
         }
         catch (Exception ex)
         {
             errorMessage = $"An error occurred: {ex.Message}";
         }
     }
-   
-    private void UpdateQuantity(CartDto item, int change)
+
+    private async Task GetUserCartDetailsByUserIdAsync()
+    {
+        try
+        {
+            var response = await CartService.GetCartDetailsByUserIdAsync(Id);
+
+            if (response.IsSuccess)
+            {
+                cart.Clear();
+                var fetchedProduct = response;
+                if (fetchedProduct != null)
+                {
+                    foreach (var items in fetchedProduct.Result)
+                    {
+
+                        var item = new CartDto
+                            {
+                                CartId = items.CartId,
+                                ProductName = items.ProductName,
+                                ProductDescription = items.ProductDescription,
+                                Quantity = items.Quantity,
+                                TotalPrice = items.TotalPrice,
+                                UnitPrice = items.UnitPrice,
+                                ProductImageUrls = items.ProductImageUrls,
+                                ProductSize = items.ProductSize
+                            };
+                        cart.Add(item);
+                    }
+
+
+                }
+            }
+            else
+            {
+                errorMessage = response.Message ?? "Failed to fetch product details.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred: {ex.Message}";
+        }
+    }
+
+    private async Task  UpdateQuantity(CartDto item, int change)
     {
         item.Quantity = Math.Max(1, item.Quantity + change);
+        item.TotalPrice = item.Quantity * item.UnitPrice;
+        var response = await CartService.UpdateCart(item.CartId, item.Quantity);
+        if (response.IsSuccess)
+        {
+            Snackbar.Add("Item Updated successfully", Severity.Success);
+            // await GetUserCartDetailsByUserIdAsync();
+
+        }
+        else
+        {
+            Snackbar.Add(response.Message, Severity.Error);
+        }
 
     }
-
-    private void RemoveItem(CartDto item)
+    private async Task RemoveItem(string id)
     {
-        // CartItems.Remove(item);
-    }
-
-    // Models
-    public class CartItem
-    {
-        public string Name { get; set; }
-        public string Size { get; set; }
-        public string Color { get; set; }
-        public double DiscountedPrice { get; set; }
-        public double OriginalPrice { get; set; }
-        public int Quantity { get; set; }
-        public string ImageUrl { get; set; }
-    }
-
-    public class Product
-    {
-        public string Name { get; set; }
-        public double Price { get; set; }
-        public string ImageUrl { get; set; }
+        var response = await CartService.DeleteCartItem(id);
+        if (response.IsSuccess)
+        {
+            Snackbar.Add("Item Removed Successfully", Severity.Success);
+            await GetUserCartDetailsByUserIdAsync();
+            
+        }
+        else
+        {
+            Snackbar.Add($"Error: {response.Message}", Severity.Error);
+        }
     }
 }
