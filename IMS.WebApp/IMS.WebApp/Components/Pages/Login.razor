@@ -67,16 +67,16 @@
                 var role = await TokenService.GetRoleFromTokenAsync();
                 AuthStateService.UserRole = role; 
 
-                AuthStateService.NotifyAuthenticationStateChanged(); 
-
                 // Navigate based on user role
                 if (role == "user")
                 {
-                    NavigationManager.NavigateTo("/product");
+                    NavigationManager.NavigateTo("/product",true);
+                    AuthStateService.NotifyAuthenticationStateChanged();
                 }
                 else if (role == "admin")
                 {
-                    NavigationManager.NavigateTo("/");
+                    NavigationManager.NavigateTo("/product",true);
+                    AuthStateService.NotifyAuthenticationStateChanged();
                 }
             }
             else
