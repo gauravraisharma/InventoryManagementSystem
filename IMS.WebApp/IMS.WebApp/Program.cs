@@ -12,6 +12,7 @@ using IMS.WebApp.Client.Services.Category;
 using IMS.WebApp.Client.Services.Department;
 using IMS.WebApp.Client.Services.Product;
 using IMS.WebApp.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor;
 using MudBlazor.Services;
 
@@ -28,6 +29,7 @@ builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddScoped<AuthenticationStateProvider, AuthStateService>();
 builder.Services.AddScoped<AuthStateService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICartService, CartService>();

@@ -212,11 +212,14 @@
     private string errorMessage;
     private GetAllProductDto? product { get; set; }
     private string SelectedSize { get; set; }
-  
+    private bool IsAuthenticated { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         try
         {
+            var authState = await AuthStateService.GetAuthenticationStateAsync();
+            IsAuthenticated = authState.User.Identity.IsAuthenticated;
             if (!string.IsNullOrEmpty(EncodedId))
             {
                 var base64EncodedBytes = Convert.FromBase64String(EncodedId);
@@ -264,6 +267,11 @@
     }
     private async Task AddCartDetails()
     {
+        if(!IsAuthenticated){
+            NavigationManager.NavigateTo("/login");
+            return;
+        }
+
         if (string.IsNullOrEmpty(SelectedSize))
         {
             Snackbar.Add("Select a Size", Severity.Error); 
