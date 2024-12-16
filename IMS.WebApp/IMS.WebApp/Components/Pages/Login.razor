@@ -63,18 +63,21 @@
             if (res.IsSuccess)
             {
                 await TokenService.SetTokenAsync(res.Result);
+
                 var role = await TokenService.GetRoleFromTokenAsync();
-                AuthStateService.IsLoggedIn = true;
-                AuthStateService.UserRole = role;
-                if (AuthStateService.UserRole == "user")
+                AuthStateService.UserRole = role; 
+
+                AuthStateService.NotifyAuthenticationStateChanged(); 
+
+                // Navigate based on user role
+                if (role == "user")
                 {
                     NavigationManager.NavigateTo("/product");
                 }
-                else{
+                else if (role == "admin")
+                {
                     NavigationManager.NavigateTo("/");
                 }
-                
-
             }
             else
             {

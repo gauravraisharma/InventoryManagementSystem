@@ -3,38 +3,49 @@
 @inject AuthStateService AuthStateService
 
 <Router AppAssembly="@typeof(Program).Assembly" AdditionalAssemblies="new[] { typeof(Client._Imports).Assembly }">
-	<Found Context="routeData">
-		@if (AuthStateService.IsLoggedIn)
-		{
-			@if (AuthStateService.UserRole == "admin")
-			{
-				<RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
-			}
-			else
-			{
-				<RouteView RouteData="routeData" DefaultLayout="typeof(Layout.Public.PublicLayout)" />
-			}
-		}
-		else
-		{
-			@if (IsLoginUrl || IsSignupUrl)
-			{
-				<RouteView RouteData="routeData" DefaultLayout="typeof(Layout.Public.LoginLayout)" />
-			}
-			else
-			{
-				<RouteView RouteData="routeData" DefaultLayout="typeof(Layout.Public.PublicLayout)" />
-			}
-		}
-		<FocusOnNavigate RouteData="routeData" Selector="h1" />
-	</Found>
+    <Found Context="routeData">
+        @if (IsAuthenticated)
+        {
+            if (UserRole == "admin")
+            {
+                <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
+            }
+            else
+            {
+                <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.Public.PublicLayout)" />
+            }
+        }
+        else
+        {
+            if (IsLoginUrl || IsSignupUrl)
+            {
+                <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.Public.LoginLayout)" />
+            }
+            else
+            {
+                <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.Public.PublicLayout)" />
+            }
+        }
+        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+    </Found>
 
-	<NotFound>
-		<h1>Page not found</h1>
-	</NotFound>
+    <NotFound>
+        <h1>Page not found</h1>
+    </NotFound>
 </Router>
 
 @code {
-	private bool IsLoginUrl => NavigationManager.Uri.EndsWith("/login", StringComparison.OrdinalIgnoreCase);
-	private bool IsSignupUrl => NavigationManager.Uri.EndsWith("/signup", StringComparison.OrdinalIgnoreCase);
+    private bool IsAuthenticated { get; set; }
+    private string UserRole { get; set; } = string.Empty;
+
+    private bool IsLoginUrl => NavigationManager.Uri.EndsWith("/login", StringComparison.OrdinalIgnoreCase);
+    private bool IsSignupUrl => NavigationManager.Uri.EndsWith("/signup", StringComparison.OrdinalIgnoreCase);
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateService.GetAuthenticationStateAsync();
+        IsAuthenticated = authState.User.Identity.IsAuthenticated;
+        UserRole = AuthStateService.UserRole; 
+
+    }
 }

@@ -70,12 +70,19 @@
 
 @code {
     private bool _isExpanded = true;
+    private bool IsAuthenticated { get; set; }
+    private string UserRole { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateService.GetAuthenticationStateAsync();
+        IsAuthenticated = authState.User.Identity.IsAuthenticated;
+        UserRole = AuthStateService.UserRole;
+    }
 
     private async Task HandleLogout()
     {
         await TokenService.RemoveTokenAsync();
         NavigationManager.NavigateTo("/");
-        AuthStateService.IsLoggedIn = false;
-        AuthStateService.UserRole = "";
     }
 }

@@ -17,7 +17,7 @@
 
     <!-- Right Section -->
     <div class="nav-right d-flex align-items-center">
-        @if (AuthStateService.IsLoggedIn)
+        @if (IsAuthenticated)
         {
             <!-- Dropdown for Signed-In User -->
             <MudMenu Class="custom-menu" AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopRight">
@@ -49,44 +49,38 @@
 
 <style>
     #nav-belt {
-        background-color: darkslateblue;
-        height: 60px;
-        font-size: 14px;
-        position: relative;
+    background-color: darkslateblue;
+    height: 60px;
+    font-size: 14px;
+    position: relative;
     }
 
     .nav-right {
-        justify-content: flex-end;
+    justify-content: flex-end;
     }
 </style>
 
 @code {
     private string Username { get; set; }
+    private bool IsAuthenticated { get; set; }
+
 
     protected override async Task OnInitializedAsync()
     {
-        AuthStateService.OnChange += StateHasChanged;
-
-        var token = await TokenService.GetTokenAsync();
-        AuthStateService.IsLoggedIn = !string.IsNullOrEmpty(token);
-
-        if (AuthStateService.IsLoggedIn)
+        var authState = await AuthStateService.GetAuthenticationStateAsync();
+        IsAuthenticated = authState.User.Identity.IsAuthenticated;
+        if (IsAuthenticated)
         {
             Username = await TokenService.GetUserNameFromTokenAsync();
         }
     }
 
-    public void Dispose()
-    {
-        AuthStateService.OnChange -= StateHasChanged;
-    }
 
     private async Task SignOut()
     {
         await TokenService.RemoveTokenAsync();
-        AuthStateService.IsLoggedIn = false;
-        AuthStateService.UserRole = "";
         Username = null;  
         NavigationManager.NavigateTo("/");
+        AuthStateService.NotifyAuthenticationStateChanged();
     }
 }
