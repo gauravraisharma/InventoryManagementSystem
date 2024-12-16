@@ -7,7 +7,7 @@
 @inject ITokenService TokenService
 @inject ISnackbar Snackbar
 @inject NavigationManager NavigationManager
-
+@inject AuthStateService AuthStateService
 
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
@@ -98,14 +98,23 @@
     private string errorMessage;
     public string Id { get; set; }
     private List<CartDto> cart = new List<CartDto>();
+    private bool IsAuthenticated { get; set; }
     protected override async Task OnInitializedAsync()
     {
 
         try
         {
-                Id = await TokenService.GetUserIdFromTokenAsync();
-                if (!string.IsNullOrEmpty(Id))
-                {
+            var authState = await AuthStateService.GetAuthenticationStateAsync();
+            IsAuthenticated = authState.User.Identity.IsAuthenticated;
+            if (!IsAuthenticated)
+            {
+                NavigationManager.NavigateTo("/login");
+                return;
+            }
+
+            Id = await TokenService.GetUserIdFromTokenAsync();
+            if (!string.IsNullOrEmpty(Id))
+            {
 
                     var response = await CartService.GetCartDetailsByUserIdAsync(Id);
 

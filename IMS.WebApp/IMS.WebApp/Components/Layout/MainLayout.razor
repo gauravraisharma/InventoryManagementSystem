@@ -8,7 +8,7 @@
 
 <MudThemeProvider />
 <div class="page">
-    @if (AuthStateService.IsLoggedIn)
+    @if (IsAuthenticated)
     {
         <div class="sidebar">
             <NavMenu />
@@ -40,10 +40,10 @@
 
 @code {
     private bool IsSignupUrl => NavigationManager.Uri.EndsWith("/signup", StringComparison.OrdinalIgnoreCase);
-
-    protected override void OnInitialized()
+    private bool IsAuthenticated { get; set; }
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
-        // Optional: Handle redirection or additional initialization logic here
+        var authState = await AuthStateService.GetAuthenticationStateAsync();
+        IsAuthenticated = authState.User.Identity.IsAuthenticated;
     }
 }

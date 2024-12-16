@@ -1,37 +1,45 @@
-﻿namespace IMS.WebApp.Client.Authentication
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Components.Authorization;
+
+namespace IMS.WebApp.Client.Authentication
 {
-    public class AuthStateService
+    public class AuthStateService : AuthenticationStateProvider
     {
-        public event Action OnChange;
+        private readonly ITokenService _tokenService;
+        public string UserRole { get; set; } = string.Empty;
 
-        private bool _isLoggedIn;
-        public bool IsLoggedIn
+        public AuthStateService(ITokenService tokenService)
         {
-            get => _isLoggedIn;
-            set
-            {
-                if (_isLoggedIn != value)
-                {
-                    _isLoggedIn = value;
-                    NotifyStateChanged();
-                }
-            }
+            _tokenService = tokenService;
         }
 
-        private string _userRole;
-        public string UserRole
+        public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            get => _userRole;
-            set
+            var token = await _tokenService.GetTokenAsync();
+
+            if (string.IsNullOrWhiteSpace(token))
             {
-                if (_userRole != value)
-                {
-                    _userRole = value;
-                    NotifyStateChanged();
-                }
+                // No token means no authentication
+                return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
             }
+
+            // Decode the token and create claims
+            var claimsIdentity = new ClaimsIdentity(ParseClaimsFromJwt(token), "jwt");
+            var user = new ClaimsPrincipal(claimsIdentity);
+
+            return new AuthenticationState(user);
         }
 
-        private void NotifyStateChanged() => OnChange?.Invoke();
+        public void NotifyAuthenticationStateChanged()
+        {
+            NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+        }
+
+        private IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
+        {
+            var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(jwt);
+            return token.Claims;
+        }
     }
 }
