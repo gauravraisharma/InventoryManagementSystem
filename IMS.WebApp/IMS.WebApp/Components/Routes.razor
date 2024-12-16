@@ -1,7 +1,10 @@
 ﻿@inject NavigationManager NavigationManager
 @using IMS.WebApp.Client.Authentication
+@using Microsoft.AspNetCore.Components.Authorization
 @inject AuthStateService AuthStateService
+@inject ITokenService TokenService
 
+<CascadingAuthenticationState>
 <Router AppAssembly="@typeof(Program).Assembly" AdditionalAssemblies="new[] { typeof(Client._Imports).Assembly }">
     <Found Context="routeData">
         @if (IsAuthenticated)
@@ -33,6 +36,7 @@
         <h1>Page not found</h1>
     </NotFound>
 </Router>
+</CascadingAuthenticationState>
 
 @code {
     private bool IsAuthenticated { get; set; }
@@ -45,7 +49,8 @@
     {
         var authState = await AuthStateService.GetAuthenticationStateAsync();
         IsAuthenticated = authState.User.Identity.IsAuthenticated;
-        UserRole = AuthStateService.UserRole; 
+        UserRole = await TokenService.GetRoleFromTokenAsync();
 
+        AuthStateService.UserRole = UserRole;
     }
 }

@@ -83,6 +83,6 @@
     private async Task HandleLogout()
     {
         await TokenService.RemoveTokenAsync();
-        NavigationManager.NavigateTo("/");
+        NavigationManager.NavigateTo("/",true);
     }
 }

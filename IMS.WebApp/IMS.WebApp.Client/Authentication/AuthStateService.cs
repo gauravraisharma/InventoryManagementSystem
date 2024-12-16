@@ -23,9 +23,12 @@ namespace IMS.WebApp.Client.Authentication
                 return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
             }
 
-            // Decode the token and create claims
+            // Decode the token and extract claims
             var claimsIdentity = new ClaimsIdentity(ParseClaimsFromJwt(token), "jwt");
             var user = new ClaimsPrincipal(claimsIdentity);
+
+            // Update UserRole
+            UserRole = claimsIdentity.FindFirst(ClaimTypes.Role)?.Value ?? string.Empty;
 
             return new AuthenticationState(user);
         }
