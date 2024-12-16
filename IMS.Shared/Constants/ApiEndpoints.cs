@@ -40,8 +40,10 @@ namespace IMS.Shared.Constants
         public class Cart
         {
             public const string Base = "https://localhost:44317/";
-            public const string AddToCart= Base + "api/Cart/add";
-            public const string GetByUserId = Base + "api/Cart/user";
+            public const string AddToCart= Base + "api/Cart/AddToCart";
+            public const string GetCartItems = Base + "api/Cart/GetCartItems";
+            public const string UpdateCart = Base + "api/Cart/EditCart";
+            public const string DeleteCartItem = Base + "api/Cart/DeleteCartItem";
         }
     }
 }
