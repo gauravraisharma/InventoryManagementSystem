@@ -1,0 +1,67 @@
+﻿ @page "/customer"
+
+<MudPaper Elevation="4" Class="centered-table-container">
+    <MudTable Items="customers" Hover="true" SortLabel="Sort by" Striped="true" Dense="true" Bordered="true">
+        <HeaderContent>
+            <MudTh>First Name</MudTh>
+            <MudTh>Last Name</MudTh>
+            <MudTh>Customer ID</MudTh>
+            <MudTh>Email</MudTh>
+            <MudTh>Phone</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="First Name">@context.FirstName</MudTd>
+            <MudTd DataLabel="Last Name">@context.LastName</MudTd>
+            <MudTd DataLabel="Customer ID">@context.CustomerId</MudTd>
+            <MudTd DataLabel="Email">@context.Email</MudTd>
+            <MudTd DataLabel="Phone">@context.Phone</MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudPaper>
+
+@code {
+    private List<CustomerDto> customers = new List<CustomerDto>
+    {
+        new CustomerDto
+        {
+            FirstName = "John",
+            LastName = "Doe",
+            CustomerId = 1,
+            Email = "john.doe@example.com",
+            Phone = "123-456-7890"
+        },
+        new CustomerDto
+        {
+            FirstName = "Jane",
+            LastName = "Smith",
+            CustomerId = 2,
+            Email = "jane.smith@example.com",
+            Phone = "987-654-3210"
+        },
+        new CustomerDto
+        {
+            FirstName = "Michael",
+            LastName = "Johnson",
+            CustomerId = 3,
+            Email = "michael.johnson@example.com",
+            Phone = "555-555-5555"
+        },
+        new CustomerDto
+        {
+            FirstName = "Emily",
+            LastName = "Williams",
+            CustomerId = 4,
+            Email = "emily.williams@example.com",
+            Phone = "555-123-4567"
+        }
+    };
+
+    public class CustomerDto
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public int CustomerId { get; set; }
+        public string Email { get; set; }
+        public string Phone { get; set; }
+    }
+}
