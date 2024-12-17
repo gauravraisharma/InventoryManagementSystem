@@ -1,77 +1,45 @@
-﻿@page "/admin/dashboard"
-@rendermode InteractiveAuto
+﻿
+
+@page "/admin/dashboard"
+@using MudBlazor
+@implements IDisposable
+@using IMS.Shared.Interface.Product
+@inject IProductService ProductService
+@using IMS.Shared.RequestDto.ProductDTOs
+
+<MudGrid Class="mb-4" Style="align-items: center; justify-content: flex-end;">
+    <MudItem xs="12">
+        <div Style="display: flex; justify-content: flex-end; gap: 8px;">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="min-width: 120px;" OnClick="LoadSampleData">
+                Sample Data
+            </MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" Style="min-width: 120px;" OnClick="LoadLiveData">
+                Live Data
+            </MudButton>
+        </div>
+    </MudItem>
+</MudGrid>
+
 <MudText Typo="Typo.h4">Dashboard</MudText>
-
 <MudGrid>
-    <MudItem xs="12" sm="6" md="3">
-        <MudCard Style="background-color:white; height: 300px; display: flex; flex-direction: column; align-items: center;">
-            <MudCardContent Style="flex-grow: 1; text-align: center;">
-                <svg width="100" height="100" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="3" y="3" width="8" height="8" fill="#FF6B6B" />
-                    <rect x="13" y="3" width="8" height="8" fill="#4ECDC4" />
-                    <rect x="3" y="13" width="8" height="8" fill="#4ECDC4" />
-                    <rect x="13" y="13" width="8" height="8" fill="#FF6B6B" />
-                </svg>
-                <MudText Typo="Typo.h6" Class="mt-3">Products</MudText>
-                <MudText Typo="Typo.h4">1,236</MudText>
-                <MudText Typo="Typo.body2" Color="Color.Success">Increased 75%</MudText>
-            </MudCardContent>
-            <MudCardActions Class="d-flex justify-center pb-4">
-                <MudButton Variant="Variant.Outlined" Color="Color.Primary">VIEW REPORT</MudButton>
-            </MudCardActions>
-        </MudCard>
-    </MudItem>
-
-    <MudItem xs="12" sm="6" md="3">
-        <MudCard Style="background-color:white; height: 300px; display: flex; flex-direction: column; align-items: center;">
-            <MudCardContent Style="flex-grow: 1; text-align: center;">
-                <svg width="100" height="100" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M4 12V20H20V12" stroke="#4ECDC4" stroke-width="2" />
-                    <path d="M12 3L12 15M12 15L7 10M12 15L17 10" stroke="#FF6B6B" stroke-width="2" />
-                </svg>
-                <MudText Typo="Typo.h6" Class="mt-3">Orders</MudText>
-                <MudText Typo="Typo.h4">3,612</MudText>
-                <MudText Typo="Typo.body2" Color="Color.Success">Increased 75%</MudText>
-            </MudCardContent>
-            <MudCardActions Class="d-flex justify-center pb-4">
-                <MudButton Variant="Variant.Outlined" Color="Color.Primary">VIEW REPORT</MudButton>
-            </MudCardActions>
-        </MudCard>
-    </MudItem>
-
-    <MudItem xs="12" sm="6" md="3">
-        <MudCard Style="background-color:white; height: 300px; display: flex; flex-direction: column; align-items: center;">
-            <MudCardContent Style="flex-grow: 1; text-align: center;">
-                <svg width="100" height="100" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 3V21M3 12L21 12" stroke="#4ECDC4" stroke-width="2" />
-                    <circle cx="12" cy="12" r="8" stroke="#FF6B6B" stroke-width="2" />
-                </svg>
-                <MudText Typo="Typo.h6" Class="mt-3">Sales</MudText>
-                <MudText Typo="Typo.h4">$35,000</MudText>
-                <MudText Typo="Typo.body2" Color="Color.Success">Increased 15%</MudText>
-            </MudCardContent>
-            <MudCardActions Class="d-flex justify-center pb-4">
-                <MudButton Variant="Variant.Outlined" Color="Color.Primary">VIEW REPORT</MudButton>
-            </MudCardActions>
-        </MudCard>
-    </MudItem>
-
-    <MudItem xs="12" sm="6" md="3">
-        <MudCard Style="background-color:white; height: 300px; display: flex; flex-direction: column; align-items: center;">
-            <MudCardContent Style="flex-grow: 1; text-align: center;">
-                <svg width="100" height="100" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="8" r="5" stroke="#FF6B6B" stroke-width="2" />
-                    <path d="M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21" stroke="#4ECDC4" stroke-width="2" />
-                </svg>
-                <MudText Typo="Typo.h6" Class="mt-3">Customers</MudText>
-                <MudText Typo="Typo.h4">+10</MudText>
-                <MudText Typo="Typo.body2" Color="Color.Success">Increased 75%</MudText>
-            </MudCardContent>
-            <MudCardActions Class="d-flex justify-center pb-4">
-                <MudButton Variant="Variant.Outlined" Color="Color.Primary">VIEW REPORT</MudButton>
-            </MudCardActions>
-        </MudCard>
-    </MudItem>
+    @foreach (var card in CardsData)
+    {
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard Style="background-color:white; height: 300px; display: flex; flex-direction: column; align-items: center;">
+                <MudCardContent Style="flex-grow: 1; text-align: center;">
+                    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        @((MarkupString)card.Icon)
+                    </svg>
+                    <MudText Typo="Typo.h6" Class="mt-3">@card.Title</MudText>
+                    <MudText Typo="Typo.h4">@card.Value</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Success">@card.Percentage</MudText>
+                </MudCardContent>
+                <MudCardActions Class="d-flex justify-center pb-4">
+                    <MudButton Variant="Variant.Outlined" Color="Color.Primary">VIEW REPORT</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    }
 </MudGrid>
 
 <MudGrid Class="mt-4">
@@ -82,21 +50,41 @@
                 <MudText Typo="Typo.h6">New Products</MudText>
             </MudCardHeader>
             <MudCardContent Style="height: 300px; overflow-y: auto;">
-                @foreach (var i in Enumerable.Range(1, 15))
+                @foreach (var product in _products)
                 {
                     <MudPaper Class="pa-4 my-2" Elevation="0">
                         <div class="d-flex gap-4">
-                            <MudAvatar Color="Color.Primary">@i</MudAvatar>
+                            @* <MudAvatar Color="Color.Primary">@product.Id</MudAvatar> *@
+                            <MudAvatar Color="Color.Primary">
+                                @if (product.ProductImages?.Any() == true)
+                                {
+                                    <img src="@($"data:image/jpeg;base64,{product.ProductImages.First()}")"
+                                         alt="Product Image"
+                                         style="width: 40px; height: 40px; object-fit: cover;" />
+                                }
+                                else
+                                {
+                                    <span>No image</span>
+                                }
+                            </MudAvatar>
                             <div>
-                                <MudText Typo="Typo.body1">Product @i</MudText>
-                                <MudText Typo="Typo.caption">This is a description for Product @i</MudText>
+                                <MudText Typo="Typo.body1">@product.Title</MudText>
+                                <MudText Typo="Typo.caption">
+                                    @string.Join(" | ", product.CategoryNames) 
+                                    @if (!string.IsNullOrEmpty(product.ProductCode))
+                                    {
+                                        @(" | " + product.ProductCode) 
+                                    }
+                                </MudText>
                             </div>
+
                         </div>
                     </MudPaper>
                 }
             </MudCardContent>
         </MudCard>
     </MudItem>
+
 
     <!-- Pie Chart Card -->
     <MudItem xs="12" md="4">
@@ -106,10 +94,10 @@
             </MudCardHeader>
             <MudCardContent>
                 <MudChart ChartType="ChartType.Pie"
-                          InputData="@_pieData"
-                          InputLabels="@_pieLabels"
-                          Width="300px"
-                          Height="300px" />
+                InputData="@_pieData"
+                InputLabels="@_pieLabels"
+                Width="300px"
+                Height="300px" />
             </MudCardContent>
         </MudCard>
     </MudItem>
@@ -122,29 +110,30 @@
             </MudCardHeader>
             <MudCardContent>
                 <MudChart ChartType="ChartType.Bar"
-                          ChartSeries="@_barChartSeries"
-                          XAxisLabels="@_monthLabels"
-                          Width="100%"
-                          Height="300px"
-                          DisableLegend="true"
-                          Color="Color.Warning"
-                          XAxisLines="true"
-                          YAxisLines="true" />
+                ChartSeries="@_barChartSeries"
+                XAxisLabels="@_monthLabels"
+                Width="100%"
+                Height="300px"
+                DisableLegend="true"
+                Color="Color.Warning"
+                XAxisLines="true"
+                YAxisLines="true" />
             </MudCardContent>
         </MudCard>
     </MudItem>
-
-
 </MudGrid>
 
-
 @code {
-    // Pie Chart Data
     private double[] _pieData = new double[] { 30, 25, 20, 15, 10 };
     private string[] _pieLabels = new[] { "Tops", "Bottoms", "Dresses", "Shoes", "Accessories" };
-
-    // Bar Chart Data
+    private string selectedDepartment = "all";
+    private string selectedCategory = "all";
+    private string selectedSort = "newest";
+    private string searchText = "";
+    private List<GetAllProductDto> _products = new();
+    private string errorMessage;
     private List<ChartSeries> _barChartSeries = new List<ChartSeries>()
+
     {
         new ChartSeries()
         {
@@ -152,9 +141,146 @@
             Data = new double[] { 400, 350, 380, 400, 420, 500, 700, 600, 550, 650, 620, 640 }
         }
     };
-
     private string[] _monthLabels = new[] { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
-    // Custom colors for the chart
-    private string[] _chartColors = new[] { "#FF7043" };
+    private List<CardData> CardsData;
+
+    private class CardData
+    {
+        public string Icon { get; set; }
+        public string Title { get; set; }
+        public string Value { get; set; }
+        public string Percentage { get; set; }
+    }
+
+    protected override void OnInitialized()
+    {
+        LoadSampleData();
+    }
+
+    private void LoadSampleData()
+    {
+        CardsData = new List<CardData>
+        {
+            new CardData
+            {
+                Icon = "<rect x='3' y='3' width='8' height='8' fill='#FF6B6B' /><rect x='13' y='3' width='8' height='8' fill='#4ECDC4' /><rect x='3' y='13' width='8' height='8' fill='#4ECDC4' /><rect x='13' y='13' width='8' height='8' fill='#FF6B6B' />",
+                Title = "Products",
+                Value = "1,236",
+                Percentage = "Increased 75%"
+            },
+            new CardData
+            {
+                Icon = "<path d='M4 12V20H20V12' stroke='#4ECDC4' stroke-width='2' /><path d='M12 3L12 15M12 15L7 10M12 15L17 10' stroke='#FF6B6B' stroke-width='2' />",
+                Title = "Orders",
+                Value = "3,612",
+                Percentage = "Increased 75%"
+            },
+            new CardData
+            {
+                Icon = "<path d='M12 3V21M3 12L21 12' stroke='#4ECDC4' stroke-width='2' /><circle cx='12' cy='12' r='8' stroke='#FF6B6B' stroke-width='2' />",
+                Title = "Sales",
+                Value = "$35,000",
+                Percentage = "Increased 15%"
+            },
+            new CardData
+            {
+                Icon = "<circle cx='12' cy='8' r='5' stroke='#FF6B6B' stroke-width='2' /><path d='M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21' stroke='#4ECDC4' stroke-width='2' />",
+                Title = "Customers",
+                Value = "+10",
+                Percentage = "Increased 75%"
+            }
+        };
+        _products = new List<GetAllProductDto>
+    {
+        new GetAllProductDto
+        {
+            Id = "1",
+            Title = "Product 1",
+            Description = "Description of Product 1",
+            UnitPrice = 19.99m,
+            UnitsInStock = 100,
+            ProductCode = "P001",
+            ProductImages = new List<string> { "image1.jpg", "image2.jpg" },
+            ProductSizes = new List<string> { "S", "M", "L" },
+            CategoryNames = new List<string> { "Tops" },
+            DepartmentNames = new List<string> { "Apparel" },
+            CategoryIds = new List<string> { "1" },
+            DepartmentIds = new List<string> { "A" }
+        },
+        new GetAllProductDto
+        {
+            Id = "2",
+            Title = "Product 2",
+            Description = "Description of Product 2",
+            UnitPrice = 29.99m,
+            UnitsInStock = 200,
+            ProductCode = "P002",
+            ProductImages = new List<string> { "image3.jpg", "image4.jpg" },
+            ProductSizes = new List<string> { "M", "L", "XL" },
+            CategoryNames = new List<string> { "Bottoms" },
+            DepartmentNames = new List<string> { "Apparel" },
+            CategoryIds = new List<string> { "2" },
+            DepartmentIds = new List<string> { "A" }
+        },
+        // Add more sample data here
+    };
+        StateHasChanged();
+    }
+
+    private async Task  LoadLiveData()
+    {
+        CardsData = new List<CardData>
+        {
+            new CardData
+            {
+                Icon = "<rect x='3' y='3' width='8' height='8' fill='#FF6B6B' /><rect x='13' y='3' width='8' height='8' fill='#4ECDC4' /><rect x='3' y='13' width='8' height='8' fill='#4ECDC4' /><rect x='13' y='13' width='8' height='8' fill='#FF6B6B' />",
+                Title = "Live Products",
+                Value = "1,800",
+                Percentage = "Increased 10%"
+            },
+            new CardData
+            {
+                Icon = "<path d='M4 12V20H20V12' stroke='#4ECDC4' stroke-width='2' /><path d='M12 3L12 15M12 15L7 10M12 15L17 10' stroke='#FF6B6B' stroke-width='2' />",
+                Title = "Live Orders",
+                Value = "4,000",
+                Percentage = "Increased 15%"
+            },
+            new CardData
+            {
+                Icon = "<path d='M12 3V21M3 12L21 12' stroke='#4ECDC4' stroke-width='2' /><circle cx='12' cy='12' r='8' stroke='#FF6B6B' stroke-width='2' />",
+                Title = "Live Sales",
+                Value = "$45,000",
+                Percentage = "Increased 20%"
+            },
+            new CardData
+            {
+                Icon = "<circle cx='12' cy='8' r='5' stroke='#FF6B6B' stroke-width='2' /><path d='M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21' stroke='#4ECDC4' stroke-width='2' />",
+                Title = "New Customers",
+                Value = "+25",
+                Percentage = "Increased 10%"
+            }
+        };
+        await GetAllProducts();
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        // Dispose any resources if necessary
+    }
+    public async Task GetAllProducts()
+    {
+        var response = await ProductService.GetAllProductsAsync(selectedDepartment, selectedCategory, searchText, selectedSort);
+        if (response.IsSuccess)
+        {
+            _products = response.Result;
+            StateHasChanged();
+        }
+        else
+        {
+            errorMessage = response.Message;
+        }
+    }
 }
+
