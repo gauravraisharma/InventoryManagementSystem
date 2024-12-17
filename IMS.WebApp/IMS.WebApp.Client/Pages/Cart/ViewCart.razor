@@ -1,8 +1,10 @@
 ﻿@page "/view-cart"
 @using IMS.Shared.RequestDto.CartDTOs
+@using IMS.Shared.Services.Shared
 @using IMS.WebApp.Client.Authentication
 @using MudBlazor
 @inject ICartService CartService
+@inject CartStateService CartStateService
 @using IMS.Shared.Interface.Cart
 @inject ITokenService TokenService
 @inject ISnackbar Snackbar
@@ -21,18 +23,18 @@
                     @foreach (var item in cart)
                     {
                         <MudPaper Class="d-flex align-center p-2 mb-2">
-                           <MudCarousel TData="string" AutoCycle="true" Class="mr-3" Style="height: 200px; width: 200px;">
-                            <Items>
-                                @foreach (var imageUrl in item.ProductImageUrls)
-                                {
-                                    <MudCarouselItem>
-                                        <MudImage Src="@($"data:image/jpeg;base64,{imageUrl}")" 
-                                                  Alt="@item.ProductName" 
-                                                  Style="width: 100%; height: 100%; object-fit: cover;" />
-                                    </MudCarouselItem>
-                                }
-                            </Items>
-                        </MudCarousel>
+                            <MudCarousel TData="string" AutoCycle="true" Class="mr-3" Style="height: 200px; width: 200px;">
+                                <Items>
+                                    @foreach (var imageUrl in item.ProductImageUrls)
+                                    {
+                                        <MudCarouselItem>
+                                            <MudImage Src="@($"data:image/jpeg;base64,{imageUrl}")" 
+                                            Alt="@item.ProductName" 
+                                            Style="width: 100%; height: 100%; object-fit: cover;" />
+                                        </MudCarouselItem>
+                                    }
+                                </Items>
+                            </MudCarousel>
 
                             <MudStack>
                                 <MudText Typo="Typo.h6" hidden >@item.CartId</MudText>
@@ -82,7 +84,7 @@
                             <span class="text-danger">@($"₹{totalPrice:0.00}")</span>
                         </MudText>
                         <MudText Typo="Typo.subtitle2" Class="text-success">Free Delivery Available</MudText>
-                        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true">Proceed to Buy</MudButton>
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="@(() =>ProceedToBuy())">Proceed to Buy</MudButton>
                     </MudStack>
                 }
                 else
@@ -116,18 +118,18 @@
             if (!string.IsNullOrEmpty(Id))
             {
 
-                    var response = await CartService.GetCartDetailsByUserIdAsync(Id);
+                var response = await CartService.GetCartDetailsByUserIdAsync(Id);
 
-                    if (response.IsSuccess)
+                if (response.IsSuccess)
+                {
+
+                    var fetchedProduct = response;
+                    if (fetchedProduct != null)
                     {
-
-                        var fetchedProduct = response;
-                        if (fetchedProduct != null)
+                        foreach (var items in fetchedProduct.Result)
                         {
-                            foreach (var items in fetchedProduct.Result)
-                            {
 
-                                var item = new CartDto
+                            var item = new CartDto
                                     {
                                         CartId = items.CartId,
                                         ProductName = items.ProductName,
@@ -138,18 +140,18 @@
                                         ProductImageUrls = items.ProductImageUrls,
                                         ProductSize = items.ProductSize
                                     };
-                                cart.Add(item);
-                            }
-
-
+                            cart.Add(item);
                         }
+
+
                     }
-                    else
-                    {
-                        errorMessage = response.Message ?? "Failed to fetch product details.";
-                    }
+                }
+                else
+                {
+                    errorMessage = response.Message ?? "Failed to fetch product details.";
+                }
             }
-            
+
         }
         catch (Exception ex)
         {
@@ -208,7 +210,6 @@
         if (response.IsSuccess)
         {
             Snackbar.Add("Item Updated successfully", Severity.Success);
-            // await GetUserCartDetailsByUserIdAsync();
 
         }
         else
@@ -224,11 +225,17 @@
         {
             Snackbar.Add("Item Removed Successfully", Severity.Success);
             await GetUserCartDetailsByUserIdAsync();
-            
+
         }
         else
         {
             Snackbar.Add($"Error: {response.Message}", Severity.Error);
         }
+    }
+
+    public async Task ProceedToBuy()
+    {
+        CartStateService.SetCartItems(cart);
+        NavigationManager.NavigateTo("/order-summary");
     }
 }
