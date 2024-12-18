@@ -439,6 +439,15 @@ namespace IMS.Infrastructure.Services.Product
             var response = new GenericBaseResult<DeleteProductDto>(null);
             try
             {
+                var isProductInCart = await context.Carts.AnyAsync(cart => cart.ProductSize.ProductId == productId);
+
+                if (isProductInCart)
+                {
+                    throw new Exception("Cannot delete this product as it is present in a cart of a user.");
+                    
+                }
+
+                // Retrieve product details along with related entities
                 var product = await context.Products
                     .Where(p => p.Id == productId)
                     .Select(p => new
@@ -481,9 +490,7 @@ namespace IMS.Infrastructure.Services.Product
             }
 
             return response;
-
         }
-
 
 
 
