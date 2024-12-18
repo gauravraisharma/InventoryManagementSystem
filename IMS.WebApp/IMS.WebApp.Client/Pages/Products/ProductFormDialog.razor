@@ -379,7 +379,11 @@
             }
             else
             {
-                Snackbar.Add($"Error: {response.Message}", Severity.Error);
+                // Snackbar.Add($"Error: {response.Errors}", Severity.Error);
+                var errorMessage = response.Errors != null && response.Errors.Any()
+            ? string.Join(", ", response.Errors)
+            : "An unknown error occurred.";
+                Snackbar.Add($"Error: {errorMessage}", Severity.Error);
             }
             NavigationManager.NavigateTo("/product");
         }

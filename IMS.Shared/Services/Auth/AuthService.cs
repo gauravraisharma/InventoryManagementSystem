@@ -3,6 +3,7 @@ using System.Text.Json;
 using IMS.Shared.Common;
 using IMS.Shared.Constants;
 using IMS.Shared.Interface.Auth;
+using IMS.Shared.RequestDto.UserDTOs;
 
 namespace IMS.Shared.Services.Auth
 {
@@ -78,5 +79,40 @@ namespace IMS.Shared.Services.Auth
                 Message = "Failed to register"
             };
         }
+
+        public async Task<ApiResponse<List<ApplicationUserDto>>> GetAllUsers()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync(ApiEndpoints.Auth.GetAllUsers);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var apiResponse = JsonSerializer.Deserialize<ApiResponse<List<ApplicationUserDto>>>(responseContent, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+
+                    return apiResponse;
+                }
+
+                return new ApiResponse<List<ApplicationUserDto>>
+                {
+                    IsSuccess = false,
+                    Message = "Failed to retrieve users"
+                };
+            }
+            catch (Exception ex)
+            {
+                // Handle any exceptions that occur during the request
+                return new ApiResponse<List<ApplicationUserDto>>
+                {
+                    IsSuccess = false,
+                    Message = $"An error occurred: {ex.Message}"
+                };
+            }
+        }
+
     }
 }

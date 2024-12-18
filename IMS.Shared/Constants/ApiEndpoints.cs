@@ -35,6 +35,7 @@ namespace IMS.Shared.Constants
             public const string Base = "https://localhost:44317/";
             public const string Login = Base + "api/auth/Login";
             public const string Register = Base + "api/auth/register";
+            public const string GetAllUsers = Base + "api/auth/getAllUsers";
         }
 
         public class Cart
