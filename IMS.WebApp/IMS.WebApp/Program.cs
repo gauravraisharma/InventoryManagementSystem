@@ -6,6 +6,7 @@ using IMS.Shared.Interface.Department;
 using IMS.Shared.Interface.Product;
 using IMS.Shared.Services.Auth;
 using IMS.Shared.Services.Cart;
+using IMS.Shared.Services.Shared;
 using IMS.WebApp.Client.Authentication;
 using IMS.WebApp.Client.Pages;
 using IMS.WebApp.Client.Services.Category;
@@ -33,6 +34,8 @@ builder.Services.AddScoped<AuthenticationStateProvider, AuthStateService>();
 builder.Services.AddScoped<AuthStateService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddSingleton<CartStateService>();
+
 builder.Services.AddMudServices();
 //builder.Services.AddMudServices(config =>
 //{
