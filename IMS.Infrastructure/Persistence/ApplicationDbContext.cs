@@ -94,11 +94,11 @@ namespace IMS.Infrastructure.Persistence
                 .HasForeignKey(ps => ps.ProductId);
 
             // Orders Relationships
-            builder.Entity<Orders>()
-                .HasOne(o => o.Product)
-                .WithMany()
-                .HasForeignKey(o => o.ProductId)
-                .OnDelete(DeleteBehavior.Restrict);
+            //builder.Entity<Orders>()
+            //    .HasOne(o => o.Product)
+            //    .WithMany()
+            //    .HasForeignKey(o => o.ProductId)
+            //    .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Orders>()
                 .HasOne(o => o.Customer)
@@ -106,17 +106,16 @@ namespace IMS.Infrastructure.Persistence
                 .HasForeignKey(o => o.CustomerId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Decimal Precision Configuration
-            builder.Entity<Orders>()
-                .Property(o => o.Amount)
-                .HasPrecision(18, 2);
+            //// Decimal Precision Configuration
+            //builder.Entity<Orders>()
+            //    .Property(o => o.Amount)
+            //    .HasPrecision(18, 2);
 
             builder.Entity<Product>()
                 .Property(p => p.UnitPrice)
                 .HasPrecision(18, 2);
 
             // Seed Roles
-            SeedRoles(builder);
 
             builder.Entity<Cart>()
          .HasIndex(c => new { c.UserId, c.ProductId, c.ProductSizeId })
