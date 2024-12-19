@@ -1,0 +1,110 @@
+﻿@page "/order"
+@inject IOrderService OrderService
+@inject ISnackbar Snackbar
+@using IMS.Shared.Interface.Order
+@using IMS.Shared.RequestDto.orderDTOs
+@using MudBlazor
+
+<MudCard>
+    <MudCardContent>
+        <MudTable Items="orders" Dense="false" Hover="true" Bordered="true" Striped="true" RowHeight="56">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6" Align="Align.Center">Order List</MudText>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Order ID</MudTh>
+                <MudTh>User Name</MudTh>
+                <MudTh>Order Date</MudTh>
+                <MudTh>Total Amount</MudTh>
+                <MudTh>Shipment Date</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd @onclick="() => ToggleRowDetails(context)">@context.OrderId</MudTd>
+                <MudTd>@context.UserName</MudTd>
+                <MudTd>@context.OrderDate.ToString("yyyy-MM-dd HH:mm:ss")</MudTd>
+                <MudTd>@context.TotalAmount</MudTd>
+                <MudTd>@(context.ShipmentDate.HasValue ? context.ShipmentDate.Value.ToString("yyyy-MM-dd") : "N/A")</MudTd>
+            </RowTemplate>
+            <ChildRowContent>
+                @if (expandedOrders.Contains(context))
+                {
+                    <MudTable Items="context.ProductDetails" Dense="true" Hover="true" Bordered="true" Striped="true" RowHeight="40">
+                        <HeaderContent>
+                            <MudTh>Product ID</MudTh>
+                            <MudTh>Quantity</MudTh>
+                            <MudTh>Amount</MudTh>
+                        </HeaderContent>
+                        <RowTemplate Context="product">
+                            <MudTd>@product.ProductId</MudTd>
+                            <MudTd>@product.Quantity</MudTd>
+                            <MudTd>@product.Amount</MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                }
+            </ChildRowContent>
+        </MudTable>
+    </MudCardContent>
+
+    @if (_loading)
+    {
+        <MudCardActions>
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+        </MudCardActions>
+    }
+    @if (errorMessage != null)
+    {
+        <MudCardActions>
+            <MudText Color="Color.Error">@errorMessage</MudText>
+        </MudCardActions>
+    }
+</MudCard>
+
+@code {
+    private List<GetOrderDto> orders = new();
+    private HashSet<GetOrderDto> expandedOrders = new(); // Tracks the expanded orders
+    private bool _loading = true;
+    private string? errorMessage = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _loading = true;
+
+        try
+        {
+            var response = await OrderService.GetAllOrdersAsync();
+
+            if (response.IsSuccess)
+            {
+                orders = response.Result;
+            }
+            else
+            {
+                errorMessage = response.Errors != null && response.Errors.Any()
+                    ? string.Join(", ", response.Errors)
+                    : "An unknown error occurred.";
+                Snackbar.Add($"Error: {errorMessage}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private void ToggleRowDetails(GetOrderDto order)
+    {
+        // Toggle the expansion state of the order
+        if (expandedOrders.Contains(order))
+        {
+            expandedOrders.Remove(order); // Collapse if the order is already expanded
+        }
+        else
+        {
+            expandedOrders.Add(order); // Expand the newly clicked order
+        }
+    }
+}

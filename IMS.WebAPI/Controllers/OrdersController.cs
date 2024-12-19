@@ -1,6 +1,8 @@
 ﻿using IMS.Application.Features.Order.Command;
 using IMS.Application.Features.Order.Queries;
 using IMS.Core.Common.Helper;
+using IMS.Core.Identity;
+using IMS.Core.RequestDto;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,6 +20,7 @@ namespace IMS.WebAPI.Controllers
         }
 
         [HttpPost]
+        [Route("AddOrder")]
         public async Task<GenericBaseResult<bool>> AddOrder([FromBody] AddOrderCommand command)
         {
             try
@@ -36,10 +39,15 @@ namespace IMS.WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllOrders()
+        [Route("GetAllOrders")]
+        public async Task<GenericBaseResult<List<OrderDto>>> GetAllOrders()
         {
             var orders = await _mediator.Send(new GetAllOrdersQuery());
-            return Ok(orders);
+            //return Ok(orders);
+            return new GenericBaseResult<List<OrderDto>>(orders)
+            {
+                Message = "Orders retrieved successfully"
+            };
         }
     }
 }

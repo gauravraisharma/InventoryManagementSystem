@@ -46,5 +46,11 @@ namespace IMS.Shared.Constants
             public const string UpdateCart = Base + "api/Cart/EditCart";
             public const string DeleteCartItem = Base + "api/Cart/DeleteCartItem";
         }
-    }
+        public static class Order
+        {
+            public const string Base = "https://localhost:44317/";
+            public const string SaveOrder = Base + "api/Orders/AddOrder";
+            public const string GetAllOrders = Base + "api/Orders/GetAllOrders";
+        }
+        }
 }
