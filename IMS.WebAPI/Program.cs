@@ -5,8 +5,10 @@ using IMS.Core.Identity;
 using IMS.Infrastructure.Interface.Cart;
 using IMS.Infrastructure.Interface.Category;
 using IMS.Infrastructure.Interface.Department;
+using IMS.Infrastructure.Interface.Order;
 using IMS.Infrastructure.Interface.Products;
 using IMS.Infrastructure.Persistence;
+using IMS.Infrastructure.Services;
 using IMS.Infrastructure.Services.Cart;
 using IMS.Infrastructure.Services.Category;
 using IMS.Infrastructure.Services.Department;
@@ -33,6 +35,7 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
