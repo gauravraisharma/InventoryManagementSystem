@@ -2,7 +2,7 @@
 using IMS.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace IMS.Infrastructure.Services
+namespace IMS.Infrastructure.Services.Order
 {
     public class OrderRepository : IOrderRepository
     {

@@ -3,11 +3,11 @@ using IMS.Shared.Constants;
 using IMS.Shared.Interface.Product;
 using IMS.Shared.RequestDto;
 using IMS.Shared.RequestDto.ProductDTOs;
-using IMS.WebApp.Client.Services.Base;
+using IMS.Shared.Services.Base;
 using System.Net.Http.Json;
 using static IMS.Shared.Constants.ApiEndpoints;
 
-namespace IMS.WebApp.Client.Services.Product
+namespace IMS.Shared.Services.Product
 {
     public class ProductService : IProductService
     {
