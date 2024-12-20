@@ -62,22 +62,8 @@
             var res = await AuthService.Login(model.Username, model.Password);
             if (res.IsSuccess)
             {
-                await TokenService.SetTokenAsync(res.Result);
-
-                var role = await TokenService.GetRoleFromTokenAsync();
-                AuthStateService.UserRole = role; 
-
-                // Navigate based on user role
-                if (role == "user")
-                {
-                    NavigationManager.NavigateTo("/product",true);
-                    AuthStateService.NotifyAuthenticationStateChanged();
-                }
-                else if (role == "admin")
-                {
-                    NavigationManager.NavigateTo("/product",true);
-                    AuthStateService.NotifyAuthenticationStateChanged();
-                }
+                await TokenService.SetPreTokenToSessionAsync(res.Result);
+                NavigationManager.NavigateTo("/validate", true);
             }
             else
             {

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace IMS.Shared.Constants
+﻿namespace IMS.Shared.Constants
 {
     public class ApiEndpoints
     {
@@ -52,5 +46,11 @@ namespace IMS.Shared.Constants
             public const string SaveOrder = Base + "api/Orders/AddOrder";
             public const string GetAllOrders = Base + "api/Orders/GetAllOrders";
         }
+        public class TwoFactor
+        {
+            public const string Base = "https://localhost:44317/";
+            public const string SendCode = Base + "api/TwoFactorAuth/generate";
+            public const string ValidateCode = Base + "api/TwoFactorAuth/validate";
         }
+    }
 }

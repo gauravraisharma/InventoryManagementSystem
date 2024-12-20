@@ -27,6 +27,7 @@ namespace IMS.Infrastructure.Persistence
         public DbSet<DepartmentProductMapping> DepartmentProductMappings { get; set; }
         public DbSet<CategoryProductMapping> CategoryProductMappings { get; set; }
         public DbSet<Cart> Carts { get; set; }
+        public DbSet<VerificationCode> VerificationCodes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
