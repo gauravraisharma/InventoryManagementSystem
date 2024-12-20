@@ -1,0 +1,127 @@
+﻿@using IMS.Shared.Interface.Code
+@using IMS.WebApp.Client.Authentication
+@inject NavigationManager NavigationManager
+@inject AuthStateService AuthStateService
+@inject ITwoFactorService TwoFactorService
+@inject ITokenService TokenService
+@inject Blazored.SessionStorage.ISessionStorageService _sessionStorageService
+@inject NavigationManager NavigationManager
+
+@page "/validate"
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="mt-6">
+	<MudPaper Class="pa-4" Elevation="4">
+		@if (!IsCodeSent)
+		{
+			<MudText Typo="Typo.h6" GutterBottom>Email Verification</MudText>
+
+			<MudForm>
+				<MudTextField Label="Email" @bind-Value="Email" Disabled="true" Variant="Variant.Filled" Class="mb-3" />
+				<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SendCode">Send Code</MudButton>
+			</MudForm>
+		}
+		else
+		{
+			<MudText Typo="Typo.h6" GutterBottom>Enter Verification Code</MudText>
+
+			<MudForm>
+				<MudTextField Label="Verification Code" @bind-Value="Code" Variant="Variant.Filled" MaxLength="6" Class="mb-3" />
+				<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ValidateCode">Verify Code</MudButton>
+			</MudForm>
+		}
+
+		@if (!string.IsNullOrEmpty(StatusMessage))
+		{
+			<MudText Typo="Typo.body2" Color="Color.Secondary" Class="mt-3">@StatusMessage</MudText>
+		}
+		<MudLink @onclick="LogoutAndRedirect" Color="Color.Primary" Class="mt-3">Back to Login</MudLink>
+	</MudPaper>
+</MudContainer>
+
+@code {
+	private string Email { get; set; } = string.Empty; // Set this to the logged-in user's email
+	private string Code { get; set; } = string.Empty;
+	private bool IsCodeSent { get; set; } = false;
+	private string StatusMessage { get; set; } = string.Empty;
+	private bool IsAuthenticated { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		var token = await TokenService.GetPreTokenFromSessionAsync();
+		if (!string.IsNullOrEmpty(token))
+		{
+			Email = await TokenService.GetUserEmailFromTokenAsync(token);
+		}
+		else{
+			NavigationManager.NavigateTo("/login", true);
+		}
+	}
+
+	private async Task SendCode()
+	{
+		try
+		{
+			var generateCommand = await TwoFactorService.SendCodeAsync(Email);
+			if (generateCommand.IsSuccess)
+			{
+				IsCodeSent = true;
+				
+				StatusMessage = "Verification code sent to your email.";
+			}
+			else
+			{
+				StatusMessage = "Email does not exist.";
+			}
+		}
+		catch (Exception ex)
+		{
+			StatusMessage = $"Error: {ex.Message}";
+		}
+	}
+
+	private async Task ValidateCode()
+	{
+		try
+		{
+			var isValid = await TwoFactorService.ValidateCode(Email, Code);
+
+			if (isValid.IsSuccess)
+			{
+				StatusMessage = "Code validated successfully.";
+				var preToken = await TokenService.GetPreTokenFromSessionAsync();
+				await TokenService.SetTokenAsync(preToken);
+				await _sessionStorageService.RemoveItemAsync("preToken");
+
+				var role = await TokenService.GetRoleFromTokenAsync();
+				AuthStateService.UserRole = role;
+
+				if (role == "user")
+				{
+					NavigationManager.NavigateTo("/product", true);
+					AuthStateService.NotifyAuthenticationStateChanged();
+				}
+				else if (role == "admin")
+				{
+					NavigationManager.NavigateTo("/product", true);
+					AuthStateService.NotifyAuthenticationStateChanged();
+				}
+			}
+			else
+			{
+				StatusMessage = "Invalid or expired code.";
+			}
+		}
+		catch (Exception ex)
+		{
+			StatusMessage = $"Error: {ex.Message}";
+		}
+	}
+
+	private async Task LogoutAndRedirect()
+	{
+		await _sessionStorageService.RemoveItemAsync("preToken");
+		await _sessionStorageService.ClearAsync();  
+		await TokenService.RemoveTokenAsync();    
+		NavigationManager.NavigateTo("/login", true);
+	}
+}

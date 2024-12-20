@@ -1,25 +1,19 @@
-﻿using IMS.Shared.Common;
+﻿using System.Net.Http.Json;
+using IMS.Shared.Common;
 using IMS.Shared.Constants;
 using IMS.Shared.Interface.Product;
-using IMS.Shared.RequestDto;
 using IMS.Shared.RequestDto.ProductDTOs;
-using IMS.Shared.Services.Base;
-using System.Net.Http.Json;
-using static IMS.Shared.Constants.ApiEndpoints;
 
 namespace IMS.Shared.Services.Product
 {
     public class ProductService : IProductService
     {
-       
-
         private readonly HttpClient _httpClient;
 
         public ProductService(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
-
 
         public async Task<ApiResponse<List<GetAllProductDto>>> GetAllProductsAsync(string department, string category,string searchText, string sortBy)
         {

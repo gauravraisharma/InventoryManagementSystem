@@ -1,5 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using Blazored.LocalStorage;
+using Blazored.SessionStorage;
 
 namespace IMS.WebApp.Client.Authentication
 {
@@ -7,10 +8,22 @@ namespace IMS.WebApp.Client.Authentication
     {
         private readonly ILocalStorageService _localStorage;
         private const string TokenKey = "authToken";
+        private readonly ISessionStorageService _sessionStorageService;
 
-        public TokenService(ILocalStorageService localStorage)
+        public TokenService(ILocalStorageService localStorageService, ISessionStorageService sessionStorageService)
         {
-            _localStorage = localStorage;
+            _localStorage = localStorageService;
+            _sessionStorageService = sessionStorageService;
+        }
+
+        public async Task SetPreTokenToSessionAsync(string token)
+        {
+            await _sessionStorageService.SetItemAsync("preToken", token);
+        }
+
+        public async Task<string> GetPreTokenFromSessionAsync()
+        {
+            return await _sessionStorageService.GetItemAsync<string>("preToken");
         }
 
         /// <summary>
@@ -114,6 +127,37 @@ namespace IMS.WebApp.Client.Authentication
                     .FirstOrDefault(c => string.Equals(c.Type, nameClaimType, StringComparison.OrdinalIgnoreCase))?.Value;
 
                 return userName;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Extracts the user's email from the JWT stored in local storage.
+        /// </summary>
+        /// <returns>The email if present, otherwise null.</returns>
+        public async Task<string?> GetUserEmailFromTokenAsync(string token)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+                return null;
+
+            try
+            {
+                var jwtHandler = new JwtSecurityTokenHandler();
+
+                if (!jwtHandler.CanReadToken(token))
+                    return null;
+
+                var jwtToken = jwtHandler.ReadJwtToken(token);
+
+                // Match the claim type exactly for "email"
+                var emailClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress";
+                var userEmail = jwtToken.Claims
+                    .FirstOrDefault(c => string.Equals(c.Type, emailClaimType, StringComparison.OrdinalIgnoreCase))?.Value;
+
+                return userEmail;
             }
             catch
             {
