@@ -45,7 +45,7 @@ namespace IMS.WebAPI.Controllers
                     return new GenericBaseResult<bool>(true);
                 }
 
-                return new GenericBaseResult<bool>(false);
+                throw new Exception("InvalidCode");
             }
             catch (Exception ex)
             {
