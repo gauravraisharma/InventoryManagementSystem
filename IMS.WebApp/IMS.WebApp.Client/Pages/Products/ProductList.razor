@@ -29,28 +29,24 @@
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
     <!-- Header Section -->
-    <div style=" background-color: white; box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);">
-        <MudGrid>
-            <MudItem xs="12" Class="d-flex justify-space-between align-center">
-                <MudText Typo="Typo.h5">Products</MudText>
-                @if (AuthStateService.UserRole == "admin")
-                {
-                    <div class="d-flex gap-2">
-                        <MudButton @onclick="OpenAddProductDialogAsync" Variant="Variant.Filled" Color="Color.Primary">
-                            Add Product
-                        </MudButton>
-                        <MudButton Variant="Variant.Outlined"
-                                   Color="Color.Primary"
-                                   StartIcon="@Icons.Material.Filled.Upload"
-                                   Href="/export">
-                            IMPORT PRODUCT
-                        </MudButton>
-                    </div>
-                }
-               
-            </MudItem>
-        </MudGrid>
-    </div>
+    <MudGrid>
+        <MudItem xs="12" Class="d-flex justify-end align-center">
+            @if (AuthStateService.UserRole == "admin")
+            {
+                <div class="d-flex gap-2">
+                    <MudButton @onclick="OpenAddProductDialogAsync" Variant="Variant.Filled" Color="Color.Primary">
+                        Add Product
+                    </MudButton>
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.Upload"
+                               Href="/export">
+                        IMPORT PRODUCT
+                    </MudButton>
+                </div>
+            }
+        </MudItem>
+    </MudGrid>
 
     <!-- Products Grid -->
     <MudGrid>

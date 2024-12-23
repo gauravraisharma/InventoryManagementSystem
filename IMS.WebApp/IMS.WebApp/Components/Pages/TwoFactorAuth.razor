@@ -10,23 +10,26 @@
 @page "/validate"
 
 <MudContainer MaxWidth="MaxWidth.Small" Class="mt-6">
-	<MudPaper Class="pa-4" Elevation="4">
+	<MudPaper Class="pa-10 login-card">
 		@if (!IsCodeSent)
 		{
-			<MudText Typo="Typo.h6" GutterBottom>Email Verification</MudText>
+			<MudText Typo="Typo.h4" Class="mb-4 text-center main-title mb-5">Email Verification</MudText>
 
 			<MudForm>
-				<MudTextField Label="Email" @bind-Value="Email" Disabled="true" Variant="Variant.Filled" Class="mb-3" />
-				<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SendCode">Send Code</MudButton>
+				<div class="mb-5">
+					<label class="mb-2">Email</label>
+					<MudTextField Variant="Variant.Outlined" @bind-Value="Email" Disabled="true" />
+				</div>
+				<MudButton OnClick="SendCode" Class="btn-theme">Send Code</MudButton>
 			</MudForm>
 		}
 		else
 		{
-			<MudText Typo="Typo.h6" GutterBottom>Enter Verification Code</MudText>
+			<MudText Typo="Typo.h4" Class="mb-4 text-center main-title mb-5">Enter Verification Code</MudText>
 
 			<MudForm>
-				<MudTextField Label="Verification Code" @bind-Value="Code" Variant="Variant.Filled" MaxLength="6" Class="mb-3" />
-				<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ValidateCode">Verify Code</MudButton>
+				<MudTextField Variant="Variant.Outlined" @bind-Value="Code" MaxLength="6" Class="mb-5" />
+				<MudButton Class="btn-theme" OnClick="ValidateCode">Verify Code</MudButton>
 			</MudForm>
 		}
 
@@ -34,9 +37,48 @@
 		{
 			<MudText Typo="Typo.body2" Color="Color.Secondary" Class="mt-3">@StatusMessage</MudText>
 		}
-		<MudLink @onclick="LogoutAndRedirect" Color="Color.Primary" Class="mt-3">Back to Login</MudLink>
+		<MudText Class="mt-4 text-center"><MudLink @onclick="LogoutAndRedirect" Color="Color.Primary" Class="text-theme">Back to Login</MudLink></MudText>
 	</MudPaper>
 </MudContainer>
+<style>
+	.login-card {
+		box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+		border-radius: 10px;
+		border: 1px solid #eaeaea;
+	}
+
+	.btn-theme {
+		width: 100%;
+		background: darkslateblue;
+		color: #fff;
+		text-transform: capitalize;
+		padding: 8px 16px;
+		font-size: 18px;
+	}
+
+		.btn-theme:hover {
+			background: #FFD700;
+			color: #000;
+		}
+
+	.text-center {
+		text-align: center;
+	}
+
+	.text-theme {
+		color: darkslateblue;
+		font-weight: 500;
+	}
+
+	.main-title {
+		font-weight: 600;
+		color: #000;
+	}
+
+	.mud-input > input.mud-input-root-outlined {
+		padding: 14px 14px;
+	}
+</style>
 
 @code {
 	private string Email { get; set; } = string.Empty; // Set this to the logged-in user's email
