@@ -1,4 +1,5 @@
 ﻿using IMS.Shared.Common;
+using IMS.Shared.RequestDto.UserDTOs;
 
 namespace IMS.Shared.Interface.Auth
 {
@@ -6,5 +7,6 @@ namespace IMS.Shared.Interface.Auth
     {
         Task<ApiResponse<string>> Login(string username, string password);
         Task<ApiResponse<bool>> Register(string firstname, string lastname, string username, string email, string password);
+        Task<ApiResponse<List<ApplicationUserDto>>> GetAllUsers();
     }
 }

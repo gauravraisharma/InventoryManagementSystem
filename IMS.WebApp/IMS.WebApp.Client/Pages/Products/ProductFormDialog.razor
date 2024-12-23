@@ -45,6 +45,10 @@
                                         <MudSelectItem Value="@department.DepartmentId">@department.Name</MudSelectItem>
                                     }
                                 </MudSelect>
+                                @if (showValidation && string.IsNullOrWhiteSpace(selectedDepartment))
+                                {
+                                    <MudText Color="Color.Error">Please select a department.</MudText>
+                                }
                             </MudItem>
 
                             <MudItem xs="12" md="6">
@@ -60,6 +64,10 @@
                                         <MudSelectItem Value="@category.CategoryId">@category.Name</MudSelectItem>
                                     }
                                 </MudSelect>
+                                @if (showValidation && string.IsNullOrWhiteSpace(selectedCategory))
+                                {
+                                    <MudText Color="Color.Error">Please select a category.</MudText>
+                                }
                             </MudItem>
 
                             <MudItem xs="12">
@@ -102,7 +110,10 @@
                                         </MudButton>
                                     </ActivatorContent>
                                 </MudFileUpload>
-
+                                @if (showValidation && (!product.ProductImages.Any() && (_uploadedFiles == null || !_uploadedFiles.Any())))
+                                {
+                                    <MudText Color="Color.Error">Please upload at least one image.</MudText>
+                                }
                                 @if (_uploadedFiles != null)
                                 {
                                     <MudText Typo="@Typo.h6">@_uploadedFiles.Count() File@(_uploadedFiles.Count() == 1 ? "" : "s"):</MudText>
@@ -115,6 +126,7 @@
                                         }
                                     </MudList>
                                 }
+
                             </MudItem>
                             <MudItem xs="12" md="4">
                                 <MudNumericField @bind-Value="product.UnitPrice"
@@ -150,6 +162,10 @@
                                         </label>
                                     }
                                 </div>
+                                @if (showValidation && !product.ProductSizes.Any())
+                                {
+                                    <MudText Color="Color.Error">Please select at least one size.</MudText>
+                                }
                             </MudItem>
 
                             @* Debug section to show selected sizes (you can remove this in production) *@
@@ -167,7 +183,8 @@
                             </MudButton>
                             <MudButton ButtonType="ButtonType.Submit"
                                        Variant="Variant.Filled"
-                                       Color="Color.Primary">
+                                       Color="Color.Primary"
+                                       OnClick="ValidateForm">
                                 @(Id == null ? "Add Product" : "Save Changes")
                             </MudButton>
                         </div>
@@ -236,7 +253,7 @@
     private Dictionary<string, bool> SelectedSizes = new Dictionary<string, bool>();
     private List<GetAllProductDto> _products = new();
     private List<UploadedFile> _uploadedFiles = new(); // Holds processed file data
-
+    private bool showValidation = false;
     private async Task UploadFiles(IBrowserFile file)
     {
         if (file != null)
@@ -333,8 +350,37 @@
         }
     }
 
+    private void ValidateForm()
+    {
+        showValidation = true; // Show error messages when Save is clicked
+        StateHasChanged();
+    }
+
     private async Task HandleSubmit()
     {
+        if (string.IsNullOrWhiteSpace(selectedDepartment))
+        {
+            Snackbar.Add("Please select a department.", Severity.Error);
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(selectedCategory))
+        {
+            Snackbar.Add("Please select a category.", Severity.Error);
+            return;
+        }
+
+        if (!product.ProductSizes.Any())
+        {
+            Snackbar.Add("Please select at least one size.", Severity.Error);
+            return;
+        }
+
+        if ((_uploadedFiles == null || !_uploadedFiles.Any()) && !product.ProductImages.Any())
+        {
+            Snackbar.Add("Please upload at least one image.", Severity.Error);
+            return;
+        }
         try
         {
 
@@ -379,7 +425,11 @@
             }
             else
             {
-                Snackbar.Add($"Error: {response.Message}", Severity.Error);
+                // Snackbar.Add($"Error: {response.Errors}", Severity.Error);
+                var errorMessage = response.Errors != null && response.Errors.Any()
+            ? string.Join(", ", response.Errors)
+            : "An unknown error occurred.";
+                Snackbar.Add($"Error: {errorMessage}", Severity.Error);
             }
             NavigationManager.NavigateTo("/product");
         }

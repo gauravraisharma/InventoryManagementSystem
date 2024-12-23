@@ -4,7 +4,7 @@ using IMS.Shared.Interface.Category;
 using IMS.Shared.RequestDto.CategoryDTOs;
 using System.Net.Http.Json;
 
-namespace IMS.WebApp.Client.Services.Category
+namespace IMS.Shared.Services.Category
 {
     public class CategoryService:ICategoryService
     {

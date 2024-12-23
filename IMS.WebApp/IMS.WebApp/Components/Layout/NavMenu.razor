@@ -6,7 +6,7 @@
 
 <MudPaper Width="250px" Height="100vh" Style="background-color:antiquewhite">
     <MudNavMenu Color="Color.Primary">
-        <MudNavGroup Title="Jane Doe"
+        <MudNavGroup Title=@Username
         Icon="@Icons.Material.Filled.AccountCircle"
         IconColor="Color.Primary"
         Expanded="@_isExpanded"
@@ -72,12 +72,15 @@
     private bool _isExpanded = true;
     private bool IsAuthenticated { get; set; }
     private string UserRole { get; set; } = string.Empty;
+    private string Username { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthStateService.GetAuthenticationStateAsync();
+        Username = await TokenService.GetUserNameFromTokenAsync();
         IsAuthenticated = authState.User.Identity.IsAuthenticated;
         UserRole = AuthStateService.UserRole;
+        
     }
 
     private async Task HandleLogout()

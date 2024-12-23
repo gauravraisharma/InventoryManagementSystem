@@ -1,7 +1,7 @@
 ﻿using IMS.Shared.Common;
 using System.Net.Http.Json;
 
-namespace IMS.WebApp.Client.Services.Base
+namespace IMS.Shared.Services.Base
 {
    
     public abstract class BaseHttpService

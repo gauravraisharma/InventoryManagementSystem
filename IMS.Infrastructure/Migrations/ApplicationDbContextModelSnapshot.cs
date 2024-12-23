@@ -210,51 +210,6 @@ namespace IMS.Infrastructure.Migrations
                     b.ToTable("DepartmentProductMappings");
                 });
 
-            modelBuilder.Entity("IMS.Core.Entities.Orders", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasMaxLength(36)
-                        .HasColumnType("nvarchar(36)");
-
-                    b.Property<decimal>("Amount")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("Created")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CustomerId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(36)");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("OrderDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ProductId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(36)");
-
-                    b.Property<DateTime?>("ShipmentDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("Orders");
-                });
-
             modelBuilder.Entity("IMS.Core.Entities.Product", b =>
                 {
                     b.Property<string>("Id")
@@ -369,6 +324,25 @@ namespace IMS.Infrastructure.Migrations
                     b.ToTable("ProductSizes");
                 });
 
+            modelBuilder.Entity("IMS.Core.Entities.VerificationCode", b =>
+                {
+                    b.Property<string>("Email")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .HasColumnType("nvarchar(6)");
+
+                    b.Property<DateTime>("Expiry")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Email");
+
+                    b.ToTable("VerificationCodes");
+                });
+
             modelBuilder.Entity("IMS.Core.Identity.ApplicationRole", b =>
                 {
                     b.Property<string>("Id")
@@ -394,20 +368,6 @@ namespace IMS.Infrastructure.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRole", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "b4c69406-a22e-43b6-a2d6-e3e1168e90bd",
-                            Name = "admin",
-                            NormalizedName = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = "bc3c91c1-74aa-4288-86f7-707b23f85b75",
-                            Name = "user",
-                            NormalizedName = "USER"
-                        });
                 });
 
             modelBuilder.Entity("IMS.Core.Identity.ApplicationUser", b =>
@@ -604,6 +564,48 @@ namespace IMS.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Orders", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(36)
+                        .HasColumnType("nvarchar(36)");
+
+                    b.Property<DateTime?>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CustomerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ProductDetailsJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ShipmentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("Orders");
+                });
+
             modelBuilder.Entity("IMS.Core.Entities.Cart", b =>
                 {
                     b.HasOne("IMS.Core.Entities.Product", "Product")
@@ -657,25 +659,6 @@ namespace IMS.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Department");
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("IMS.Core.Entities.Orders", b =>
-                {
-                    b.HasOne("IMS.Core.Entities.Customer", "Customer")
-                        .WithMany()
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("IMS.Core.Entities.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
 
                     b.Navigation("Product");
                 });
@@ -755,6 +738,17 @@ namespace IMS.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Orders", b =>
+                {
+                    b.HasOne("IMS.Core.Identity.ApplicationUser", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("IMS.Core.Entities.Category", b =>

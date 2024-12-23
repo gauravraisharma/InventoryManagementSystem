@@ -1,8 +1,22 @@
 ﻿@page "/order-summary"
-@using IMS.Shared.Services.Shared
+@rendermode InteractiveServer
+@inject CartStateService CartStateService
+@inject IOrderService OrderService
+@inject ITokenService TokensService
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+@using IMS.Shared.Interface.Order
+@using IMS.Shared.RequestDto.orderDTOs
+@using IMS.Shared.Services.Cart
+@using IMS.Shared.Services.Order
+@using IMS.WebApp.Client.Authentication
 @using MudBlazor
 @using IMS.Shared.RequestDto.CartDTOs;
-@inject CartStateService CartStateService
+@using IMS.Shared.Services.Shared;
+@using IMS.Shared.Services.Cart;
+
+
+
 <MudPopoverProvider />
 <div class="order-summary-container">
     <MudCard Class="pa-5 order-summary-card" Style="max-width: 600px; width: 100%;">
@@ -45,7 +59,7 @@
                 </MudItem>
             </MudGrid>
 
-            <MudButton Variant="Variant.Filled" Color="Color.Success" Class="mb-2" FullWidth>
+            <MudButton Variant="Variant.Filled" Color="Color.Success" Class="mb-2" OnClick="@(() => SaveOrder())" FullWidth>
                 Continue to secure payment
             </MudButton>
         }
@@ -62,46 +76,89 @@
 
 <style>
     .order-summary-container {
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        min-height: 100vh;
-        padding-top: 50px;
-        padding-left: 80px;
-        padding-right: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding-top: 50px;
+    padding-left: 80px;
+    padding-right: 10px;
     }
 
     .order-summary-card {
-        width: 100%;
-        max-width: 550px;
-        box-sizing: border-box;
+    width: 100%;
+    max-width: 550px;
+    box-sizing: border-box;
     }
 
     .no-gap {
-        margin: 0;
+    margin: 0;
     }
 
     .tight-spacing {
-        margin-bottom: 4px;
+    margin-bottom: 4px;
     }
 
     .cancel-payment-link {
-        margin-top: 20px;
+    margin-top: 20px;
     }
 
     .text-center {
-        text-align: center;
+    text-align: center;
     }
 </style>
 
 @code {
-
     private List<CartDto> Products = new();
     private decimal TotalPrice => Products.Sum(p => p.TotalPrice);
     private string OrderReference => Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
-
+    public string Id { get; set; }
     protected override void OnInitialized()
     {
-        Products = CartStateService.GetCartItems(); 
+        Products = CartStateService.GetCartItems();
     }
+
+    private async Task SaveOrder()
+    {
+        try
+        {
+            Id = await TokensService.GetUserIdFromTokenAsync();
+            var orderRequest = new AddOrderDto
+                {
+                    CustomerId = Id,
+                    OrderDate = DateTime.Now,
+                    TotalAmount = TotalPrice,
+                    ProductDetails = Products.Select(product => new OrderProductDetails
+                    {
+                        ProductId = product.ProductId,
+                        Quantity = product.Quantity,
+                        Amount = product.TotalPrice
+                    }).ToList()
+                };
+
+            var response=await OrderService.SaveOrderAsync(orderRequest);
+            if (response.IsSuccess)
+            {
+
+                Snackbar.Add("Order Completed ", Severity.Success);
+                NavigationManager.NavigateTo("/product");
+
+
+            }
+            else
+            {
+                // Snackbar.Add($"Error: {response.Errors}", Severity.Error);
+                var errorMessage = response.Errors != null && response.Errors.Any()
+            ? string.Join(", ", response.Errors)
+            : "An unknown error occurred.";
+                Snackbar.Add($"Error: {errorMessage}", Severity.Error);
+            }
+            NavigationManager.NavigateTo("/product");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error saving order: {ex.Message}");
+        }
+    }
+
 }

@@ -326,17 +326,57 @@ namespace IMS.Infrastructure.Services.Product
 
                 if (addProductRequestDto.ProductSizes != null && addProductRequestDto.ProductSizes.Any())
                 {
-                    product.ProductSizes.Clear();
+                    // Get existing product sizes for the product
+                    var existingProductSizes = product.ProductSizes.ToList();
 
-                    var productSizes = addProductRequestDto.ProductSizes.Select(size => new ProductSize
+                    // Find product sizes that are currently used in the Cart table for this product
+                    var productSizeIdsInCart = await context.Carts
+                        .Where(cart => cart.ProductId == product.Id &&
+                                       existingProductSizes.Select(ps => ps.Id).Contains(cart.ProductSizeId))
+                        .Select(cart => cart.ProductSizeId)
+                        .ToListAsync();
+
+                    // Do not remove conflicting sizes (used in the Cart)
+                    var conflictingSizes = existingProductSizes
+                        .Where(ps => productSizeIdsInCart.Contains(ps.Id))
+                        .ToList();
+
+                    // Find removable sizes (not in use in Cart and not present in new sizes)
+                    var removableSizes = existingProductSizes
+                        .Where(ps => !productSizeIdsInCart.Contains(ps.Id) &&
+                                     !addProductRequestDto.ProductSizes.Contains(ps.Size))
+                        .ToList();
+
+
+                    foreach (var size in removableSizes)
                     {
-                        Size = size,
-                        Product = product,
-                        CreatedBy = "Admin",
-                        Created = DateTime.Now
-                    }).ToList();
+                        product.ProductSizes.Remove(size);
+                    }
+                    //if(addProductRequestDto.ProductSizes.Where(i=>i.).Contains(conflictingSizes))
 
-                    product.ProductSizes = productSizes;
+                    // Add new sizes or update existing sizes
+                    foreach (var size in addProductRequestDto.ProductSizes)
+                    {
+                        var existingSize = existingProductSizes.FirstOrDefault(ps => ps.Size == size);
+
+                        if (existingSize == null)
+                        {
+                            // Add new size if not already present
+                            product.ProductSizes.Add(new ProductSize
+                            {
+                                Size = size,
+                                Product = product,
+                                CreatedBy = "Admin",
+                                Created = DateTime.Now
+                            });
+                        }
+                        else if (productSizeIdsInCart.Contains(existingSize.Id))
+                        {
+                            // If the size is in the cart, modify its properties if needed (optional, based on requirements)
+                            existingSize.LastModifiedBy = "Admin";
+                            existingSize.LastModified = DateTime.Now;
+                        }
+                    }
                 }
 
 
@@ -399,6 +439,15 @@ namespace IMS.Infrastructure.Services.Product
             var response = new GenericBaseResult<DeleteProductDto>(null);
             try
             {
+                var isProductInCart = await context.Carts.AnyAsync(cart => cart.ProductSize.ProductId == productId);
+
+                if (isProductInCart)
+                {
+                    throw new Exception("Cannot delete this product as it is present in a cart of a user.");
+                    
+                }
+
+                // Retrieve product details along with related entities
                 var product = await context.Products
                     .Where(p => p.Id == productId)
                     .Select(p => new
@@ -441,9 +490,7 @@ namespace IMS.Infrastructure.Services.Product
             }
 
             return response;
-
         }
-
 
 
 

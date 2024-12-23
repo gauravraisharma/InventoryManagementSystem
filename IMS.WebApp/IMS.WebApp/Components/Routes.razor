@@ -5,52 +5,53 @@
 @inject ITokenService TokenService
 
 <CascadingAuthenticationState>
-<Router AppAssembly="@typeof(Program).Assembly" AdditionalAssemblies="new[] { typeof(Client._Imports).Assembly }">
-    <Found Context="routeData">
-        @if (IsAuthenticated)
-        {
-            if (UserRole == "admin")
-            {
-                <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
-            }
-            else
-            {
-                <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.Public.PublicLayout)" />
-            }
-        }
-        else
-        {
-            if (IsLoginUrl || IsSignupUrl)
-            {
-                <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.Public.LoginLayout)" />
-            }
-            else
-            {
-                <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.Public.PublicLayout)" />
-            }
-        }
-        <FocusOnNavigate RouteData="routeData" Selector="h1" />
-    </Found>
+	<Router AppAssembly="@typeof(Program).Assembly" AdditionalAssemblies="new[] { typeof(Client._Imports).Assembly }">
+		<Found Context="routeData">
+			@if (IsAuthenticated)
+			{
+				if (UserRole == "admin")
+				{
+					<RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
+				}
+				else
+				{
+					<RouteView RouteData="routeData" DefaultLayout="typeof(Layout.Public.PublicLayout)" />
+				}
+			}
+			else
+			{
+				if (IsLoginUrl || IsSignupUrl || IsValidateUrl)
+				{
+					<RouteView RouteData="routeData" DefaultLayout="typeof(Layout.Public.LoginLayout)" />
+				}
+				else
+				{
+					<RouteView RouteData="routeData" DefaultLayout="typeof(Layout.Public.PublicLayout)" />
+				}
+			}
+			<FocusOnNavigate RouteData="routeData" Selector="h1" />
+		</Found>
 
-    <NotFound>
-        <h1>Page not found</h1>
-    </NotFound>
-</Router>
+		<NotFound>
+			<h1>Page not found</h1>
+		</NotFound>
+	</Router>
 </CascadingAuthenticationState>
 
 @code {
-    private bool IsAuthenticated { get; set; }
-    private string UserRole { get; set; } = string.Empty;
+	private bool IsAuthenticated { get; set; }
+	private string UserRole { get; set; } = string.Empty;
 
-    private bool IsLoginUrl => NavigationManager.Uri.EndsWith("/login", StringComparison.OrdinalIgnoreCase);
-    private bool IsSignupUrl => NavigationManager.Uri.EndsWith("/signup", StringComparison.OrdinalIgnoreCase);
+	private bool IsLoginUrl => NavigationManager.Uri.EndsWith("/login", StringComparison.OrdinalIgnoreCase);
+	private bool IsSignupUrl => NavigationManager.Uri.EndsWith("/signup", StringComparison.OrdinalIgnoreCase);
+	private bool IsValidateUrl => NavigationManager.Uri.EndsWith("/validate", StringComparison.OrdinalIgnoreCase);
 
-    protected override async Task OnInitializedAsync()
-    {
-        var authState = await AuthStateService.GetAuthenticationStateAsync();
-        IsAuthenticated = authState.User.Identity.IsAuthenticated;
-        UserRole = await TokenService.GetRoleFromTokenAsync();
+	protected override async Task OnInitializedAsync()
+	{
+		var authState = await AuthStateService.GetAuthenticationStateAsync();
+		IsAuthenticated = authState.User.Identity.IsAuthenticated;
+		UserRole = await TokenService.GetRoleFromTokenAsync();
 
-        AuthStateService.UserRole = UserRole;
-    }
+		AuthStateService.UserRole = UserRole;
+	}
 }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace IMS.Shared.Constants
+﻿namespace IMS.Shared.Constants
 {
     public class ApiEndpoints
     {
@@ -35,6 +29,7 @@ namespace IMS.Shared.Constants
             public const string Base = "https://localhost:44317/";
             public const string Login = Base + "api/auth/Login";
             public const string Register = Base + "api/auth/register";
+            public const string GetAllUsers = Base + "api/auth/getAllUsers";
         }
 
         public class Cart
@@ -44,6 +39,18 @@ namespace IMS.Shared.Constants
             public const string GetCartItems = Base + "api/Cart/GetCartItems";
             public const string UpdateCart = Base + "api/Cart/EditCart";
             public const string DeleteCartItem = Base + "api/Cart/DeleteCartItem";
+        }
+        public static class Order
+        {
+            public const string Base = "https://localhost:44317/";
+            public const string SaveOrder = Base + "api/Orders/AddOrder";
+            public const string GetAllOrders = Base + "api/Orders/GetAllOrders";
+        }
+        public class TwoFactor
+        {
+            public const string Base = "https://localhost:44317/";
+            public const string SendCode = Base + "api/TwoFactorAuth/generate";
+            public const string ValidateCode = Base + "api/TwoFactorAuth/validate";
         }
     }
 }

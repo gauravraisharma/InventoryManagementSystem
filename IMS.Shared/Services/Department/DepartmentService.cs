@@ -5,7 +5,7 @@ using IMS.Shared.RequestDto.DepartmentDTOs;
 using IMS.Shared.RequestDto.ProductDTOs;
 using System.Net.Http.Json;
 
-namespace IMS.WebApp.Client.Services.Department
+namespace IMS.Shared.Services.Department
 {
     public class DepartmentService:IDepartmentService
     {
