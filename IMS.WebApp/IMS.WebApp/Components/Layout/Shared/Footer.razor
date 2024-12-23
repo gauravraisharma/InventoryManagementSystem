@@ -2,28 +2,37 @@
     <MudText Typo="Typo.body2">© 2024 Your Company</MudText>
 </MudPaper>
  *@
-<MudPaper Elevation="2" Class="p-4 bg-dark text-white">
-    <div class="d-flex flex-wrap justify-content-between">
+<MudPaper Elevation="2" Class="px-14 py-6 bg-dark text-white">
+    <MudContainer>
+    <MudGrid Class="mt-4">
+                    <MudItem xs="12" sm="3">
         <!-- Column 1: Get to Know Us -->
         <div class="footer-column">
-            <MudText Typo="Typo.subtitle1" Class="mb-2">Get to Know Us</MudText>
-            <MudText Typo="Typo.body2">About tackingStuff</MudText>
-            <MudText Typo="Typo.body2">Careers</MudText>
-            <MudText Typo="Typo.body2">Press Releases</MudText>
-            <MudText Typo="Typo.body2">tackingStuff Science</MudText>
+            <MudText Typo="Typo.subtitle1" Class="title">Get to Know Us</MudText>
+            <div class="list-items">
+                <MudText Typo="Typo.body2">About tackingStuff</MudText>
+                <MudText Typo="Typo.body2">Careers</MudText>
+                <MudText Typo="Typo.body2">Press Releases</MudText>
+                <MudText Typo="Typo.body2">tackingStuff Science</MudText>
+            </div>
         </div>
-
+        </MudItem>
+            <MudItem xs="12" sm="3">
         <!-- Column 2: Connect with Us -->
         <div class="footer-column">
-            <MudText Typo="Typo.subtitle1" Class="mb-2">Connect with Us</MudText>
+            <MudText Typo="Typo.subtitle1" Class="title">Connect with Us</MudText>
+            <div class="list-items">
             <MudText Typo="Typo.body2">Facebook</MudText>
             <MudText Typo="Typo.body2">Twitter</MudText>
             <MudText Typo="Typo.body2">Instagram</MudText>
+            </div>
         </div>
-
+        </MudItem>
+            <MudItem xs="12" sm="3">
         <!-- Column 3: Make Money with Us -->
         <div class="footer-column">
-            <MudText Typo="Typo.subtitle1" Class="mb-2">Make Money with Us</MudText>
+            <MudText Typo="Typo.subtitle1" Class="title">Make Money with Us</MudText>
+            <div class="list-items">
             <MudText Typo="Typo.body2">Sell on tackingStuff</MudText>
             <MudText Typo="Typo.body2">Sell under tackingStuff Accelerator</MudText>
             <MudText Typo="Typo.body2">Protect and Build Your Brand</MudText>
@@ -31,24 +40,29 @@
             <MudText Typo="Typo.body2">Supply to tackingStuff</MudText>
             <MudText Typo="Typo.body2">Become an Affiliate</MudText>
             <MudText Typo="Typo.body2">Fulfillment by tackingStuff</MudText>
+            </div>
         </div>
-
+        </MudItem>
+            <MudItem xs="12" sm="3">
         <!-- Column 4: Let Us Help You -->
         <div class="footer-column">
-            <MudText Typo="Typo.subtitle1" Class="mb-2">Let Us Help You</MudText>
+            <MudText Typo="Typo.subtitle1" Class="title">Let Us Help You</MudText>
+            <div class="list-items">
             <MudText Typo="Typo.body2">Your Account</MudText>
             <MudText Typo="Typo.body2">Returns Centre</MudText>
             <MudText Typo="Typo.body2">Recalls and Product Safety Alerts</MudText>
             <MudText Typo="Typo.body2">100% Purchase Protection</MudText>
             <MudText Typo="Typo.body2">tackingStuff App Download</MudText>
             <MudText Typo="Typo.body2">Help</MudText>
+            </div>
         </div>
-    </div>
-
+    </MudItem>
+    </MudGrid>
     <!-- Footer Bottom -->
-    <div class="text-center mt-4">
+    <div class="mt-4 pt-4 btm-footer">
         <MudText Typo="Typo.body2">© 2024 Your Company</MudText>
     </div>
+    </MudContainer>
 </MudPaper>
 
 <style>
@@ -60,6 +74,22 @@
         margin-left:25px;
     }
 
+    .footer-column .title {
+        font-size: 18px;
+        font-weight: 500;
+        margin-bottom: 24px;
+    }
+    .list-items p {
+        font-size: 14px;
+        margin-bottom: 12px;
+    }
+    .btm-footer {
+        border-top: 1px solid #898989;
+    }
+
+    .btm-footer p {
+        text-align: center;
+    }
     .bg-dark {
         background-color: #232f3e; 
     }
