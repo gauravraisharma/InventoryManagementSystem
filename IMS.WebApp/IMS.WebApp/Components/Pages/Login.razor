@@ -8,46 +8,91 @@
 @inject AuthStateService AuthStateService
 
 <MudContainer MaxWidth="MaxWidth.Small" Class="mt-6">
-    <MudPaper Class="pa-6 login-card">
-        <MudText Typo="Typo.h4" Class="mb-4 text-center">Login</MudText>
+    <MudPaper Class="pa-10 login-card">
+        <div class="text-center">
+        <img src="/images/logo.png" alt="App Logo" style="max-width: 280px; width: 100%;margin: 0 auto" />
+        </div>
+        <MudText Typo="Typo.h4" Class="mb-4 text-center main-title mt-5">Login</MudText>
 
         <MudForm @ref="form">
+            <div class="mb-5">
+                <label>Username</label>
             <MudTextField T="string"
-                          Label="Username"
+                          Variant="Variant.Outlined"
+                          Placeholder="Username"
                           @bind-Value="model.Username"
                           Required="true"
                           RequiredError="Username is required."
                           Class="mt-2" />
-
+            </div>
+            <div class="mb-5">
+                <label>Password</label>
             <MudTextField T="string"
-                          Label="Password"
+                              Variant="Variant.Outlined"
+                          Plcaeholder="Password"
                           @bind-Value="model.Password"
                           Required="true"
                           InputType="InputType.Password"
                           RequiredError="Password is required."
                           Class="mt-2" />
+                          </div>
 
             <MudText Typo="Typo.body2" Color="Color.Error" Class="mt-2">
                 @errorMessage
             </MudText>
 
             <MudButton Variant="Variant.Filled"
-                       Color="Color.Primary"
-                       Class="mt-4 w-full"
+                       Class="w-full btn-theme"
+                       DropShadow="false"
                        OnClick="HandleLogin">
-                Login
+                Sign in
             </MudButton>
-
-            <MudButton Variant="Variant.Outlined"
-                       Color="Color.Secondary"
-                       Class="mt-2 w-full"
-                       OnClick="NavigateToSignup">
-                Sign Up
-            </MudButton>
+            <MudText Class="mt-4 text-center">Don't have an account? <MudLink Href="#" OnClick="NavigateToSignup" Class="text-theme">Sign Up</MudLink></MudText>
+            @* <MudButton Variant="Variant.Outlined" *@
+            @*            Color="Color.Secondary" *@
+            @*            Class="mt-2 w-full" *@
+            @*            OnClick="NavigateToSignup"> *@
+            @*     Sign Up *@
+            @* </MudButton> *@
         </MudForm>
     </MudPaper>
 </MudContainer>
+<style>
+    .login-card {
+        box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+        border-radius: 10px;
+        border: 1px solid #eaeaea;
+    }
 
+    .btn-theme {
+        width: 100%;
+        background: darkslateblue;
+        color: #fff;
+        text-transform: capitalize;
+        padding: 8px 16px;
+        font-size: 18px;
+    }
+
+    .btn-theme:hover {
+            background: #FFD700;
+        color: #000;
+    }
+    .text-center {
+        text-align: center;
+    }
+    .text-theme {
+        color: darkslateblue;
+        font-weight: 500;
+    }
+    .main-title {
+        font-weight: 600;
+        color: #000;
+    }
+
+    .mud-input > input.mud-input-root-outlined {
+        padding: 14px 14px;
+    }
+</style>
 @code {
     private MudForm form;
     private string errorMessage = string.Empty;

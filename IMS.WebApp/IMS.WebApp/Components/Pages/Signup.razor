@@ -4,69 +4,144 @@
 @inject IAuthService AuthService
 
 <MudContainer MaxWidth="MaxWidth.Small" Class="mt-4">
-    <MudPaper Class="pa-4">
-        <MudText Typo="Typo.h4" Class="mb-4">Sign Up</MudText>
+    <MudPaper Class="pa-6 login-card">
+        <div class="text-center">
+            <img src="/images/logo.png" alt="App Logo" style="width: 280px; margin: 0 auto" />
+        </div>
+        <MudText Typo="Typo.h4" Class="mb-4 text-center main-title mt-5">Sign Up</MudText>
 
         <MudForm @ref="form">
+            <MudGrid>
+               
+<MudItem xs="12" sm="6">
+                <div>
+                <label>First Name</label>
             <MudTextField T="string"
-                          Label="Username"
-                          @bind-Value="model.Username"
-                          Required="true"
-                          RequiredError="Username is required." />
-
-            <MudTextField T="string"
-                          Label="First Name"
+                          Variant="Variant.Outlined"
+                          Placeholder="First Name"
                           @bind-Value="model.FirstName"
                           Required="true"
-                          RequiredError="First name is required." />
-
+                          RequiredError="First name is required."
+                                      Class="mt-2" />
+                          </div>
+                          </MudItem>
+                          <MudItem xs="12" sm="6">
+                          <div>
+                <label>Last Name</label>
             <MudTextField T="string"
-                          Label="Last Name"
+                          Variant="Variant.Outlined"
+                          Placeholder="Last Name"
                           @bind-Value="model.LastName"
                           Required="true"
-                          RequiredError="Last name is required." />
-
+                          RequiredError="Last name is required."
+                                      Class="mt-2" />
+                          </div>
+                          </MudItem>
+                           <MudItem xs="12" sm="12">
+            <div>
+                <label>Username</label>
             <MudTextField T="string"
-                          Label="Email"
+                          Variant="Variant.Outlined"
+                          Placeholder="Username"
+                          @bind-Value="model.Username"
+                          Required="true"
+                          RequiredError="Username is required."
+                                      Class="mt-2" />
+                          </div>
+                          
+                           </MudItem>
+                          <MudItem xs="12" sm="12">
+                          <div>
+                <label>Email</label>
+            <MudTextField T="string"
+                          Variant="Variant.Outlined"
+                          Placeholder="Email"
                           @bind-Value="model.Email"
                           Required="true"
                           RequiredError="Email is required."
                           InputType="InputType.Email"
                           Immediate="true"
                           ErrorText="@errorMessage"
-                          HelperText="Email must not contain spaces and must be valid." />
-
+                          HelperText="Email must not contain spaces and must be valid."
+                                      Class="mt-2" />
+</div>
+</MudItem>
+<MudItem xs="12" sm="12">
+<div>
+                <label>Password</label>
             <MudTextField T="string"
-                          Label="Password"
+                          Variant="Variant.Outlined"
+                          Placeholder="Password"
                           @bind-Value="model.Password"
                           Required="true"
                           InputType="InputType.Password"
                           RequiredError="Password is required."
                           Immediate="true"
                           HelperText="Password must be at least 8 characters long and include uppercase, lowercase, and a digit."
-                          ErrorText="@errorMessage" />
-
+                          ErrorText="@errorMessage"
+                                      Class="mt-2" />
+                          </div>
+                          </MudItem>
+                          </MudGrid>
             <MudText Typo="Typo.body2" Color="Color.Error" Class="mt-2">
                 @errorMessage
             </MudText>
 
             <MudButton Variant="Variant.Filled"
-                       Color="Color.Primary"
-                       Class="mt-4"
+                       DropShadow="false"
+                       Class="mt-4 btn-theme"
                        OnClick="HandleSignup">
                 Sign Up
             </MudButton>
-
-            <MudButton Variant="Variant.Outlined"
-                       Color="Color.Secondary"
-                       Class="mt-2"
-                       OnClick="NavigateToLogin">
-                Back to Login
-            </MudButton>
+            <MudText Class="mt-4 text-center">Already have an account? <MudLink Href="#" OnClick="NavigateToLogin" Class="text-theme">Sign In</MudLink></MudText>
+            @* <MudButton Variant="Variant.Outlined" *@
+            @*            Color="Color.Secondary" *@
+            @*            Class="mt-2" *@
+            @*            OnClick="NavigateToLogin"> *@
+            @*     Back to Login *@
+            @* </MudButton> *@
         </MudForm>
     </MudPaper>
 </MudContainer>
+<style>
+    .login-card {
+        box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+        border-radius: 10px;
+        border: 1px solid #eaeaea;
+    }
 
+    .btn-theme {
+        width: 100%;
+        background: darkslateblue;
+        color: #fff;
+        text-transform: capitalize;
+        padding: 8px 16px;
+        font-size: 18px;
+    }
+
+    .btn-theme:hover {
+        background: #FFD700;
+        color: #000;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .text-theme {
+        color: darkslateblue;
+        font-weight: 500;
+    }
+
+    .main-title {
+        font-weight: 600;
+        color: #000;
+    }
+
+    .mud-input > input.mud-input-root-outlined {
+        padding: 14px 14px;
+    }
+</style>
 @code {
     private MudForm form;
     private string errorMessage = string.Empty;

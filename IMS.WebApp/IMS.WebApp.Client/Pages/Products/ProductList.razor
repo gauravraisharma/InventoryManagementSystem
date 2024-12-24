@@ -29,36 +29,49 @@
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
     <!-- Header Section -->
-    <div style=" background-color: white; box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);">
-        <MudGrid>
-            <MudItem xs="12" Class="d-flex justify-space-between align-center">
-                <MudText Typo="Typo.h5">Products</MudText>
-                @if (AuthStateService.UserRole == "admin")
-                {
-                    <div class="d-flex gap-2">
-                        <MudButton @onclick="OpenAddProductDialogAsync" Variant="Variant.Filled" Color="Color.Primary">
-                            Add Product
-                        </MudButton>
-                        <MudButton Variant="Variant.Outlined"
-                                   Color="Color.Primary"
-                                   StartIcon="@Icons.Material.Filled.Upload"
-                                   Href="/export">
-                            IMPORT PRODUCT
-                        </MudButton>
-                    </div>
-                }
-               
-            </MudItem>
-        </MudGrid>
+    <MudGrid>
+        <MudItem xs="12" Class="d-flex justify-end align-center">
+            @if (AuthStateService.UserRole == "admin")
+            {
+                <div class="d-flex gap-2">
+                    <MudButton @onclick="OpenAddProductDialogAsync" Variant="Variant.Filled" Color="Color.Primary">
+                        Add Product
+                    </MudButton>
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.Upload"
+                               Href="/export">
+                        IMPORT PRODUCT
+                    </MudButton>
+                </div>
+            }
+        </MudItem>
+    </MudGrid>
+
+    <!-- Products Grid -->
+    <MudGrid>
+        <MudItem xs="2">
         <!-- Filters Section -->
+        <div>
+                <MudText Typo="Typo.h5" Class="section-title">Filters</MudText>
         <MudGrid Class="mt-4">
-            <MudItem xs="12" md="3">
+                    <MudItem xs="12">
+                        <MudTextField T="string"
+                                      Label="Search"
+                                      Variant="Variant.Outlined"
+                                      Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.Search"
+                                      @bind-Value="searchText"
+                                      @bind-Value:after="@(() => GetAllProducts())"
+                                      Dense="true" />
+                    </MudItem>
+            <MudItem xs="12">
                 <MudSelect T="string"
-                Label="Department"
-                Variant="Variant.Outlined"
-                @bind-Value="selectedDepartment"
-                @bind-Value:after="@(() => GetAllProducts())"
-                Dense="true">
+                           Label="Department"
+                           Variant="Variant.Outlined"
+                           @bind-Value="selectedDepartment"
+                           @bind-Value:after="@(() => GetAllProducts())"
+                           Dense="true">
                     <MudSelectItem Value="@("all")">Pick a Department</MudSelectItem>
                     @foreach (var department in _departments)
                     {
@@ -66,13 +79,13 @@
                     }
                 </MudSelect>
             </MudItem>
-            <MudItem xs="12" md="3">
+            <MudItem xs="12">
                 <MudSelect T="string"
-                Label="Category"
-                Variant="Variant.Outlined"
-                @bind-Value="selectedCategory"
-                @bind-Value:after="@(() => GetAllProducts())"
-                Dense="true">
+                           Label="Category"
+                           Variant="Variant.Outlined"
+                           @bind-Value="selectedCategory"
+                           @bind-Value:after="@(() => GetAllProducts())"
+                           Dense="true">
                     <MudSelectItem Value="@("all")">Pick a Category</MudSelectItem>
                     @foreach (var category in _categories)
                     {
@@ -80,31 +93,27 @@
                     }
                 </MudSelect>
             </MudItem>
-            <MudItem xs="12" md="4">
-                <MudTextField T="string"
-                Label="Search"
-                Variant="Variant.Outlined"
-                Adornment="Adornment.Start"
-                AdornmentIcon="@Icons.Material.Filled.Search"
-                @bind-Value="searchText"
-                @bind-Value:after="@(() => GetAllProducts())"
-                Dense="true" />
-            </MudItem>
-            <MudItem xs="12" md="2">
+            
+            <MudItem xs="12">
                 <MudSelect T="string"
-                Label="Sort By"
-                Variant="Variant.Outlined"
-                @bind-Value="selectedSort"
-                @bind-Value:after="@(() => GetAllProducts())"
-                Dense="true">
+                           Label="Sort By"
+                           Variant="Variant.Outlined"
+                           @bind-Value="selectedSort"
+                           @bind-Value:after="@(() => GetAllProducts())"
+                           Dense="true">
                     <MudSelectItem Value="@("newest")">Newest First</MudSelectItem>
                     <MudSelectItem Value="@("oldest")">Oldest First</MudSelectItem>
                 </MudSelect>
             </MudItem>
         </MudGrid>
-    </div>
-
-    <!-- Products Grid -->
+            </div>
+        
+        </MudItem>
+        
+        
+        <MudItem xs="10"> 
+            <div>
+                <MudText Typo="Typo.h5" Class="section-title">Products</MudText>
     <MudGrid Class="mt-4">
         @if (_products.Count == 0)
         {
@@ -116,15 +125,14 @@
         {
             @foreach (var product in _products)
             {
-                <MudItem xs="12" sm="6" md="3">
-                    <MudCard>
-                        <MudCardContent Style="height: 400px; overflow: hidden;">
+                <MudItem xs="12" sm="6" md="4" lg="3">
+                    <MudCard Class="list-card">
+                        <MudCardContent class="pa-0">
                             @if (product.ProductImages?.Any() == true)
                             {
-                                <div style="height: 200px; overflow: hidden;">
+                                <div style="height: 240px; overflow: hidden;">
                                     <img src="@($"data:image/jpeg;base64,{product.ProductImages.First()}")"
                                     alt="Product Image"
-                                    class="mt-2"
                                     style="width: 100%; height: 100%; object-fit: cover;" />
                                 </div>
                             }
@@ -132,14 +140,18 @@
                             {
                                 <MudText Typo="Typo.body2" Class="mt-2">No image available</MudText>
                             }
-
-                            <MudText Typo="Typo.h6">@product.Title</MudText>
+                            <div class="pa-4">
+                            <MudText Typo="Typo.h6" Class="mb-2 title">@product.Title</MudText>
+                            <div class="d-flex align-center justify-between mb-3">
+                                                <MudText Typo="Typo.h5" Class="price flex-1"> ₹@product.UnitPrice.ToString("N2")</MudText>
                             <MudText Typo="Typo.body2">
                                 @string.Join(", ", product.DepartmentNames)
                             </MudText>
+                                        </div>
 
-                            <div style="max-height: 100px; overflow-y: auto;">
-                                <MudText Typo="Typo.body2" Class="mt-4">@product.Description</MudText>
+                            <div>
+                                <MudText Typo="Typo.body2" Class="sub-title">@product.Description</MudText>
+                            </div>
                             </div>
                         </MudCardContent>
                         <MudCardActions Class="d-flex justify-space-between">
@@ -149,11 +161,12 @@
                                 EDIT
                             </MudButton>
                         }
-                            <div>
-                                <MudTooltip Text="Preview">
-                                <MudIconButton Icon="@Icons.Material.Filled.Visibility"Color="Color.Default" OnClick="@(() => NavigateToProductDetails(product.Id))" />
-                                </MudTooltip>
-                            </div>
+                            @* <div> *@
+                            @*     <MudTooltip Text="Preview"> *@
+                            @*     <MudIconButton Icon="@Icons.Material.Filled.Visibility"Color="Color.Default" OnClick="@(() => NavigateToProductDetails(product.Id))" /> *@
+                            @*     </MudTooltip> *@
+                            @* </div> *@
+                                        <MudButton Variant="Variant.Filled" DropShadow="false" Class="btn-theme btn-yellow" OnClick="@(() => NavigateToProductDetails(product.Id))">View Details</MudButton>
                             @if(AuthStateService.UserRole=="admin")
                             {
                                 <div>
@@ -167,6 +180,11 @@
             }
         }
     </MudGrid>
+
+            </div>
+        </MudItem>
+    </MudGrid>
+    
 </MudContainer>
 
 
@@ -174,6 +192,50 @@
     .custom-dialog {
     max-width: 800px;
     width: 90%;
+    }
+    .list-card {
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: none;
+        border: 1px solid #e6e6e6;
+        height: 450px;
+    }
+    .list-card .title {
+        font-size: 20px;
+        line-height: normal;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .list-card .sub-title {
+        font-size: 14px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        position: relative;
+    }
+    .list-card .price {
+        font-size: 26px;
+        font-weight: 600;
+    }
+    .btn-theme.btn-yellow {
+        width: 100%;
+        background: #FFD700;
+        color: #000;
+        text-transform: capitalize;
+        border: 1px solid #FFD700;
+    }
+
+    .btn-theme.btn-yellow:hover {
+            background: #fff;
+            border: 1px solid #FFD700;
+    }
+    .section-title {
+        font-weight: 500;
     }
 </style>
 

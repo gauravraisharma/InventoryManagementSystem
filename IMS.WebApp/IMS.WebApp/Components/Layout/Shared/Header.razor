@@ -3,24 +3,37 @@
 @inject NavigationManager NavigationManager
 @using IMS.WebApp.Client.Authentication
 
-<div id="nav-belt" class="d-flex align-items-center justify-content-between w-100">
+<div id="nav-belt" class="d-flex align-center justify-content-between w-100">
     <!-- Left Section -->
-    <div class="nav-left d-flex align-items-center">
-        <MudText Typo="Typo.h6" Class="ml-2" Style="color: white;">TrackingStuff.in</MudText>
-        <MudText Typo="Typo.body1" Style="color: white;" Class="ml-2">Delivering to Dehradun 248001</MudText>
+    <div class="nav-left d-flex align-center gap-5">
+        <img src="/images/logo-white.png" alt="App Logo" style="width: 200px;" />
+        @* <MudText Typo="Typo.h6" Style="color: white;">TrackingStuff.in</MudText> *@
+        <MudText Typo="Typo.body1" Style="color: white;" Class="d-flex align-center justify-center gap-1"><MudIcon Icon="@Icons.Material.Outlined.Map" Title="Icon" /> Delivering to Dehradun 248001</MudText>
     </div>
 
     <!-- Center Section -->
-    <div class="nav-fill flex-grow-1 mx-4">
-        <MudTextField T="string" Placeholder="Search" Class="w-100" Style="color: white;" />
-    </div>
+    
 
     <!-- Right Section -->
-    <div class="nav-right d-flex align-items-center">
+    <div class="nav-right d-flex align-center gap-2 ml-auto">
+        <div class="search-bar">
+            <MudTextField Variant="Variant.Outlined" T="string" Placeholder="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search"/>
+        </div>
         @if (IsAuthenticated)
         {
             <!-- Dropdown for Signed-In User -->
-            <MudMenu Class="custom-menu" AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopRight">
+            <MudMenu Class="ml-4">
+                <ActivatorContent>
+                    <MudAvatar>
+                        <MudImage Src="" />
+                    </MudAvatar>
+                </ActivatorContent>
+                <ChildContent>
+                    <MudMenuItem>@Username</MudMenuItem>
+                    <MudMenuItem OnClick="SignOut">Sign Out</MudMenuItem>
+                </ChildContent>
+            </MudMenu>
+            @* <MudMenu Class="custom-menu" AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopRight">
                 <MudButton Variant="Variant.Filled" Color="Color.Primary">
                     <MudIcon Icon="Icons.Material.Filled.AccountCircle" Class="mr-1" />
                     @Username
@@ -28,7 +41,7 @@
 
                 <!-- Sign Out Option -->
                 <MudMenuItem OnClick="SignOut" Class="mud-menu-item">Sign Out</MudMenuItem>
-            </MudMenu>
+            </MudMenu> *@
         }
         else
         {
@@ -39,11 +52,10 @@
         }
 
         <!-- Cart Link -->
-        <div style="padding-right: 10px">
             <NavLink href="/view-cart" class="ml-4 text-decoration-none" Style="color: aliceblue;">
-                <MudText Typo="Typo.body1">Cart</MudText>
+
+            <MudText Typo="Typo.body1" Class="d-flex align-center justify-center gap-1"><MudIcon Icon="@Icons.Material.Outlined.ShoppingCart" Title="Icon" /> Cart</MudText>
             </NavLink>
-        </div>
     </div>
 </div>
 
@@ -53,10 +65,32 @@
     height: 60px;
     font-size: 14px;
     position: relative;
+    padding: 12px 20px;
     }
 
     .nav-right {
     justify-content: flex-end;
+    }
+
+    .search-bar .mud-input-control {
+        width: 430px;
+    }
+
+    .search-bar .mud-input > input.mud-input-root-outlined {
+        padding: 10px 14px;
+    }
+
+    .search-bar .mud-input {
+        background: #fff;
+        color: #666666;
+        border-radius: 6px;
+    }
+    .search-bar .mud-input.mud-input-outlined:not(.mud-disabled):not(:focus-within):hover .mud-input-outlined-border {
+        border-color: rgb(255 255 255 / 54%);
+    }
+
+    .search-bar .mud-input.mud-input-outlined:focus-within .mud-input-outlined-border {
+        border-color: rgb(255 255 255 / 54%);
     }
 </style>
 
