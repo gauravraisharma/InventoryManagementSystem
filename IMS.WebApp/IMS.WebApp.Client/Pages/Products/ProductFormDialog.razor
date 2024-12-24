@@ -18,7 +18,6 @@
         <MudContainer MaxWidth="MaxWidth.Large" Class="mt-6">
             <MudCard Elevation="0">
                 <MudCardHeader>
-                    <MudText Typo="Typo.h5">@(Id == null ? "Add New Product" : "Edit Product")</MudText>
                 </MudCardHeader>
                 <MudCardContent>
                     <EditForm Model="product" OnValidSubmit="HandleSubmit" FormName="ProductForm">
