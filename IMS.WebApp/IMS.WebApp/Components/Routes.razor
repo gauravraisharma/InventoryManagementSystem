@@ -3,19 +3,31 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AuthStateService AuthStateService
 @inject ITokenService TokenService
+@using IMS.WebApp.Client.Pages.Admin
+@using IMS.WebApp.Client.Pages.Order
+@using IMS.WebApp.Client.Pages.Customer
+@using IMS.WebApp.Client.Pages.Products
+@using IMS.WebApp.Client.Pages.UnAuthorize
 
 <CascadingAuthenticationState>
 	<Router AppAssembly="@typeof(Program).Assembly" AdditionalAssemblies="new[] { typeof(Client._Imports).Assembly }">
 		<Found Context="routeData">
 			@if (IsAuthenticated)
 			{
-				if (UserRole == "admin")
+				if (CanAccess(routeData.PageType))
 				{
-					<RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
+					if (UserRole == "admin")
+					{
+						<RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
+					}
+					else
+					{
+						<RouteView RouteData="routeData" DefaultLayout="typeof(Layout.Public.PublicLayout)" />
+					}
 				}
 				else
 				{
-					<RouteView RouteData="routeData" DefaultLayout="typeof(Layout.Public.PublicLayout)" />
+					<AccessDenied />
 				}
 			}
 			else
@@ -33,7 +45,7 @@
 		</Found>
 
 		<NotFound>
-			<h1>Page not found</h1>
+			<NotFoundPage />
 		</NotFound>
 	</Router>
 </CascadingAuthenticationState>
@@ -53,5 +65,23 @@
 		UserRole = await TokenService.GetRoleFromTokenAsync();
 
 		AuthStateService.UserRole = UserRole;
+	}
+
+	private bool CanAccess(Type pageType)
+	{
+		// Pages accessible only by admin
+		var restrictedForUsers = new[] { typeof(AdminDashboard), typeof(OrderList), typeof(CustomerList) };
+
+		if (UserRole == "user" && restrictedForUsers.Contains(pageType))
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	private void RedirectToLogin()
+	{
+		NavigationManager.NavigateTo("/login", true);
 	}
 }
