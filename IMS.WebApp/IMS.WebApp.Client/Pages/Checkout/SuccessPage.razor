@@ -1,0 +1,86 @@
+﻿@page "/success"
+@using IMS.Shared.Interface.Order
+@using IMS.Shared.RequestDto.CartDTOs
+@using IMS.Shared.RequestDto.orderDTOs
+@using IMS.Shared.Services.Shared
+@using IMS.WebApp.Client.Authentication
+@using Microsoft.AspNetCore.Http
+
+<h3>SuccessPage</h3>
+<h1>Hi @CustomerName</h1>
+
+@inject NavigationManager NavigationManager
+@inject IOrderService OrderService
+@inject ITokenService TokensService
+@inject ISnackbar Snackbar
+@inject CartStateService CartStateService
+
+@code {
+    private bool _isProcessing = true;
+    private string? _errorMessage;
+    private List<CartDto> Products = new();
+    private decimal TotalPrice => Products.Sum(p => p.TotalPrice);
+    private string CustomerName = "";
+    private bool _orderSaved = false;  
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (_orderSaved)
+        {
+            return; // Prevent saving the order again
+        }
+
+        Products = CartStateService.GetCartItems();
+        try
+        {
+            var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+            var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+            var sessionId = query["sessionId"];
+
+            if (!string.IsNullOrEmpty(sessionId))
+            {
+                var orderRequest = new AddOrderDto
+                    {
+                        CustomerId = await TokensService.GetUserIdFromTokenAsync(),
+                        OrderDate = DateTime.Now,
+                        TotalAmount = TotalPrice,
+                        ProductDetails = Products.Select(product => new OrderProductDetails
+                        {
+                            Name = product.ProductName,
+                            ProductId = product.ProductId,
+                            Quantity = product.Quantity,
+                            Amount = product.TotalPrice
+                        }).ToList()
+                    };
+
+                var response = await OrderService.SaveOrderAsync(orderRequest);
+
+                if (response.IsSuccess)
+                {
+                    CustomerName = await TokensService.GetUserNameFromTokenAsync();
+                    _orderSaved = true; 
+                    Snackbar.Add("Order completed successfully.", Severity.Success);
+                    NavigationManager.NavigateTo("/product");
+                }
+                else
+                {
+                    _errorMessage = response.Errors != null && response.Errors.Any()
+                        ? string.Join(", ", response.Errors)
+                        : "An unknown error occurred while saving the order.";
+                }
+            }
+            else
+            {
+                _errorMessage = "Invalid session ID.";
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error processing payment: {ex.Message}";
+        }
+        finally
+        {
+            _isProcessing = false;
+        }
+    }
+}

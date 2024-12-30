@@ -45,6 +45,7 @@
             public const string Base = "https://localhost:44317/";
             public const string SaveOrder = Base + "api/Orders/AddOrder";
             public const string GetAllOrders = Base + "api/Orders/GetAllOrders";
+            public const string CreateStripeCheckoutSession = Base + "api/Orders/CreateStripeCheckoutSession";
         }
         public class TwoFactor
         {

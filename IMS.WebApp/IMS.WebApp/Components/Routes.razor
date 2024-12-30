@@ -1,5 +1,6 @@
 ﻿@inject NavigationManager NavigationManager
 @using IMS.WebApp.Client.Authentication
+@using IMS.WebApp.Client.Pages.Checkout
 @using IMS.WebApp.Components.Pages
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AuthStateService AuthStateService
@@ -97,6 +98,7 @@
             typeof(Home),
             typeof(ProductList),
             typeof(ProductDetail),
+            typeof(SuccessPage),
         };
 
         return publicPages.Contains(pageType);

@@ -49,5 +49,23 @@ namespace IMS.WebAPI.Controllers
                 Message = "Orders retrieved successfully"
             };
         }
+        [HttpPost]
+        [Route("CreateStripeCheckoutSession")]
+        public async Task<GenericBaseResult<string>> CreateStripeCheckoutSession([FromBody] CreateStripeCheckoutSessionCommand command)
+        {
+            try
+            {
+                var sessionId = await _mediator.Send(command);
+                return new GenericBaseResult<string>(sessionId);
+            }
+            catch (Exception ex)
+            {
+                var result = new GenericBaseResult<string>(null);
+                result.AddExceptionLog(ex); 
+                result.Message = "Error occurred while creating Stripe Checkout session."; 
+                return result;
+            }
+        }
+
     }
 }

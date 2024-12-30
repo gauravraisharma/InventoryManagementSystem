@@ -16,7 +16,13 @@ namespace IMS.Shared.RequestDto.orderDTOs
     public class OrderProductDetails
     {
         public string ProductId { get; set; }
+        public string Name { get; set; }
         public int Quantity { get; set; }
         public decimal Amount { get; set; }
     }
+    public class CreateStripeCheckoutSessionResponseDto
+    {
+        public string SessionId { get; set; }
+    }
+
 }
