@@ -30,6 +30,8 @@
                 </ActivatorContent>
                 <ChildContent>
                     <MudMenuItem>@Username</MudMenuItem>
+                    <MudMenuItem OnClick="RedirectToMyOrder">My Order</MudMenuItem>
+                    <MudMenuItem OnClick="RedirectToMyProfile">My Profile</MudMenuItem>
                     <MudMenuItem OnClick="SignOut">Sign Out</MudMenuItem>
                 </ChildContent>
             </MudMenu>
@@ -116,5 +118,15 @@
         Username = null;  
         NavigationManager.NavigateTo("/",true);
         AuthStateService.NotifyAuthenticationStateChanged();
+    }
+
+    private async Task RedirectToMyOrder()
+    {
+        NavigationManager.NavigateTo("/myorder", true);
+    }
+
+    private async Task RedirectToMyProfile()
+    {
+        NavigationManager.NavigateTo("/userProfile", true);
     }
 }

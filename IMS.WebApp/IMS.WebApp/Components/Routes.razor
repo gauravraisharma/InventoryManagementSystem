@@ -8,6 +8,7 @@
 @using IMS.WebApp.Client.Pages.Order
 @using IMS.WebApp.Client.Pages.Customer
 @using IMS.WebApp.Client.Pages.Products
+@using IMS.WebApp.Client.Pages.Cart
 @using IMS.WebApp.Client.Pages.UnAuthorize
 @using IMS.WebApp.Components.Pages.Public
 
@@ -80,10 +81,10 @@
 
         if (restrictedForAdmin.Contains(pageType) && UserRole != "admin")
         {
-            return false; // Only admin can access these pages
+            return false;
         }
 
-        return true; // Allow access to other pages
+        return true; 
     }
 
     private bool IsPublicPage(Type pageType)
@@ -96,6 +97,7 @@
             typeof(TwoFactorAuth),
             typeof(Home),
             typeof(ProductList),
+            typeof(ViewCart),
             typeof(ProductDetail),
         };
 

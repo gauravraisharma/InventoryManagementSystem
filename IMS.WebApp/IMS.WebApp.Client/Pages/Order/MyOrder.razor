@@ -1,0 +1,66 @@
+﻿@page "/myorder"
+@using IMS.Shared.Interface.Order
+@using IMS.Shared.RequestDto.orderDTOs
+@using IMS.WebApp.Client.Authentication
+@inject IOrderService OrderService
+@inject NavigationManager Navigation
+@inject ITokenService TokenService
+
+<MudPopoverProvider />
+<h3>My Orders</h3>
+
+@if (orders == null)
+{
+    <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+}
+else if (!orders.Any())
+{
+    <p>No orders found.</p>
+}
+else
+{
+    <MudGrid>
+        @foreach (var order in orders)
+        {
+            <MudItem xs="12" sm="6" md="4">
+                <MudCard>
+                    <MudCardContent>
+                        <MudText Typo="Typo.h6" hidden GutterBottom="true">Order ID: @order.OrderId</MudText>
+                        <MudText Typo="Typo.body1">Quantity: @order.ProductDetails.Sum(iterator => iterator.Quantity)</MudText>
+                        <MudText Typo="Typo.body1">Price: @order.ProductDetails.Sum(iterator => iterator.Amount)</MudText>
+                        <MudText Typo="Typo.body1">Order Date: @order.OrderDate.ToShortDateString()</MudText>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="() => ViewDetails(order.OrderId)">View Details</MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+        }
+    </MudGrid>
+}
+
+@code {
+    private List<GetOrderDto> orders;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userId = await TokenService.GetUserIdFromTokenAsync(); 
+        var response = await OrderService.GetAllUserOrdersAsync(userId);
+
+        if (response.IsSuccess)
+        {
+            orders = response.Result;
+        }
+        else
+        {
+            // Handle error (e.g., display a message or log the issue)
+            Console.Error.WriteLine(response.Message);
+            orders = new List<GetOrderDto>();
+        }
+    }
+
+    private void ViewDetails(string orderId)
+    {
+        Navigation.NavigateTo($"/order-details/{orderId}");
+    }
+}
