@@ -1,0 +1,72 @@
+﻿@page "/order-details/{EncodedId}"
+@inject IOrderService OrderService
+@inject NavigationManager Navigation
+@using IMS.Shared.Interface.Order
+@using IMS.Shared.RequestDto.orderDTOs
+<MudPopoverProvider />
+<h3>Order Details</h3>
+
+@if (order == null)
+{
+    <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+}
+else
+{
+    <MudCard>
+        <MudCardContent>
+            <MudText Typo="Typo.h5" GutterBottom="true">Order ID: @order.OrderId</MudText>
+            <MudText Typo="Typo.body1">Order Date: @order.OrderDate.ToShortDateString()</MudText>
+            <MudText Typo="Typo.body1">Total Price: @order.TotalAmount.ToString("C")</MudText>
+        </MudCardContent>
+
+        <MudCardContent>
+            <MudText Typo="Typo.h6">Products:</MudText>
+            <MudTable Items="@order.ProductDetails.ToList()" Hover="true" Bordered="true">
+                <HeaderContent>
+                    <MudTh>Product Name</MudTh>
+                    <MudTh>Quantity</MudTh>
+                    <MudTh>Price</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.Title</MudTd>
+                    <MudTd>@context.Quantity</MudTd>
+                    <MudTd>@context.Amount.ToString("C")</MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudCardContent>
+    </MudCard>
+}
+
+<MudButton Variant="Variant.Outlined" Color="Color.Secondary" @onclick="NavigateBack">Back to Orders</MudButton>
+
+@code {
+    [Parameter]
+    public string EncodedId { get; set; }
+
+    private GetOrderDto order;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!string.IsNullOrEmpty(EncodedId))
+        {
+            var decodedId = EncodedId;
+
+            var response = await OrderService.GetOrderByIdAsync(decodedId);
+
+            if (response.IsSuccess)
+            {
+                order = response.Result;
+            }
+            else
+            {
+                Console.Error.WriteLine(response.Message);
+                order = null;
+            }
+        }
+    }
+
+    private void NavigateBack()
+    {
+        Navigation.NavigateTo("/myorder");
+    }
+}
