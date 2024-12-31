@@ -39,6 +39,7 @@
             public const string GetCartItems = Base + "api/Cart/GetCartItems";
             public const string UpdateCart = Base + "api/Cart/EditCart";
             public const string DeleteCartItem = Base + "api/Cart/DeleteCartItem";
+            public const string DeleteAllCartItemsByUserId = Base + "api/Cart/DeleteAllCartItemsByUserId";
         }
         public static class Order
         {

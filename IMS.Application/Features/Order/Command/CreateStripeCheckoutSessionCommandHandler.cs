@@ -27,23 +27,23 @@ namespace IMS.Application.Features.Order.Command
                 {
                     PriceData = new SessionLineItemPriceDataOptions
                     {
-                        Currency = "inr", 
+                        Currency = "inr",
                         ProductData = new SessionLineItemPriceDataProductDataOptions
                         {
-                            Name = product.Name, 
+                            Name = product.Name,
                         },
-                        UnitAmount = (long)(product.Amount * 100), 
+                        UnitAmount = (long)(product.Amount * 100),
                     },
                     Quantity = product.Quantity,
                 }).ToList(),
                 Mode = "payment",
-                SuccessUrl = $"https://localhost:7093/success?sessionId={{CHECKOUT_SESSION_ID}}", 
-                CancelUrl = "https://localhost:7093/cancel", // Change to your cancel URL
+                SuccessUrl = $"https://localhost:7093/success?sessionId={{CHECKOUT_SESSION_ID}}",
+                CancelUrl = "https://localhost:7093/cancel",   
             };
 
             var service = new SessionService();
             Session session = await service.CreateAsync(options);
-            return session.Url; 
+            return session.Url;
         }
     }
 }

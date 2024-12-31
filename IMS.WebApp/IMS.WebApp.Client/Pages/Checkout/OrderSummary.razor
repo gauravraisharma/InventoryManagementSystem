@@ -21,9 +21,9 @@
 <div class="order-summary-container">
     <MudCard Class="pa-5 order-summary-card" Style="max-width: 600px; width: 100%;">
         <MudText Typo="Typo.h6" Class="mb-1">Order Summary</MudText>
-        <MudText Typo="Typo.body2" Class="mb-4" Style="color: gray;">
+        @* <MudText Typo="Typo.body2" Class="mb-4" Style="color: gray;">
             Order reference: <b>@OrderReference</b>
-        </MudText>
+        </MudText> *@
 
         @if (Products != null && Products.Any())
         {
@@ -126,8 +126,9 @@
             var sessionUrl = await CreateStripeCheckoutSession();
             if (!string.IsNullOrEmpty(sessionUrl))
             {
-                await JSRuntime.InvokeVoidAsync("open", sessionUrl, "_blank");
-                // NavigationManager.NavigateTo(sessionUrl);
+                await JSRuntime.InvokeVoidAsync("open", sessionUrl, "_self");
+                // NavigationManager.NavigateTo(sessionUrl, true);
+                
             }
             else
             {
@@ -147,7 +148,6 @@
         {
             Id = await TokensService.GetUserIdFromTokenAsync();
 
-            // Create order request based on products and other information
             var orderRequest = new AddOrderDto
                 {
                     CustomerId = Id,

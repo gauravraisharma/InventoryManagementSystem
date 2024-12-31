@@ -1,33 +1,59 @@
 ﻿@page "/success"
+@using IMS.Shared.Interface.Cart
 @using IMS.Shared.Interface.Order
 @using IMS.Shared.RequestDto.CartDTOs
 @using IMS.Shared.RequestDto.orderDTOs
 @using IMS.Shared.Services.Shared
 @using IMS.WebApp.Client.Authentication
 @using Microsoft.AspNetCore.Http
-
-<h3>SuccessPage</h3>
-<h1>Hi @CustomerName</h1>
-
 @inject NavigationManager NavigationManager
 @inject IOrderService OrderService
 @inject ITokenService TokensService
 @inject ISnackbar Snackbar
 @inject CartStateService CartStateService
+@inject ICartService CartService
+
+
+<MudPopoverProvider />
+<MudContainer Class="d-flex flex-column align-items-center justify-content-center" MaxWidth="MaxWidth.Small" Style="margin-top: 5rem;">
+
+    <MudText Typo="Typo.h3" Align="Align.Center" Class="mb-1">
+        Thank You, @CustomerName!
+    </MudText>
+
+    <MudText Typo="Typo.subtitle1" Align="Align.Center" Class="mb-3">
+        Your payment has been successfully completed.
+    </MudText>
+
+    <MudButton Variant="Variant.Filled" Color="Color.Success" Class="mb-2" OnClick="@Back" FullWidth>
+        Continue Shopping
+    </MudButton>
+
+</MudContainer>
 
 @code {
+    private string CustomerName = "";
     private bool _isProcessing = true;
     private string? _errorMessage;
     private List<CartDto> Products = new();
     private decimal TotalPrice => Products.Sum(p => p.TotalPrice);
-    private string CustomerName = "";
-    private bool _orderSaved = false;  
-
+    private bool _orderSaved = false;
+    public string Id { get; set; }
     protected override async Task OnInitializedAsync()
+    {
+        CustomerName = await TokensService.GetUserNameFromTokenAsync();
+        await saveOrder();
+    }
+
+    public void Back()
+    {
+        NavigationManager.NavigateTo("/product");
+    }
+    public async Task saveOrder()
     {
         if (_orderSaved)
         {
-            return; // Prevent saving the order again
+            return; 
         }
 
         Products = CartStateService.GetCartItems();
@@ -57,10 +83,19 @@
 
                 if (response.IsSuccess)
                 {
-                    CustomerName = await TokensService.GetUserNameFromTokenAsync();
-                    _orderSaved = true; 
+                    _orderSaved = true;
                     Snackbar.Add("Order completed successfully.", Severity.Success);
-                    NavigationManager.NavigateTo("/product");
+                    var userId = await TokensService.GetUserIdFromTokenAsync();
+                    var deleteCartResponse = await CartService.DeleteAllCartItemsByUserId(userId);
+
+                    if (deleteCartResponse.IsSuccess)
+                    {
+                        Snackbar.Add("Cart items cleared successfully.", Severity.Success);
+                    }
+                    // else
+                    // {
+                    //     Snackbar.Add("Error clearing cart items.", Severity.Error);
+                    // }
                 }
                 else
                 {
