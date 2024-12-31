@@ -6,6 +6,9 @@
         Task<List<Orders>> GetAllOrdersAsync();
         Task AddOrderAsync(Orders order);
         Task SaveChangesAsync();
+        Task DeleteOrderByIdAsync(string orderId);
+        Task UpdateOrderAsync(Orders order);
+        Task<Orders?> GetOrderByIdAsync(string orderId);
     }
 
 }

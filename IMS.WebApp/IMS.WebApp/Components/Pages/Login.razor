@@ -10,7 +10,7 @@
 <MudContainer MaxWidth="MaxWidth.Small" Class="mt-6">
     <MudPaper Class="pa-10 login-card">
         <div class="text-center">
-        <img src="/images/logo.png" alt="App Logo" style="max-width: 280px; width: 100%;margin: 0 auto" />
+        <img src="/images/logo.png" @onclick="goToHome" alt="App Logo" style="max-width: 280px; width: 100%;margin: 0 auto;cursor: pointer" />
         </div>
         <MudText Typo="Typo.h4" Class="mb-4 text-center main-title mt-5">Login</MudText>
 
@@ -121,7 +121,10 @@
     {
         NavigationManager.NavigateTo("/signup");
     }
-
+    private void goToHome()
+    {
+        NavigationManager.NavigateTo("/",true);
+    }
     public class LoginModel
     {
         public string Username { get; set; }

@@ -74,5 +74,63 @@ namespace IMS.Shared.Services.Order
             }
         }
 
+        public async Task<ApiResponse<List<GetOrderDto>>> GetAllUserOrdersAsync(string userId)
+        {
+            try
+            {
+                var requestUrl = $"{ApiEndpoints.Order.GetAllUserOrders}/{userId}";
+                var response = await _httpClient.GetAsync(requestUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<ApiResponse<List<GetOrderDto>>>();
+                    return result;
+                }
+
+                return new ApiResponse<List<GetOrderDto>>
+                {
+                    IsSuccess = false,
+                    Message = "Failed to fetch order details."
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<List<GetOrderDto>>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message
+                };
+            }
+        }
+
+        public async Task<ApiResponse<GetOrderDto>> GetOrderByIdAsync(string orderId)
+        {
+            try
+            {
+                var requestUrl = $"{ApiEndpoints.Order.GetOrderById}/{orderId}";
+                var response = await _httpClient.GetAsync(requestUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<ApiResponse<GetOrderDto>>();
+                    return result;
+                }
+
+                return new ApiResponse<GetOrderDto>
+                {
+                    IsSuccess = false,
+                    Message = "Failed to fetch order details."
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<GetOrderDto>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message
+                };
+            }
+        }
+
     }
 }

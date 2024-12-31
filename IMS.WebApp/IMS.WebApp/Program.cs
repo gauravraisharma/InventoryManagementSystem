@@ -46,6 +46,15 @@ builder.Services.AddSingleton<CartStateService>();
 
 
 builder.Services.AddMudServices();
+
+var apiBaseUrl = builder.Configuration["ApiBaseUrl"];
+if (string.IsNullOrEmpty(apiBaseUrl))
+{
+    throw new Exception("ApiBaseUrl is not configured in appsettings.json");
+}
+
+// Initialize the ApiEndpoints with the Base URL
+IMS.Shared.Constants.ApiEndpoints.Initialize(apiBaseUrl);
 //builder.Services.AddMudServices(config =>
 //{
 //    config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomRight;
