@@ -13,6 +13,7 @@
 @using IMS.Shared.RequestDto.ProductDTOs
 @using IMS.WebApp.Client.Authentication
 
+<MudPopoverProvider />
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
     @if (product != null)
     {
@@ -20,23 +21,25 @@
             <MudGrid Spacing="6" Justify="Justify.Center">
                 <!-- Left Column: Images -->
                 <MudItem xs="12" md="6">
-                    <div class="slide-wrap">
+                    <div class="slide-wrap" style="position: relative;">
+                        <!-- Share Product Component -->
+                        <ShareProduct ProductId="product.Id" EncodedId="@EncodedId" />
+
                         <div class="mr-4">
                             @foreach (var imgUrl in product.ProductImages)
                             {
                                 <img src="@($"data:image/jpeg;base64,{imgUrl}")"
                                      alt="Thumbnail"
-                                     style="width: 100px;"
+                                     style="width: 100px; height: auto;"
                                      class="thumb-img @(DynamicImage == imgUrl ? "active-thumbnail" : "")"
                                      @onclick="(() => handleDynamicImage(imgUrl))" />
                             }
                         </div>
-                        <div Class="mr-3" Style="height: 70vh; width: 100%;">
+                        <div class="mr-3" style="height: 70vh; width: 100%;">
                             <MudImage Src="@($"data:image/jpeg;base64,{DynamicImage}")"
                                       Alt="@product.Title"
                                       Style="width: 100%; height: 100%; object-fit: contain !important;" />
                         </div>
-                        
                     </div>
                 </MudItem>
 
@@ -146,12 +149,13 @@
     }
 
         .btn-theme.btn-border {
-            background: #fff;
+            background: darkslateblue;
             color: #darkslateblue;
         }
 
         .btn-theme:hover {
             background: #FFD700;
+            #fff;
             color: #000;
         }
 

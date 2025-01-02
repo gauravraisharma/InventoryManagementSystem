@@ -1,4 +1,5 @@
 ﻿@page "/success"
+@rendermode InteractiveServer
 @using IMS.Shared.Interface.Cart
 @using IMS.Shared.Interface.Order
 @using IMS.Shared.RequestDto.CartDTOs
@@ -15,6 +16,8 @@
 
 
 <MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
 <MudContainer Class="d-flex flex-column align-items-center justify-content-center" MaxWidth="MaxWidth.Small" Style="margin-top: 5rem;">
 
     <MudText Typo="Typo.h3" Align="Align.Center" Class="mb-1">
@@ -33,89 +36,18 @@
 
 @code {
     private string CustomerName = "";
-    private bool _isProcessing = true;
     private string? _errorMessage;
     private List<CartDto> Products = new();
     private decimal TotalPrice => Products.Sum(p => p.TotalPrice);
-    private bool _orderSaved = false;
     public string Id { get; set; }
     protected override async Task OnInitializedAsync()
     {
         CustomerName = await TokensService.GetUserNameFromTokenAsync();
-        await saveOrder();
     }
 
     public void Back()
     {
         NavigationManager.NavigateTo("/product");
     }
-    public async Task saveOrder()
-    {
-        if (_orderSaved)
-        {
-            return; 
-        }
-
-        Products = CartStateService.GetCartItems();
-        try
-        {
-            var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-            var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
-            var sessionId = query["sessionId"];
-
-            if (!string.IsNullOrEmpty(sessionId))
-            {
-                var orderRequest = new AddOrderDto
-                    {
-                        CustomerId = await TokensService.GetUserIdFromTokenAsync(),
-                        OrderDate = DateTime.Now,
-                        TotalAmount = TotalPrice,
-                        ProductDetails = Products.Select(product => new OrderProductDetails
-                        {
-                            Name = product.ProductName,
-                            ProductId = product.ProductId,
-                            Quantity = product.Quantity,
-                            Amount = product.TotalPrice
-                        }).ToList()
-                    };
-
-                var response = await OrderService.SaveOrderAsync(orderRequest);
-
-                if (response.IsSuccess)
-                {
-                    _orderSaved = true;
-                    Snackbar.Add("Order completed successfully.", Severity.Success);
-                    var userId = await TokensService.GetUserIdFromTokenAsync();
-                    var deleteCartResponse = await CartService.DeleteAllCartItemsByUserId(userId);
-
-                    if (deleteCartResponse.IsSuccess)
-                    {
-                        Snackbar.Add("Cart items cleared successfully.", Severity.Success);
-                    }
-                    // else
-                    // {
-                    //     Snackbar.Add("Error clearing cart items.", Severity.Error);
-                    // }
-                }
-                else
-                {
-                    _errorMessage = response.Errors != null && response.Errors.Any()
-                        ? string.Join(", ", response.Errors)
-                        : "An unknown error occurred while saving the order.";
-                }
-            }
-            else
-            {
-                _errorMessage = "Invalid session ID.";
-            }
-        }
-        catch (Exception ex)
-        {
-            _errorMessage = $"Error processing payment: {ex.Message}";
-        }
-        finally
-        {
-            _isProcessing = false;
-        }
-    }
+  
 }

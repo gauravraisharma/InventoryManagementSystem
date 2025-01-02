@@ -1,5 +1,7 @@
-﻿using IMS.Application.Features.Order.Command;
+﻿using IMS.Application.Features.Cart.Command;
+using IMS.Application.Features.Order.Command;
 using IMS.Application.Features.Order.Queries;
+using IMS.Core.Common.Entities;
 using IMS.Core.Common.Helper;
 using IMS.Core.Identity;
 using IMS.Core.RequestDto;
@@ -43,7 +45,6 @@ namespace IMS.WebAPI.Controllers
         public async Task<GenericBaseResult<List<OrderDto>>> GetAllOrders()
         {
             var orders = await _mediator.Send(new GetAllOrdersQuery());
-            //return Ok(orders);
             return new GenericBaseResult<List<OrderDto>>(orders)
             {
                 Message = "Orders retrieved successfully"
@@ -64,6 +65,33 @@ namespace IMS.WebAPI.Controllers
                 result.AddExceptionLog(ex); 
                 result.Message = "Error occurred while creating Stripe Checkout session."; 
                 return result;
+            }
+        }
+       
+        [HttpGet]
+        [Route("StripeSuccess")]
+        public async Task<IActionResult> StripeSuccess([FromQuery] string orderDetails, [FromQuery] string userId, [FromQuery] string totalAmount)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(orderDetails) || string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(totalAmount))
+                {
+                    return BadRequest("Missing required parameters.");
+                }
+                var decodedOrderDetails = System.Web.HttpUtility.UrlDecode(orderDetails);
+                var productDetails = System.Text.Json.JsonSerializer.Deserialize<List<OrderProductDetails>>(decodedOrderDetails);
+                var parsedTotalAmount = decimal.Parse(totalAmount);
+                var orderDate = DateTime.Now;
+                var addOrderCommand = new AddOrderCommand(userId, orderDate, parsedTotalAmount, productDetails);
+                await _mediator.Send(addOrderCommand);
+                var deleteUserCartCommand = new DeleteAllCartItemsByUserIdCommand();
+                deleteUserCartCommand.UserId = userId;  
+                await _mediator.Send(deleteUserCartCommand);
+                return Redirect("https://localhost:7093/success");
+            }
+            catch(Exception e)
+            {
+                return Redirect("https://localhost:7093/success");
             }
         }
 
