@@ -42,6 +42,7 @@
             public static string GetCartItems => $"{_baseUrl}api/Cart/GetCartItems";
             public static string UpdateCart => $"{_baseUrl}api/Cart/EditCart";
             public static string DeleteCartItem => $"{_baseUrl}api/Cart/DeleteCartItem";
+            public static string DeleteAllCartItemsByUserId => $"{_baseUrl}api/Cart/DeleteAllCartItemsByUserId";
         }
 
         public static class Order
@@ -50,6 +51,7 @@
             public static string GetAllOrders => $"{_baseUrl}api/orders/GetAllOrders";
             public static string GetAllUserOrders => $"{_baseUrl}api/orders/GetUserOrderById";
             public static string GetOrderById => $"{_baseUrl}api/orders/GetOrderById";
+            public static string CreateStripeCheckoutSession => $"{_baseUrl}api/orders/CreateStripeCheckoutSession";
         }
 
         public static class TwoFactor
