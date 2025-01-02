@@ -1,5 +1,6 @@
 ﻿@inject NavigationManager NavigationManager
 @using IMS.WebApp.Client.Authentication
+@using IMS.WebApp.Client.Pages.Payment
 @using IMS.WebApp.Components.Pages
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AuthStateService AuthStateService
@@ -99,6 +100,8 @@
             typeof(ProductList),
             typeof(ViewCart),
             typeof(ProductDetail),
+            typeof(SuccessPage),
+            typeof(FailedPage),
         };
 
         return publicPages.Contains(pageType);

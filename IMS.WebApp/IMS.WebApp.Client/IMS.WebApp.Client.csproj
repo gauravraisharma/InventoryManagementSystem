@@ -30,4 +30,8 @@
     <ProjectReference Include="..\..\IMS.Shared\IMS.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Pages\Payment\" />
+  </ItemGroup>
+
 </Project>

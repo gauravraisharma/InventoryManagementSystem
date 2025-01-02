@@ -14,5 +14,6 @@ namespace IMS.Shared.Interface.Order
         Task<ApiResponse<bool>> SaveOrderAsync(AddOrderDto orderRequest);
         Task<ApiResponse<List<GetOrderDto>>> GetAllUserOrdersAsync(string userId);
         Task<ApiResponse<GetOrderDto>> GetOrderByIdAsync(string orderId);
+        Task<ApiResponse<string>> CreateStripeCheckoutSessionAsync(AddOrderDto orderRequest);
     }
 }

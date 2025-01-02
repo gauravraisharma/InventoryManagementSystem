@@ -73,7 +73,27 @@ namespace IMS.Shared.Services.Order
                 };
             }
         }
+        public async Task<ApiResponse<string>> CreateStripeCheckoutSessionAsync(AddOrderDto orderRequest)
+        {
+            var content = new StringContent(JsonSerializer.Serialize(orderRequest), Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync(ApiEndpoints.Order.CreateStripeCheckoutSession, content);
+         if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var apiResponse = JsonSerializer.Deserialize<ApiResponse<string>>(responseContent, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
 
+                return apiResponse;
+            }
+
+            return new ApiResponse<string>
+            {
+                IsSuccess = false,
+                Message = "Failed to create Stripe Checkout session"
+            };
+        }
         public async Task<ApiResponse<List<GetOrderDto>>> GetAllUserOrdersAsync(string userId)
         {
             try
@@ -132,5 +152,6 @@ namespace IMS.Shared.Services.Order
             }
         }
 
+          
     }
 }
