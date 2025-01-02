@@ -34,6 +34,24 @@ namespace IMS.WebAPI.Controllers
             }
         }
 
+
+        [HttpGet]
+        [Route("generateCodeForProfile")]
+        public async Task<GenericBaseResult<string>> generateCodeForProfile(string email)
+        {
+            try
+            {
+                var code = await _mediator.Send(new GenerateAndStoreUserProfileCodeCommand(email));
+                return new GenericBaseResult<string>(code);
+            }
+            catch (Exception ex)
+            {
+                var result = new GenericBaseResult<string>(null);
+                result.AddExceptionLog(ex);
+                throw ex;
+            }
+        }
+
         [HttpPost("validate")]
         public async Task<GenericBaseResult<bool>> ValidateCode([FromBody] ValidateCodeQuery query)
         {

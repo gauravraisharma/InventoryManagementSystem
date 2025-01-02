@@ -4,6 +4,7 @@ using IMS.Shared.Common;
 using IMS.Shared.Constants;
 using IMS.Shared.Interface.Auth;
 using IMS.Shared.RequestDto.UserDTOs;
+using IMS.Shared.RequestDto;
 
 namespace IMS.Shared.Services.Auth
 {
@@ -114,5 +115,90 @@ namespace IMS.Shared.Services.Auth
             }
         }
 
+        public async Task<ApiResponse<ApplicationUserDto>> GetUserById(string id)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"{ApiEndpoints.Auth.GetUserById}/{id}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var apiResponse = JsonSerializer.Deserialize<ApiResponse<ApplicationUserDto>>(responseContent, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+
+                    return apiResponse;
+                }
+
+                return new ApiResponse<ApplicationUserDto>
+                {
+                    IsSuccess = false,
+                    Message = "Failed to retrieve user"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<ApplicationUserDto>
+                {
+                    IsSuccess = false,
+                    Message = $"An error occurred: {ex.Message}"
+                };
+            }
+        }
+
+        public async Task<ApiResponse<bool>> UpdateUserProfile(string userId, string email, string phone, string firstName, string lastName, string address)
+        {
+            // Construct the payload for updating the user profile
+            var updatePayload = new
+            {
+                UserId = userId,
+                Email = email,
+                Phone = phone,
+                FirstName = firstName,
+                LastName = lastName ?? "",  // Handle nullable last name
+                Address = address ?? ""     // Handle nullable address
+            };
+
+            // Serialize the payload and set the content type to JSON
+            var content = new StringContent(JsonSerializer.Serialize(updatePayload), Encoding.UTF8, "application/json");
+
+            try
+            {
+                var response = await _httpClient.PostAsync($"{ApiEndpoints.Auth.UpdateUserProfile}", content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                  
+                }
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var apiResponse = JsonSerializer.Deserialize<ApiResponse<bool>>(responseContent, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+
+                    return apiResponse;
+                }
+
+                return new ApiResponse<bool>
+                {
+                    IsSuccess = false,
+                    Message = "Failed to update profile"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<bool>
+                {
+                    IsSuccess = false,
+                    Message = $"An error occurred: {ex.Message}"
+                };
+            }
+        }
     }
 }

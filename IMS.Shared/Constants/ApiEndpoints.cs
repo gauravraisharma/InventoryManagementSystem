@@ -34,6 +34,8 @@
             public static string Login => $"{_baseUrl}api/auth/Login";
             public static string Register => $"{_baseUrl}api/auth/register";
             public static string GetAllUsers => $"{_baseUrl}api/auth/getAllUsers";
+            public static string GetUserById => $"{_baseUrl}api/auth/GetUserById";
+            public static string UpdateUserProfile => $"{_baseUrl}api/auth/UpdateProfile";
         }
 
         public static class Cart
@@ -57,6 +59,7 @@
         public static class TwoFactor
         {
             public static string SendCode => $"{_baseUrl}api/TwoFactorAuth/generate";
+            public static string SendCodeForProfile => $"{_baseUrl}api/TwoFactorAuth/generateCodeForProfile";
             public static string ValidateCode => $"{_baseUrl}api/TwoFactorAuth/validate";
         }
     }

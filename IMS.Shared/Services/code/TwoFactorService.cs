@@ -41,6 +41,32 @@ namespace IMS.Shared.Services.code
                 };
             }
         }
+        public async Task<ApiResponse<string>> SendCodeForUserProfileAsync(string email)
+        {
+            try
+            {
+                var requestUrl = $"{ApiEndpoints.TwoFactor.SendCodeForProfile}?email={email}";
+                var response = await _httpClient.GetAsync(requestUrl);
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<ApiResponse<string>>();
+                    return result;
+                }
+                return new ApiResponse<string>
+                {
+                    IsSuccess = false,
+                    Message = "Failed to fetch products"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<string>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message
+                };
+            }
+        }
 
         public async Task<ApiResponse<bool>> ValidateCode(string email, string code)
         {
