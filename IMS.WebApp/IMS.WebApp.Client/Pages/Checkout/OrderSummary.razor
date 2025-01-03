@@ -153,7 +153,8 @@
                         Quantity = product.Quantity,
                         Amount = product.TotalPrice,
                         Title = product.ProductName,
-                        Name= product.ProductName
+                        Name= product.ProductName,
+                        UnitAmount= product.UnitPrice
                     }).ToList()
                 };
             var response = await OrderService.CreateStripeCheckoutSessionAsync(orderRequest);

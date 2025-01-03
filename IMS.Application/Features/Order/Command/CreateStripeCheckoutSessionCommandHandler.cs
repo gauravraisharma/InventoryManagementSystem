@@ -24,7 +24,8 @@ namespace IMS.Application.Features.Order.Command
             var encodedOrderDetails = System.Web.HttpUtility.UrlEncode(orderDetailsJson);
             var encodedUserId = System.Web.HttpUtility.UrlEncode(request.CustomerId.ToString());
             var encodedTotalAmount = System.Web.HttpUtility.UrlEncode(request.TotalAmount.ToString());
-
+            var apiBaseUrl = _configuration["ApiBaseUrl"];
+            var frontEndUrl = _configuration["FrontEndUrl"];
             var options = new SessionCreateOptions
             {
                 PaymentMethodTypes = new List<string> { "card" },
@@ -37,13 +38,13 @@ namespace IMS.Application.Features.Order.Command
                         {
                             Name = product.Name,
                         },
-                        UnitAmount = (long)(product.Amount * 100),
+                        UnitAmount = (long)(product.UnitAmount * 100),
                     },
                     Quantity = product.Quantity,
                 }).ToList(),
                 Mode = "payment",
-                SuccessUrl = $"https://localhost:7056/api/Orders/StripeSuccess?orderDetails={encodedOrderDetails}&userId={encodedUserId}&totalAmount={encodedTotalAmount}",
-                CancelUrl = "https://localhost:7093/cancel",
+                SuccessUrl = $"{apiBaseUrl}api/Orders/StripeSuccess?orderDetails={encodedOrderDetails}&userId={encodedUserId}&totalAmount={encodedTotalAmount}",
+                CancelUrl = $"{frontEndUrl}cancel",
             };
 
             var service = new SessionService();
