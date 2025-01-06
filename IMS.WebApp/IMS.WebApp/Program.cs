@@ -72,10 +72,12 @@ IMS.Shared.Constants.ApiEndpoints.Initialize(apiBaseUrl);
 builder.Services.AddServerSideBlazor()
     .AddCircuitOptions(options => options.DetailedErrors = true);
 
-builder.Services.AddHttpClient("APIClient", client =>
-{
-    client.BaseAddress = new Uri("https://localhost:44317/");
-});
+//builder.Services.AddHttpClient("APIClient", client =>
+//{
+//    client.BaseAddress = new Uri("https://localhost:44317/");
+//});
+
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 

@@ -9,21 +9,21 @@ namespace IMS.Mobile.Service
 {
     public class ProductService
     {
-        private readonly HttpClient _httpClient;
+        //private readonly HttpClient _httpClient;
 
-        public ProductService(IHttpClientFactory httpClientFactory)
-        {
-            _httpClient = httpClientFactory.CreateClient("APIClient");
-        }
+        //public ProductService(IHttpClientFactory httpClientFactory)
+        //{
+        //    _httpClient = httpClientFactory.CreateClient("APIClient");
+        //}
 
       
-        public async Task<List<Product>> GetProductsAsync()
-        {
-            var response = await _httpClient.GetAsync("api/products"); 
-            response.EnsureSuccessStatusCode();
+        //public async Task<List<Product>> GetProductsAsync()
+        //{
+        //    var response = await _httpClient.GetAsync("api/products"); 
+        //    response.EnsureSuccessStatusCode();
 
-            var products = await response.Content.ReadFromJsonAsync<List<Product>>();
-            return products;
-        }
+        //    var products = await response.Content.ReadFromJsonAsync<List<Product>>();
+        //    return products;
+        //}
     }
 }

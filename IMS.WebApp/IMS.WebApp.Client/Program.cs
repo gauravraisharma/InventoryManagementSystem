@@ -8,7 +8,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 //builder.Services.AddMudServices();
 builder.Services.AddHttpClient();
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:44317/") });
+//builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:44317/") });
 
 //builder.Services.AddHttpClient("APIClient", client =>
 //{

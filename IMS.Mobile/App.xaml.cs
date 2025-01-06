@@ -4,12 +4,12 @@ namespace IMS.Mobile
 {
     public partial class App : Application
     {
-        public App(ProductService productService)  
-        {
-            InitializeComponent();
+        //public App(ProductService productService)  
+        //{
+        //    InitializeComponent();
 
          
-            MainPage = new MainPage(productService); 
-        }
+        //    MainPage = new MainPage(productService); 
+        //}
     }
 }
