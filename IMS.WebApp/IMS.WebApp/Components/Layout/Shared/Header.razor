@@ -32,6 +32,7 @@
                     <MudMenuItem>@Username</MudMenuItem>
                     <MudMenuItem OnClick="RedirectToMyOrder">My Order</MudMenuItem>
                     <MudMenuItem OnClick="RedirectToMyProfile">My Profile</MudMenuItem>
+                    <MudMenuItem OnClick="RedirectToMyAddress">My Address</MudMenuItem>
                     <MudMenuItem OnClick="SignOut">Sign Out</MudMenuItem>
                 </ChildContent>
             </MudMenu>
@@ -128,5 +129,9 @@
     private async Task RedirectToMyProfile()
     {
         NavigationManager.NavigateTo("/userProfile", true);
+    }
+    private async Task RedirectToMyAddress()
+    {
+        NavigationManager.NavigateTo("/addresses");
     }
 }

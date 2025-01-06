@@ -41,6 +41,32 @@ namespace IMS.Shared.Services.code
                 };
             }
         }
+        public async Task<ApiResponse<string>> SendCodeForUserProfileAsync(string email)
+        {
+            try
+            {
+                var requestUrl = $"{ApiEndpoints.TwoFactor.SendCodeForProfile}?email={email}";
+                var response = await _httpClient.GetAsync(requestUrl);
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<ApiResponse<string>>();
+                    return result;
+                }
+                return new ApiResponse<string>
+                {
+                    IsSuccess = false,
+                    Message = "Failed to fetch products"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<string>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message
+                };
+            }
+        }
 
         public async Task<ApiResponse<bool>> ValidateCode(string email, string code)
         {
@@ -53,6 +79,37 @@ namespace IMS.Shared.Services.code
             var content = new StringContent(JsonSerializer.Serialize(loginPayload), Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PostAsync(ApiEndpoints.TwoFactor.ValidateCode, content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var apiResponse = JsonSerializer.Deserialize<ApiResponse<bool>>(responseContent, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                return apiResponse;
+
+            }
+
+            return new ApiResponse<bool>
+            {
+                IsSuccess = false,
+                Message = "Failed to login"
+            };
+        }
+
+        public async Task<ApiResponse<bool>> ValidateCodeForProfile(string email, string code)
+        {
+            var loginPayload = new
+            {
+                Email = email,
+                Code = code
+            };
+
+            var content = new StringContent(JsonSerializer.Serialize(loginPayload), Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync(ApiEndpoints.TwoFactor.ValidateCodeForProfile, content);
 
             if (response.IsSuccessStatusCode)
             {

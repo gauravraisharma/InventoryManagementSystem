@@ -41,6 +41,28 @@ namespace IMS.Infrastructure.Services.VerifyCode
             }
         }
 
+        public async Task AddOrUpdateForProfileAsync(VerificationCode verificationCode)
+        {
+            try
+            {
+                var existingCode = await _dbContext.VerificationCodes
+                    .FirstOrDefaultAsync(v => v.Email == verificationCode.Email);
+
+                if (existingCode != null)
+                {
+                    _dbContext.VerificationCodes.Remove(existingCode);
+                }
+
+                _dbContext.VerificationCodes.Add(verificationCode);
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
         public async Task<VerificationCode> GetByEmailAsync(string email)
         {
             try

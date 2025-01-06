@@ -1,0 +1,133 @@
+﻿@page "/addresses"
+@using IMS.Shared.Interface.Address
+@using IMS.Shared.RequestDto
+@using IMS.WebApp.Client.Authentication
+@using MudBlazor
+@inject IAddressService AddressService
+@inject IDialogService DialogService
+@inject ITokenService TokenService
+
+<MudDialogProvider />
+<MudPopoverProvider />
+<MudContainer MaxWidth="MaxWidth.Medium">
+    <MudText Typo="Typo.h4" Class="mb-4">Manage Addresses</MudText>
+
+    <!-- Button to open the add address dialog -->
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OpenAddAddressDialog">
+        Add New Address
+    </MudButton>
+
+    <MudGrid Class="mt-4">
+        @foreach (var address in Addresses)
+        {
+            <MudItem xs="12" sm="6" md="4">
+                <MudCard>
+                    <MudCardContent>
+                        <MudText Typo="Typo.h6">@address.City, @address.Country</MudText>
+                        <MudText Typo="Typo.subtitle2">@address.Street</MudText>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton Variant="Variant.Outlined" Class="mr-2" Color="Color.Primary" Disabled="@address.IsActive" OnClick="() => MakeActive(address)">
+                            @if (address.IsActive)
+                            {
+                                <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" />
+                            }
+                            else
+                            {
+                                <MudText Typo="Typo.subtitle2">Make Active</MudText>
+                            }
+                        </MudButton>
+
+                        <!-- Delete Address Button -->
+                        <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="() => DeleteAddress(address)">
+                            <MudIcon Icon="@Icons.Material.Filled.Delete" />
+                        </MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+        }
+    </MudGrid>
+</MudContainer>
+
+@code {
+    private List<AddressDTO> Addresses = new();
+    public string UserId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        UserId = await TokenService.GetUserIdFromTokenAsync();
+        await LoadAddresses();
+    }
+
+    private async Task LoadAddresses()
+    {
+        var response = await AddressService.GetAddressesByUserIdAsync(UserId); // Replace with actual userId
+        if (response.IsSuccess)
+        {
+            Addresses = response.Result;
+        }
+        else
+        {
+            // Handle error
+        }
+    }
+
+    private async Task OpenAddAddressDialog()
+    {
+        var parameters = new DialogParameters
+        {
+            { "UserId", UserId }
+        };
+
+        var dialog = DialogService.Show<AddAddressDialog>("Add Address", parameters);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            var newAddress = (AddressDTO)result.Data;
+            newAddress.IsActive = false;
+            Addresses.Add(newAddress);
+
+            // Call API to refresh the address list after adding a new address
+            await LoadAddresses();
+        }
+    }
+
+    private async Task MakeActive(AddressDTO address)
+    {
+        foreach (var addr in Addresses)
+        {
+            addr.IsActive = false;
+        }
+
+        
+        var updateResponse = await AddressService.UpdateAddressAsync(UserId, address.Id, address.City, address.Country, address.Street, true);
+        if (!updateResponse.IsSuccess)
+        {
+            address.IsActive = false;
+        }
+        else{
+            address.IsActive = true;
+            await LoadAddresses();
+        }
+    }
+
+    private async Task DeleteAddress(AddressDTO address)
+    {
+        var confirmResult = await DialogService.ShowMessageBox("Confirm Delete", "Are you sure you want to delete this address?",
+            yesText: "Yes", noText: "No");
+
+        if (confirmResult.HasValue && confirmResult.Value)
+        {
+            var deleteResponse = await AddressService.DeleteAddressAsync(address.Id); // Assuming address has an Id property
+            if (deleteResponse.IsSuccess)
+            {
+                Addresses.Remove(address);
+            }
+            else
+            {
+                // Handle error
+            }
+        }
+    }
+}
