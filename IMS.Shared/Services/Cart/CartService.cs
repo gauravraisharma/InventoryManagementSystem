@@ -141,6 +141,44 @@ namespace IMS.Shared.Services.Cart
                 };
             }
         }
+        public async Task<ApiResponse<bool>> DeleteAllCartItemsByUserId(string userId)
+        {
+            try
+            {
+                var requestUrl = $"{ApiEndpoints.Cart.DeleteAllCartItemsByUserId}/{userId}";
+                var response = await _httpClient.DeleteAsync(requestUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var apiResponse = JsonSerializer.Deserialize<ApiResponse<bool>>(responseContent, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+
+                    return apiResponse ?? new ApiResponse<bool>
+                    {
+                        IsSuccess = false,
+                        Message = "No response content from server"
+                    };
+                }
+
+                return new ApiResponse<bool>
+                {
+                    IsSuccess = false,
+                    Message = "Failed to delete cart items"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<bool>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message
+                };
+            }
+        }
+
 
     }
 }

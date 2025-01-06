@@ -14,16 +14,13 @@
 @using IMS.Shared.RequestDto.CartDTOs;
 @using IMS.Shared.Services.Shared;
 @using IMS.Shared.Services.Cart;
-
+@inject IJSRuntime JSRuntime
 
 
 <MudPopoverProvider />
 <div class="order-summary-container">
     <MudCard Class="pa-5 order-summary-card" Style="max-width: 600px; width: 100%;">
         <MudText Typo="Typo.h6" Class="mb-1">Order Summary</MudText>
-        <MudText Typo="Typo.body2" Class="mb-4" Style="color: gray;">
-            Order reference: <b>@OrderReference</b>
-        </MudText>
 
         @if (Products != null && Products.Any())
         {
@@ -59,7 +56,7 @@
                 </MudItem>
             </MudGrid>
 
-            <MudButton Variant="Variant.Filled" Color="Color.Success" Class="mb-2" OnClick="@(() => SaveOrder())" FullWidth>
+            <MudButton Variant="Variant.Filled" Color="Color.Success" Class="mb-2" OnClick="@(() => ProceedToPayment())" FullWidth>
                 Continue to secure payment
             </MudButton>
         }
@@ -111,18 +108,40 @@
 @code {
     private List<CartDto> Products = new();
     private decimal TotalPrice => Products.Sum(p => p.TotalPrice);
-    private string OrderReference => Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
     public string Id { get; set; }
     protected override void OnInitialized()
     {
         Products = CartStateService.GetCartItems();
     }
 
-    private async Task SaveOrder()
+
+    private async Task ProceedToPayment()
+    {
+        try
+        {
+            var sessionUrl = await CreateStripeCheckoutSession();
+            if (!string.IsNullOrEmpty(sessionUrl))
+            {
+                await JSRuntime.InvokeVoidAsync("open", sessionUrl, "_self");
+            }
+            else
+            {
+                Snackbar.Add("Failed to create session. Please try again.", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error creating payment session: {ex.Message}");
+            Snackbar.Add("Error initiating payment. Please try again.", Severity.Error);
+        }
+    }
+
+    private async Task<string> CreateStripeCheckoutSession()
     {
         try
         {
             Id = await TokensService.GetUserIdFromTokenAsync();
+
             var orderRequest = new AddOrderDto
                 {
                     CustomerId = Id,
@@ -133,33 +152,28 @@
                         ProductId = product.ProductId,
                         Quantity = product.Quantity,
                         Amount = product.TotalPrice,
-                        Title = product.ProductName
+                        Title = product.ProductName,
+                        Name= product.ProductName,
+                        UnitAmount= product.UnitPrice
                     }).ToList()
                 };
-
-            var response=await OrderService.SaveOrderAsync(orderRequest);
+            var response = await OrderService.CreateStripeCheckoutSessionAsync(orderRequest);
             if (response.IsSuccess)
             {
-
-                Snackbar.Add("Order Completed ", Severity.Success);
-                NavigationManager.NavigateTo("/product");
-
-
+                return response.Result; 
             }
             else
             {
-                // Snackbar.Add($"Error: {response.Errors}", Severity.Error);
-                var errorMessage = response.Errors != null && response.Errors.Any()
-            ? string.Join(", ", response.Errors)
-            : "An unknown error occurred.";
-                Snackbar.Add($"Error: {errorMessage}", Severity.Error);
+                Snackbar.Add($"Failed to create payment session: {response.Message}", Severity.Error);
+                return null;
             }
-            NavigationManager.NavigateTo("/product");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error saving order: {ex.Message}");
+            Console.WriteLine($"Error creating Stripe session: {ex.Message}");
+            Snackbar.Add("Error initiating payment session. Please try again.", Severity.Error);
+            return null;
         }
     }
-
+  
 }

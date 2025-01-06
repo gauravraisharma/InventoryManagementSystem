@@ -1,5 +1,304 @@
-﻿<h3>UserProfile</h3>
+﻿@page "/userProfile"
+@using IMS.Shared.Interface.Auth
+@using IMS.Shared.Interface.Code
+@using IMS.WebApp.Client.Authentication
+@inject ITokenService TokenService
+@inject IAuthService AuthService
+@inject ITwoFactorService TwoFactorService
+@inject ISnackbar Snackbar
+
+<MudPopoverProvider />
+<MudPaper Class="profile-container" Elevation="4">
+    <MudText Typo="Typo.h5" Align="Align.Center" Class="profile-title">User Profile</MudText>
+
+    <MudForm>
+        <MudItem xs="12" Class="form-group">
+            <MudText Typo="Typo.body2" Color="Color.Default">Username</MudText>
+            <MudTextField T="string" Value="@Username" Disabled Class="form-control" />
+        </MudItem>
+
+        <MudGrid>
+            <MudItem xs="6" Class="form-group">
+                <MudText Typo="Typo.body2" Color="Color.Default">First Name</MudText>
+                <MudTextField T="string" @bind-Value="FirstName" Placeholder="Enter your first name" Class="form-control" />
+            </MudItem>
+            <MudItem xs="6" Class="form-group">
+                <MudText Typo="Typo.body2" Color="Color.Default">Last Name</MudText>
+                <MudTextField T="string" @bind-Value="LastName" Placeholder="Enter your last name" Class="form-control" />
+            </MudItem>
+        </MudGrid>
+
+        <MudItem xs="12" Class="form-group">
+            <MudText Typo="Typo.body2" Color="Color.Default">Email</MudText>
+            <MudGrid Class="email-field-group">
+                <MudItem xs="9">
+                    <MudTextField T="string" @bind-Value="Email" Placeholder="Enter your email" Disabled="@(!IsEditingEmail)" Class="form-control" />
+                </MudItem>
+                <MudItem xs="3">
+                    @if (!IsEditingEmail)
+                    {
+                        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@EnableEmailEditing" Class="email-edit-btn">
+                            Edit Email
+                        </MudButton>
+                    }
+                    else if (!IsEmailVerified)
+                    {
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@ValidateEmail" Class="validate-email-btn">
+                            Validate Email
+                        </MudButton>
+                    }
+                </MudItem>
+            </MudGrid>
+            @if (!string.IsNullOrEmpty(EmailError))
+            {
+                <MudText Typo="Typo.caption" Color="Color.Error" Class="email-error">
+                    @EmailError
+                </MudText>
+            }
+            @if (IsTwoFactorRequired)
+            {
+                <MudText Typo="Typo.caption" Color="Color.Warning" Class="verification-note">
+                    Verification code sent to your email. Please verify.
+                </MudText>
+            }
+        </MudItem>
+
+        @if (IsTwoFactorRequired)
+        {
+            <MudItem xs="12" Class="form-group">
+                <MudText Typo="Typo.body2" Color="Color.Default">Verification Code</MudText>
+                <MudTextField T="string" @bind-Value="VerificationCode" Placeholder="Enter verification code" Class="form-control" />
+                <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="@VerifyCode" Class="verify-code-btn">
+                    Verify Code
+                </MudButton>
+            </MudItem>
+        }
+
+        <MudItem xs="12" Class="form-group">
+            <MudText Typo="Typo.body2" Color="Color.Default">Phone</MudText>
+            <MudTextField T="string" @bind-Value="PhoneNumber" Placeholder="Enter your phone number" Class="form-control" />
+        </MudItem>
+
+        @* <MudItem xs="12" Class="form-group"> *@
+        @*     <MudText Typo="Typo.body2" Color="Color.Default">Address</MudText> *@
+        @*     <MudTextField T="string" @bind-Value="Address" Placeholder="Enter your address" Class="form-control" /> *@
+        @* </MudItem> *@
+
+        <MudGrid Class="form-actions">
+            <MudText Class="ml-5" Typo="Typo.subtitle2" Color="Color.Info">
+                To save changes, please click on the "Update Profile" button.
+            </MudText>
+            <MudItem xs="6">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@UpdateProfile" Disabled="@(!IsEmailVerified)">
+                    Update Profile
+                </MudButton>
+            </MudItem>
+            @* <MudItem xs="6"> *@
+            @*     <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="@NavigateToChangePassword"> *@
+            @*         Change Password *@
+            @*     </MudButton> *@
+            @* </MudItem> *@
+        </MudGrid>
+    </MudForm>
+</MudPaper>
+
+<style>
+    .profile-container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    }
+
+    .profile-title {
+    margin-bottom: 20px;
+    }
+
+    .form-group {
+    margin-bottom: 15px;
+    }
+
+    .form-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    }
+
+    .email-field-group {
+    display: flex;
+    gap: 10px;
+    }
+
+    .email-error {
+    margin-top: 5px;
+    color: red;
+    }
+
+    .verification-note {
+    margin-top: 5px;
+    color: orange;
+    }
+
+    .validate-email-btn,
+    .verify-code-btn {
+    width: 120px !important;
+    }
+</style>
 
 @code {
+    private string Username { get; set; } = "";
+    private string FirstName { get; set; } = "";
+    private string LastName { get; set; } = "";
+    private string Email { get; set; } = "";
+    private string OriginalEmail { get; set; } = "";
+    private string PhoneNumber { get; set; } = "";
+    private string Address { get; set; } = "";
+    private string VerificationCode { get; set; }
+    private bool IsTwoFactorRequired { get; set; } = false;
+    private bool IsEditingEmail { get; set; } = false;
+    private bool IsEmailVerified { get; set; } = true;
+    private string EmailError { get; set; } = string.Empty;
+    private string UserId { get; set; } = string.Empty;
 
+
+    protected override async Task OnInitializedAsync()
+    {
+        UserId = await TokenService.GetUserIdFromTokenAsync();
+        var response = await AuthService.GetUserById(UserId);
+
+        if (response.IsSuccess)
+        {
+            FirstName = response.Result.FirstName;
+            LastName = response.Result.LastName;
+            Username = response.Result.UserName;
+            Email = response.Result.Email;
+            OriginalEmail = response.Result.Email;
+            PhoneNumber = response.Result.PhoneNumber;
+        }
+        else
+        {
+            // Handle error
+        }
+    }
+
+    private void EnableEmailEditing()
+    {
+        IsEditingEmail = true;
+        IsEmailVerified = false;
+        EmailError = string.Empty;
+    }
+
+    private async Task ValidateEmail()
+    {
+        IsEditingEmail = false;
+        EmailError = ValidateEmailFormat(Email);
+        if (!string.IsNullOrEmpty(EmailError))
+        {
+            return;
+        }
+
+        if (Email != OriginalEmail)
+        {
+            IsTwoFactorRequired = true;
+            var isCodeSent = await SendVerificationCode();
+            if (isCodeSent)
+            {
+                Console.WriteLine("Verification code sent to the email.");
+            }
+            else
+            {
+                EmailError = "Failed to send verification code.";
+                IsTwoFactorRequired = false;
+            }
+        }
+        else
+        {
+            IsTwoFactorRequired = false;
+            IsEmailVerified = true;
+            IsEditingEmail = false;
+        }
+    }
+
+    private async Task VerifyCode()
+    {
+        if (string.IsNullOrEmpty(VerificationCode))
+        {
+            EmailError = "Please enter the verification code.";
+            return;
+        }
+
+        var isVerified = await VerifyEmailChange();
+        if (isVerified)
+        {
+            IsTwoFactorRequired = false;
+            IsEditingEmail = false;
+            IsEmailVerified = true;
+            OriginalEmail = Email;
+            VerificationCode = "";
+            EmailError = "";
+        }
+        else
+        {
+            EmailError = "Invalid verification code Or Expired.";
+        }
+    }
+
+    private async Task UpdateProfile()
+    {
+        if (!IsEmailVerified && IsTwoFactorRequired)
+        {
+            EmailError = "Please verify your email before updating the profile.";
+            return;
+        }
+
+        var res = await AuthService.UpdateUserProfile(UserId, Email, PhoneNumber, FirstName, LastName, Address);
+        if(res.IsSuccess){
+        }
+    }
+
+    private string ValidateEmailFormat(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return "Email cannot be empty.";
+        }
+
+        var emailRegex = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+        if (!System.Text.RegularExpressions.Regex.IsMatch(email, emailRegex))
+        {
+            return "Invalid email format.";
+        }
+
+        return string.Empty;
+    }
+
+    private async Task<bool> VerifyEmailChange()
+    {
+        var isValid = await TwoFactorService.ValidateCodeForProfile(Email, VerificationCode);
+        if (isValid.IsSuccess)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private async Task<bool> SendVerificationCode()
+    {
+        var generateCommand = await TwoFactorService.SendCodeForUserProfileAsync(Email);
+        if (generateCommand.IsSuccess)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private void NavigateToChangePassword()
+    {
+        Console.WriteLine("Navigating to change password page...");
+    }
 }

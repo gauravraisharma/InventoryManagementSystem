@@ -126,5 +126,16 @@ namespace IMS.Infrastructure.Services.Cart
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<bool> DeleteAllCartItemsByUserIdAsync(string userId)
+        {
+            var cartItems = await _context.Carts.Where(c => c.UserId == userId).ToListAsync();
+            if (cartItems == null || !cartItems.Any()) return false;
+
+            _context.Carts.RemoveRange(cartItems);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
     }
 }

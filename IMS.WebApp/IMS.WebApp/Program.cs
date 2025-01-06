@@ -1,5 +1,6 @@
 using Blazored.LocalStorage;
 using Blazored.SessionStorage;
+using IMS.Shared.Interface.Address;
 using IMS.Shared.Interface.Auth;
 using IMS.Shared.Interface.Cart;
 using IMS.Shared.Interface.Category;
@@ -7,6 +8,7 @@ using IMS.Shared.Interface.Code;
 using IMS.Shared.Interface.Department;
 using IMS.Shared.Interface.Order;
 using IMS.Shared.Interface.Product;
+using IMS.Shared.Services.Address;
 using IMS.Shared.Services.Auth;
 using IMS.Shared.Services.Cart;
 using IMS.Shared.Services.Category;
@@ -40,6 +42,7 @@ builder.Services.AddScoped<AuthStateService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ITwoFactorService, TwoFactorService>();
 builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddSingleton<CartStateService>();
 

@@ -51,5 +51,15 @@ namespace IMS.WebAPI.Controllers
             var success = await _mediator.Send(command);
             return new GenericBaseResult<bool>(success);
         }
+
+        [HttpDelete]
+        [Route("DeleteAllCartItemsByUserId/{userId}")]
+        public async Task<GenericBaseResult<bool>> DeleteAllCartItemsByUserId(string userId)
+        {
+            var command = new DeleteAllCartItemsByUserIdCommand { UserId = userId };
+            var success = await _mediator.Send(command);
+            return new GenericBaseResult<bool>(success);
+        }
+
     }
 }

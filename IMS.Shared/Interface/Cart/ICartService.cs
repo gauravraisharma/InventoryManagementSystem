@@ -15,6 +15,7 @@ namespace IMS.Shared.Interface.Cart
         Task<ApiResponse<string>> AddToCart(AddCartItemDto cartItem);
         Task<ApiResponse<bool>> UpdateCart(string CartItemId, int Quantity);
         Task<ApiResponse<bool>> DeleteCartItem(string CartItemId);
+        Task<ApiResponse<bool>> DeleteAllCartItemsByUserId(string userId);
 
     }
 }

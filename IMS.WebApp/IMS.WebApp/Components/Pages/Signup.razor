@@ -6,7 +6,7 @@
 <MudContainer MaxWidth="MaxWidth.Small" Class="mt-4">
     <MudPaper Class="pa-6 login-card">
         <div class="text-center">
-            <img src="/images/logo.png" alt="App Logo" style="width: 280px; margin: 0 auto" />
+            <img src="/images/logo.png" alt="App Logo" style="width: 280px; margin: 0 auto" @onclick=" NavigateToProductList" />
         </div>
         <MudText Typo="Typo.h4" Class="mb-4 text-center main-title mt-5">Sign Up</MudText>
 
@@ -169,9 +169,16 @@
 
     private void NavigateToLogin()
     {
-        NavigationManager.NavigateTo("/");
+        NavigationManager.NavigateTo("/login");
     }
 
+    private void NavigateToProductList()
+    {
+        if (!NavigationManager.Uri.EndsWith("/product", StringComparison.OrdinalIgnoreCase))
+        {
+            NavigationManager.NavigateTo("/product");
+        }
+    }
     private string ValidateEmail(string email)
     {
         if (string.IsNullOrWhiteSpace(email))

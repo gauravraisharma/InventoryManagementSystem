@@ -78,5 +78,42 @@ namespace IMS.WebAPI.Controllers
                 return result;
             }
         }
+
+        [HttpPost("UpdateProfile")]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserProfileCommand command)
+        {
+            if (command == null)
+            {
+                return BadRequest("Invalid request.");
+            }
+
+            var result = await _mediator.Send(command);
+
+            if (result)
+            {
+                return Ok("Profile updated successfully.");
+            }
+
+            return BadRequest("Failed to update profile.");
+        }
+
+        [HttpGet("GetUserById/{id}")]
+        public async Task<GenericBaseResult<ApplicationUser>> GetUserById(string id)
+        {
+            try
+            {
+                var user = await _mediator.Send(new GetUserByIdQuery(id));
+                return new GenericBaseResult<ApplicationUser>(user)
+                {
+                    Message = "Users retrieved successfully"
+                };
+            }
+            catch (Exception ex)
+            {
+                var result = new GenericBaseResult<ApplicationUser>(null);
+                result.AddExceptionLog(ex);
+                return result;
+            }
+        }
     }
 }

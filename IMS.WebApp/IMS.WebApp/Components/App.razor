@@ -23,8 +23,31 @@
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
    @*  <script src="_framework/blazor.webassembly.js"></script> *@
 @*     <script src="_framework/blazor.server.js"></script> *@
-   
+    <script src="https://js.stripe.com/v3/"></script>
+  
+<script>
+            window.navigatorInterop = {
+            getCurrentPosition: function () {
+                return new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            resolve({
+                                coords: {
+                                    latitude: position.coords.latitude,
+                                    longitude: position.coords.longitude,
+                                    accuracy: position.coords.accuracy
+                                }
+                            });
+                        },
+                        (error) => {
+                            reject(error.message);
+                        }
+                    );
+                });
+            }
+        };
 
+</script>
 </body>
 
 </html>

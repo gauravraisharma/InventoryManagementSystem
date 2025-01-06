@@ -1,0 +1,20 @@
+﻿
+
+@page "/cancel"
+@inject NavigationManager Navigation
+
+<MudPopoverProvider />
+<MudPaper Class="pa-4">
+    <MudText Typo="Typo.h4" GutterBottom="true">Payment Cancellation</MudText>
+    <MudText Typo="Typo.body1">Your payment has been canceled. If this was a mistake, you can try again from the payment page.</MudText>
+    <div style="margin-top:20px;">
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@GoToOrderSummary">Return to Order Summary</MudButton>
+    </div>
+</MudPaper>
+
+@code {
+    private void GoToOrderSummary()
+    {
+        Navigation.NavigateTo("/order-summary");
+    }
+}

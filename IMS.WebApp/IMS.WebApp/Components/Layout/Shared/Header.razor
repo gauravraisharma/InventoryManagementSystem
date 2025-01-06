@@ -1,18 +1,35 @@
 ﻿@inject AuthStateService AuthStateService
 @inject ITokenService TokenService
 @inject NavigationManager NavigationManager
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+@using IMS.Shared.Common
 @using IMS.WebApp.Client.Authentication
 
 <div id="nav-belt" class="d-flex align-center justify-content-between w-100">
     <!-- Left Section -->
     <div class="nav-left d-flex align-center gap-5">
-        <img src="/images/logo-white.png" alt="App Logo" style="width: 200px;" />
-        @* <MudText Typo="Typo.h6" Style="color: white;">TrackingStuff.in</MudText> *@
-        <MudText Typo="Typo.body1" Style="color: white;" Class="d-flex align-center justify-center gap-1"><MudIcon Icon="@Icons.Material.Outlined.Map" Title="Icon" /> Delivering to Dehradun 248001</MudText>
+        <img src="/images/logo-white.png" alt="App Logo" style="width: 200px;" @onclick="NavigateToProductList" />
+       @*  <MudText Typo="Typo.body1" Style="color: white;" Class="d-flex align-center justify-center gap-1"><MudIcon Icon="@Icons.Material.Outlined.Map" Title="Icon" /> Delivering to Dehradun 248001</MudText> *@
+        <MudText Typo="Typo.body1" Style="color: white;" Class="d-flex align-center justify-center gap-1" @onclick="OnLocationClick">
+            <MudIcon Icon="@Icons.Material.Outlined.Map" Title="Icon" />
+            @if (IsLoading)
+            {
+                <span>Fetching location...</span>
+            }
+            else if (!string.IsNullOrEmpty(UserLocation))
+            {
+                <span>Delivering to @UserLocation</span>
+            }
+            else
+            {
+                <span>Unable to fetch location</span>
+            }
+        </MudText>
     </div>
 
     <!-- Center Section -->
-    
+
 
     <!-- Right Section -->
     <div class="nav-right d-flex align-center gap-2 ml-auto">
@@ -32,6 +49,7 @@
                     <MudMenuItem>@Username</MudMenuItem>
                     <MudMenuItem OnClick="RedirectToMyOrder">My Order</MudMenuItem>
                     <MudMenuItem OnClick="RedirectToMyProfile">My Profile</MudMenuItem>
+                    <MudMenuItem OnClick="RedirectToMyAddress">My Address</MudMenuItem>
                     <MudMenuItem OnClick="SignOut">Sign Out</MudMenuItem>
                 </ChildContent>
             </MudMenu>
@@ -54,10 +72,10 @@
         }
 
         <!-- Cart Link -->
-            <NavLink href="/view-cart" class="ml-4 text-decoration-none" Style="color: aliceblue;">
+        <NavLink href="/view-cart" class="ml-4 text-decoration-none" Style="color: aliceblue;">
 
             <MudText Typo="Typo.body1" Class="d-flex align-center justify-center gap-1"><MudIcon Icon="@Icons.Material.Outlined.ShoppingCart" Title="Icon" /> Cart</MudText>
-            </NavLink>
+        </NavLink>
     </div>
 </div>
 
@@ -75,31 +93,33 @@
     }
 
     .search-bar .mud-input-control {
-        width: 430px;
+    width: 430px;
     }
 
     .search-bar .mud-input > input.mud-input-root-outlined {
-        padding: 10px 14px;
+    padding: 10px 14px;
     }
 
     .search-bar .mud-input {
-        background: #fff;
-        color: #666666;
-        border-radius: 6px;
+    background: #fff;
+    color: #666666;
+    border-radius: 6px;
     }
     .search-bar .mud-input.mud-input-outlined:not(.mud-disabled):not(:focus-within):hover .mud-input-outlined-border {
-        border-color: rgb(255 255 255 / 54%);
+    border-color: rgb(255 255 255 / 54%);
     }
 
     .search-bar .mud-input.mud-input-outlined:focus-within .mud-input-outlined-border {
-        border-color: rgb(255 255 255 / 54%);
+    border-color: rgb(255 255 255 / 54%);
     }
 </style>
 
 @code {
     private string Username { get; set; }
     private bool IsAuthenticated { get; set; }
-
+    private string UserLocation { get; set; } = string.Empty;
+    private bool IsLoading { get; set; } = true;
+    private bool _locationFetched = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -111,7 +131,91 @@
         }
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !_locationFetched)
+        {
+            _locationFetched = true;
+            await FetchUserLocationAsync();
+            StateHasChanged();  
+        }
+    }
 
+    private async Task FetchUserLocationAsync()
+    {
+        try
+        {
+            IsLoading = true;  
+            var location = await JSRuntime.InvokeAsync<GeolocationPosition>("navigatorInterop.getCurrentPosition");
+            if (location?.Coords != null)
+            {
+                double latitude = location.Coords.Latitude;
+                double longitude = location.Coords.Longitude;
+                var apiKey = "6d57b9d259af472a94074ec6ee6df3c7";
+                var geocodeUrl = $"https://api.opencagedata.com/geocode/v1/json?q={latitude}+{longitude}&key={apiKey}";
+
+                var response = await Http.GetAsync(geocodeUrl);
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    var geocodeData = System.Text.Json.JsonSerializer.Deserialize<OpenCageResponse>(json, new System.Text.Json.JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true
+                        });
+
+                    var firstResult = geocodeData?.Results?.FirstOrDefault();
+                    if (firstResult != null && firstResult.Components != null)
+                    {
+                        var city = firstResult.Components.City ?? firstResult.Components.Town ??
+                                   firstResult.Components.state_district ?? firstResult.Components.Municipality ?? "Unknown City";
+
+                        UserLocation = $"{city}, {firstResult.Components.State}, {firstResult.Components.Postcode}";
+                    }
+                    else
+                    {
+                        UserLocation = "Location not found";
+                    }
+                }
+                else
+                {
+                    UserLocation = "Unable to fetch location data";
+                }
+            }
+            else
+            {
+                UserLocation = "Unable to fetch location";
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching location: {ex.Message}");
+            UserLocation = "Unable to fetch location";
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+
+
+   
+
+    private void OnLocationClick()
+    {
+        if (!IsAuthenticated)
+        {
+            NavigationManager.NavigateTo("/login");
+        }
+    }
+
+    private void NavigateToProductList()
+    {
+        if (!NavigationManager.Uri.EndsWith("/product", StringComparison.OrdinalIgnoreCase))
+        {
+            NavigationManager.NavigateTo("/product");
+        }
+    }
     private async Task SignOut()
     {
         await TokenService.RemoveTokenAsync();
@@ -128,5 +232,9 @@
     private async Task RedirectToMyProfile()
     {
         NavigationManager.NavigateTo("/userProfile", true);
+    }
+    private async Task RedirectToMyAddress()
+    {
+        NavigationManager.NavigateTo("/addresses");
     }
 }

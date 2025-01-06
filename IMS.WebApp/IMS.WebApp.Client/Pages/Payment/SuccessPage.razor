@@ -1,0 +1,53 @@
+﻿@page "/success"
+@rendermode InteractiveServer
+@using IMS.Shared.Interface.Cart
+@using IMS.Shared.Interface.Order
+@using IMS.Shared.RequestDto.CartDTOs
+@using IMS.Shared.RequestDto.orderDTOs
+@using IMS.Shared.Services.Shared
+@using IMS.WebApp.Client.Authentication
+@using Microsoft.AspNetCore.Http
+@inject NavigationManager NavigationManager
+@inject IOrderService OrderService
+@inject ITokenService TokensService
+@inject ISnackbar Snackbar
+@inject CartStateService CartStateService
+@inject ICartService CartService
+
+
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+<MudContainer Class="d-flex flex-column align-items-center justify-content-center" MaxWidth="MaxWidth.Small" Style="margin-top: 5rem;">
+
+    <MudText Typo="Typo.h3" Align="Align.Center" Class="mb-1">
+        Thank You, @CustomerName!
+    </MudText>
+
+    <MudText Typo="Typo.subtitle1" Align="Align.Center" Class="mb-3">
+        Your payment has been successfully completed.
+    </MudText>
+
+    <MudButton Variant="Variant.Filled" Color="Color.Success" Class="mb-2" OnClick="@Back" FullWidth>
+        Continue Shopping
+    </MudButton>
+
+</MudContainer>
+
+@code {
+    private string CustomerName = "";
+    private string? _errorMessage;
+    private List<CartDto> Products = new();
+    private decimal TotalPrice => Products.Sum(p => p.TotalPrice);
+    public string Id { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        CustomerName = await TokensService.GetUserNameFromTokenAsync();
+    }
+
+    public void Back()
+    {
+        NavigationManager.NavigateTo("/product");
+    }
+  
+}
