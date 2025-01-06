@@ -61,6 +61,15 @@
             public static string SendCode => $"{_baseUrl}api/TwoFactorAuth/generate";
             public static string SendCodeForProfile => $"{_baseUrl}api/TwoFactorAuth/generateCodeForProfile";
             public static string ValidateCode => $"{_baseUrl}api/TwoFactorAuth/validate";
+            public static string ValidateCodeForProfile => $"{_baseUrl}api/TwoFactorAuth/validateForUserProfile";
+        }
+
+        public static class AddressEndpoints
+        {
+            public static string AddAddress => $"{_baseUrl}api/Address/AddAddress";
+            public static string GetAddressByUserID => $"{_baseUrl}api/Address/GetAddressesByUserId";
+            public static string DeleteAddress => $"{_baseUrl}api/Address/DeleteAddress";
+            public static string UpdateAddress => $"{_baseUrl}api/Address/UpdateAddress";
         }
     }
 }

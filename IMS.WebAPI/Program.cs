@@ -3,6 +3,7 @@ using System.Text;
 using IMS.Application.Features.Products.Queries;
 using IMS.Core.Common.Helper;
 using IMS.Core.Identity;
+using IMS.Infrastructure.Interface.Address;
 using IMS.Infrastructure.Interface.Cart;
 using IMS.Infrastructure.Interface.Category;
 using IMS.Infrastructure.Interface.Department;
@@ -42,6 +43,7 @@ builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IVerificationCodeRepository, VerificationCodeRepository>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();

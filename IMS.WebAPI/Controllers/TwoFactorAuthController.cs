@@ -72,5 +72,27 @@ namespace IMS.WebAPI.Controllers
                 throw ex;
             }
         }
+
+
+        [HttpPost("validateForUserProfile")]
+        public async Task<GenericBaseResult<bool>> validateForUserProfile([FromBody] ValidateCodeUserProfileQuery query)
+        {
+            try
+            {
+                var isValid = await _mediator.Send(query);
+                if (isValid)
+                {
+                    return new GenericBaseResult<bool>(true);
+                }
+
+                throw new Exception("InvalidCode");
+            }
+            catch (Exception ex)
+            {
+                var result = new GenericBaseResult<string>(null);
+                result.AddExceptionLog(ex);
+                throw ex;
+            }
+        }
     }
 }

@@ -35,12 +35,6 @@ namespace IMS.Application.Features.VerifyCode.Command
                     Expiry = expiry
                 };
 
-                var userIsExist = await _userManager.FindByEmailAsync(request.Email);
-                if (userIsExist == null)
-                {
-                    throw new Exception("User Is not Exist");
-                }
-
                 await _repository.AddOrUpdateForProfileAsync(verificationCode);
 
                 var subject = "Your User Profile Verification Code";

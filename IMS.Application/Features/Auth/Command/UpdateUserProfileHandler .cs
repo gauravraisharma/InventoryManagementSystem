@@ -21,7 +21,6 @@ namespace IMS.Application.Features.Auth.Command
 
             user.Email = request.Email;
             user.PhoneNumber = request.Phone;
-            user.UserName = request.Email; 
 
             if (user is ApplicationUser appUser) 
             {

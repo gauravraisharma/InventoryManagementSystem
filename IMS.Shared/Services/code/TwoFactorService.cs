@@ -98,5 +98,36 @@ namespace IMS.Shared.Services.code
                 Message = "Failed to login"
             };
         }
+
+        public async Task<ApiResponse<bool>> ValidateCodeForProfile(string email, string code)
+        {
+            var loginPayload = new
+            {
+                Email = email,
+                Code = code
+            };
+
+            var content = new StringContent(JsonSerializer.Serialize(loginPayload), Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync(ApiEndpoints.TwoFactor.ValidateCodeForProfile, content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var apiResponse = JsonSerializer.Deserialize<ApiResponse<bool>>(responseContent, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                return apiResponse;
+
+            }
+
+            return new ApiResponse<bool>
+            {
+                IsSuccess = false,
+                Message = "Failed to login"
+            };
+        }
     }
 }

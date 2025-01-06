@@ -1,8 +1,11 @@
 ﻿@page "/userProfile"
 @using IMS.Shared.Interface.Auth
+@using IMS.Shared.Interface.Code
 @using IMS.WebApp.Client.Authentication
 @inject ITokenService TokenService
 @inject IAuthService AuthService
+@inject ITwoFactorService TwoFactorService
+@inject ISnackbar Snackbar
 
 <MudPopoverProvider />
 <MudPaper Class="profile-container" Elevation="4">
@@ -76,22 +79,25 @@
             <MudTextField T="string" @bind-Value="PhoneNumber" Placeholder="Enter your phone number" Class="form-control" />
         </MudItem>
 
-        <MudItem xs="12" Class="form-group">
-            <MudText Typo="Typo.body2" Color="Color.Default">Address</MudText>
-            <MudTextField T="string" @bind-Value="Address" Placeholder="Enter your address" Class="form-control" />
-        </MudItem>
+        @* <MudItem xs="12" Class="form-group"> *@
+        @*     <MudText Typo="Typo.body2" Color="Color.Default">Address</MudText> *@
+        @*     <MudTextField T="string" @bind-Value="Address" Placeholder="Enter your address" Class="form-control" /> *@
+        @* </MudItem> *@
 
         <MudGrid Class="form-actions">
+            <MudText Class="ml-5" Typo="Typo.subtitle2" Color="Color.Info">
+                To save changes, please click on the "Update Profile" button.
+            </MudText>
             <MudItem xs="6">
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@UpdateProfile" Disabled="@(!IsEmailVerified)">
                     Update Profile
                 </MudButton>
             </MudItem>
-            <MudItem xs="6">
-                <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="@NavigateToChangePassword">
-                    Change Password
-                </MudButton>
-            </MudItem>
+            @* <MudItem xs="6"> *@
+            @*     <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="@NavigateToChangePassword"> *@
+            @*         Change Password *@
+            @*     </MudButton> *@
+            @* </MudItem> *@
         </MudGrid>
     </MudForm>
 </MudPaper>
@@ -139,13 +145,13 @@
 </style>
 
 @code {
-    private string Username { get; set; } = "abhay.panchal";
-    private string FirstName { get; set; } = "Abhay";
-    private string LastName { get; set; } = "Panchal";
-    private string Email { get; set; } = "abhay.panchal@example.com";
-    private string OriginalEmail { get; set; } = "abhay.panchal@example.com";
-    private string PhoneNumber { get; set; } = "123-456-7890";
-    private string Address { get; set; } = "123 Main Street, City, Country";
+    private string Username { get; set; } = "";
+    private string FirstName { get; set; } = "";
+    private string LastName { get; set; } = "";
+    private string Email { get; set; } = "";
+    private string OriginalEmail { get; set; } = "";
+    private string PhoneNumber { get; set; } = "";
+    private string Address { get; set; } = "";
     private string VerificationCode { get; set; }
     private bool IsTwoFactorRequired { get; set; } = false;
     private bool IsEditingEmail { get; set; } = false;
@@ -165,6 +171,7 @@
             LastName = response.Result.LastName;
             Username = response.Result.UserName;
             Email = response.Result.Email;
+            OriginalEmail = response.Result.Email;
             PhoneNumber = response.Result.PhoneNumber;
         }
         else
@@ -182,6 +189,7 @@
 
     private async Task ValidateEmail()
     {
+        IsEditingEmail = false;
         EmailError = ValidateEmailFormat(Email);
         if (!string.IsNullOrEmpty(EmailError))
         {
@@ -225,11 +233,12 @@
             IsEditingEmail = false;
             IsEmailVerified = true;
             OriginalEmail = Email;
+            VerificationCode = "";
             EmailError = "";
         }
         else
         {
-            EmailError = "Invalid verification code.";
+            EmailError = "Invalid verification code Or Expired.";
         }
     }
 
@@ -243,7 +252,6 @@
 
         var res = await AuthService.UpdateUserProfile(UserId, Email, PhoneNumber, FirstName, LastName, Address);
         if(res.IsSuccess){
-
         }
     }
 
@@ -265,16 +273,28 @@
 
     private async Task<bool> VerifyEmailChange()
     {
-        // Simulate verification process
-        Console.WriteLine($"Verifying code: {VerificationCode}");
-        return await Task.FromResult(VerificationCode == "123456");
+        var isValid = await TwoFactorService.ValidateCodeForProfile(Email, VerificationCode);
+        if (isValid.IsSuccess)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     private async Task<bool> SendVerificationCode()
     {
-        // Simulate sending a verification code
-        Console.WriteLine($"Sending verification code to {Email}");
-        return await Task.FromResult(true);
+        var generateCommand = await TwoFactorService.SendCodeForUserProfileAsync(Email);
+        if (generateCommand.IsSuccess)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     private void NavigateToChangePassword()
