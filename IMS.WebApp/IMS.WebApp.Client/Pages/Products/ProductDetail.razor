@@ -89,7 +89,13 @@
                                     }
                                 </MudChipSet>
                             }
-
+                            <MudText Typo="Typo.h6" Class="mb-2">Quantity: @SelectedQuantity</MudText>
+                            <MudSelect @bind-Value="SelectedQuantity"  Class="mb-4" Required="true">
+                                @foreach (var quantity in Enumerable.Range(1, 5))
+                                {
+                                    <MudSelectItem Value="@quantity">@quantity</MudSelectItem>
+                                }
+                            </MudSelect>
                             <!-- Buttons -->
                             @if (AuthStateService.UserRole != "admin")
                             {
@@ -293,7 +299,7 @@
     private bool IsAuthenticated { get; set; }
 
     private string DynamicImage { get; set; }
-
+    private int SelectedQuantity = 1;
     protected override async Task OnInitializedAsync()
     {
         try
@@ -367,7 +373,7 @@
                 UserId = await TokenService.GetUserIdFromTokenAsync(),
                 ProductId = product.Id,
                 ProductSizeName = SelectedSize,
-                Quantity = 1
+                Quantity = SelectedQuantity
             };
 
         var result = await CartService.AddToCart(cartItem);
@@ -381,10 +387,6 @@
         {
             Snackbar.Add(result.Message, Severity.Error);
         }
-        // else{
-
-        // NavigationManager.NavigateTo("/view-cart");
-        // }
 
     }
 

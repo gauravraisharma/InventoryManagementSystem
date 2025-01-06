@@ -1,5 +1,5 @@
 ﻿
-
+@inject IConfiguration Configuration
 @using Microsoft.AspNetCore.Components
 @using Microsoft.JSInterop
 
@@ -76,8 +76,6 @@
         document.addEventListener('click', (event) => {
             const shareButton = document.querySelector('.share-product');
             const shareOptions = document.querySelector('.share-options');
-
-            // Check if the click is outside the share button and options
             if (shareButton && !shareButton.contains(event.target) && shareOptions && !shareOptions.contains(event.target)) {
                 dotNetObject.invokeMethodAsync('CloseShareOptions');
             }
@@ -89,6 +87,7 @@
     [Inject] private IJSRuntime JS { get; set; }
     private bool isShareOptionsVisible = false;
     [Parameter] public string EncodedId { get; set; }
+    private string FrontEndUrl => Configuration["FrontEndUrl"];
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -111,27 +110,29 @@
     private void ShareViaEmail()
     {
         var subject = "Check out this product!";
-        var body = $"Hey, I found this amazing product: https://localhost:7093/product-details/{EncodedId}";
+        var body = $"Hey, I found this amazing product: {FrontEndUrl}product-details/{EncodedId}";
         var mailtoUrl = $"mailto:?subject={Uri.EscapeDataString(subject)}&body={Uri.EscapeDataString(body)}";
         JS.InvokeVoidAsync("window.open", mailtoUrl, "_blank");
         isShareOptionsVisible = false;
     }
     private async Task CopyLink()
     {
-        var textToCopy = $"https://localhost:7093/product-details/{EncodedId}";
+        var textToCopy = $"{FrontEndUrl}product-details/{EncodedId}";
         await JS.InvokeVoidAsync("navigator.clipboard.writeText", textToCopy);
         isShareOptionsVisible = false;
     }
 
     private void ShareOnFacebook()
     {
-        var url = $"https://www.facebook.com/sharer/sharer.php?u=https://www.example.com/product/{ProductId}";
+        var productUrl = $"{FrontEndUrl}product-details/{EncodedId}";
+        var url = $"https://www.facebook.com/sharer/sharer.php?u={productUrl}";
         OpenShareWindow(url);
     }
 
     private void ShareOnTwitter()
     {
-        var url = $"https://twitter.com/intent/tweet?url=https://www.example.com/product/{ProductId}";
+        var productUrl = $"{FrontEndUrl}product-details/{EncodedId}";
+        var url = $"https://twitter.com/intent/tweet?url={productUrl}";
         OpenShareWindow(url);
     }
 
