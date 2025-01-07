@@ -7,8 +7,10 @@
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-6">
     <MudDialogContent>
         <MudForm @bind-IsValid="IsValid">
+            <MudTextField @bind-Value="Address.Title" Label="Title" Required="true" />
             <MudTextField @bind-Value="Address.City" Label="City" Required="true" />
             <MudTextField @bind-Value="Address.Street" Label="Street" Required="true" />
+            <MudTextField @bind-Value="Address.PinCode" Label="PinCode" Required="true" />
             <MudTextField @bind-Value="Address.Country" Label="Country" Required="true" />
         </MudForm>
     </MudDialogContent>
@@ -26,7 +28,7 @@
 
     private async Task Save()
     {
-        var response = await AddressService.AddAddressAsync(UserId, Address.City, Address.Country, Address.Street);
+        var response = await AddressService.AddAddressAsync(UserId, Address.City, Address.Country, Address.Street,Address.Title,Address.PinCode);
 
         if (response.IsSuccess)
         {

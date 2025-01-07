@@ -23,6 +23,7 @@ namespace IMS.Application.Features.Order.Command
             var orderDetailsJson = System.Text.Json.JsonSerializer.Serialize(request.ProductDetails);
             var encodedOrderDetails = System.Web.HttpUtility.UrlEncode(orderDetailsJson);
             var encodedUserId = System.Web.HttpUtility.UrlEncode(request.CustomerId.ToString());
+            var encodedAddressId = System.Web.HttpUtility.UrlEncode(request.AddressId.ToString());
             var encodedTotalAmount = System.Web.HttpUtility.UrlEncode(request.TotalAmount.ToString());
             var apiBaseUrl = _configuration["ApiBaseUrl"];
             var frontEndUrl = _configuration["FrontEndUrl"];
@@ -43,7 +44,7 @@ namespace IMS.Application.Features.Order.Command
                     Quantity = product.Quantity,
                 }).ToList(),
                 Mode = "payment",
-                SuccessUrl = $"{apiBaseUrl}api/Orders/StripeSuccess?orderDetails={encodedOrderDetails}&userId={encodedUserId}&totalAmount={encodedTotalAmount}",
+                SuccessUrl = $"{apiBaseUrl}api/Orders/StripeSuccess?orderDetails={encodedOrderDetails}&userId={encodedUserId}&addressId={encodedAddressId}&totalAmount={encodedTotalAmount}",
                 CancelUrl = $"{frontEndUrl}cancel",
             };
 

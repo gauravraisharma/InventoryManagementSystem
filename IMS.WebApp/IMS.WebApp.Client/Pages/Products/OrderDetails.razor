@@ -17,6 +17,11 @@ else
             <MudText Typo="Typo.h5" GutterBottom="true">Order ID: @order.OrderId</MudText>
             <MudText Typo="Typo.body1">Order Date: @order.OrderDate.ToShortDateString()</MudText>
                 <MudText Typo="Typo.body1">Total Price: ₹@order.TotalAmount.ToString("N2")</MudText>
+            <MudText Typo="Typo.body1">
+    Address: @(order.Address != null 
+        ? $"{order.Address.City}, {order.Address.Street}, {order.Address.Country}, {order.Address.PinCode}" 
+        : "Address not available")
+</MudText>
         </MudCardContent>
 
         <MudCardContent>
@@ -25,11 +30,13 @@ else
                 <HeaderContent>
                     <MudTh>Product Name</MudTh>
                     <MudTh>Quantity</MudTh>
+                    <MudTh>Product Size</MudTh>
                     <MudTh>Price</MudTh>
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd>@context.Title</MudTd>
                     <MudTd>@context.Quantity</MudTd>
+                    <MudTd>@context.ItemSize</MudTd>
                     <MudTd>₹@context.Amount.ToString("N2")</MudTd>
                 </RowTemplate>
             </MudTable>

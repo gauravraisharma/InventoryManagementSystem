@@ -23,7 +23,9 @@ namespace IMS.Application.Features.Address.Command
                     Street = request.Street,
                     Country = request.Country,
                     IsActive = request.IsActive,
-                    UserId = request.UserId
+                    UserId = request.UserId,
+                    PinCode = request.PinCode,
+                    Title = request.Title
                 };
 
                 return await _addressRepository.AddAsync(address);

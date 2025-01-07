@@ -22,8 +22,9 @@ namespace IMS.Application.Features.Address.Command
                 {
                     throw new NotFoundException("Address not found");
                 }
-
-                await _addressRepository.DeleteAsync(address);
+                address.IsDelete = true;
+                address.IsActive = false;
+                await _addressRepository.UpdateAsync(address);
 
                 return true;
             }

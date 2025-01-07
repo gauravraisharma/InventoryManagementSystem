@@ -46,7 +46,36 @@ namespace IMS.Shared.Services.Address
             }
         }
 
-        public async Task<ApiResponse<string>> AddAddressAsync(string userId,string city, string country, string street)
+        public async Task<ApiResponse<AddressDTO>> GetPrimaryAddressByUserId(string userId)
+        {
+            try
+            {
+                var requestUrl = $"{ApiEndpoints.AddressEndpoints.GetPrimaryAddressByUserID}/{userId}";
+                var response = await _httpClient.GetAsync(requestUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<ApiResponse<AddressDTO>>();
+                    return result;
+                }
+
+                return new ApiResponse<AddressDTO>
+                {
+                    IsSuccess = false,
+                    Message = "Failed to fetch addresses."
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<AddressDTO>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message
+                };
+            }
+        }
+
+        public async Task<ApiResponse<string>> AddAddressAsync(string userId,string city, string country, string street,string title,string pinCode)
         {
 
             var addAddressPayload = new
@@ -54,7 +83,9 @@ namespace IMS.Shared.Services.Address
                UserId = userId,
                City = city,
                Country = country,
-               Street = street
+               Street = street,
+               Title = title,
+                PinCode = pinCode
             };
             var content = new StringContent(JsonSerializer.Serialize(addAddressPayload), Encoding.UTF8, "application/json");
 
@@ -78,7 +109,7 @@ namespace IMS.Shared.Services.Address
             };
         }
 
-        public async Task<ApiResponse<bool>> UpdateAddressAsync(string userId, string addressId, string city, string country, string street,bool isActive)
+        public async Task<ApiResponse<bool>> UpdateAddressAsync(string userId, string addressId, string city, string country, string street,bool isActive, string title, string pinCode)
         {
             var updateAddressPayload = new
             {
@@ -87,12 +118,15 @@ namespace IMS.Shared.Services.Address
                 City = city,
                 Country = country,
                 Street = street,
-                IsActive = isActive
+                IsActive = isActive,
+                Title = title,
+                PinCode = pinCode,
+
             };
 
             var content = new StringContent(JsonSerializer.Serialize(updateAddressPayload), Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PutAsync(ApiEndpoints.AddressEndpoints.UpdateAddress, content);
+            var response = await _httpClient.PostAsync(ApiEndpoints.AddressEndpoints.UpdateAddress, content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -116,8 +150,12 @@ namespace IMS.Shared.Services.Address
         {
             try
             {
-                var requestUrl = $"{ApiEndpoints.AddressEndpoints.DeleteAddress}/{addressId}";
-                var response = await _httpClient.DeleteAsync(requestUrl);
+                var requestUrl = ApiEndpoints.AddressEndpoints.DeleteAddress;
+
+                var command = new { Id = addressId };
+                var content = new StringContent(JsonSerializer.Serialize(command), Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(requestUrl, content);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -149,5 +187,6 @@ namespace IMS.Shared.Services.Address
                 };
             }
         }
+
     }
 }

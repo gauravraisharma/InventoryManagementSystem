@@ -16,10 +16,12 @@ namespace IMS.WebAPI.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly IConfiguration _configuration;
 
-        public OrdersController(IMediator mediator)
+        public OrdersController(IMediator mediator, IConfiguration configuration)
         {
             _mediator = mediator;
+            _configuration = configuration;
         }
 
         [HttpPost]
@@ -114,8 +116,10 @@ namespace IMS.WebAPI.Controllers
        
         [HttpGet]
         [Route("StripeSuccess")]
-        public async Task<IActionResult> StripeSuccess([FromQuery] string orderDetails, [FromQuery] string userId, [FromQuery] string totalAmount)
+        public async Task<IActionResult> StripeSuccess([FromQuery] string orderDetails, [FromQuery] string userId, [FromQuery] string addressId, [FromQuery] string totalAmount)
         {
+            var frontEndUrl = _configuration["FrontEndUrl"];
+
             try
             {
                 if (string.IsNullOrEmpty(orderDetails) || string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(totalAmount))
@@ -126,16 +130,16 @@ namespace IMS.WebAPI.Controllers
                 var productDetails = System.Text.Json.JsonSerializer.Deserialize<List<OrderProductDetails>>(decodedOrderDetails);
                 var parsedTotalAmount = decimal.Parse(totalAmount);
                 var orderDate = DateTime.Now;
-                var addOrderCommand = new AddOrderCommand(userId, orderDate, parsedTotalAmount, productDetails);
+                var addOrderCommand = new AddOrderCommand(userId, addressId, orderDate, parsedTotalAmount, productDetails);
                 await _mediator.Send(addOrderCommand);
                 var deleteUserCartCommand = new DeleteAllCartItemsByUserIdCommand();
                 deleteUserCartCommand.UserId = userId;  
                 await _mediator.Send(deleteUserCartCommand);
-                return Redirect("https://localhost:7093/success");
+                return Redirect($"{frontEndUrl}success");
             }
             catch(Exception e)
             {
-                return Redirect("https://localhost:7093/success");
+                return Redirect($"{frontEndUrl}cancel");
             }
         }
 
