@@ -11,6 +11,7 @@ namespace IMS.Infrastructure.Interface.Address
         Task UpdateAsync(AddressTbl address);
         Task DeleteAsync(AddressTbl address);
         Task<List<AddressTbl>> GetAddressesByUserIdAsync(string userId);
+        Task<List<AddressTbl>> GetPrimaryAddressByUserIdAsync(string userId);
     }
 
 }

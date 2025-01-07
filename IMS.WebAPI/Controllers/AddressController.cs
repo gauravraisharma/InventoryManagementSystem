@@ -35,7 +35,7 @@ namespace IMS.WebAPI.Controllers
             }
         }
 
-        [HttpPut]
+        [HttpPost]
         [Route("UpdateAddress")]
         public async Task<GenericBaseResult<bool>> UpdateAddress([FromBody] UpdateAddressCommand command)
         {
@@ -52,13 +52,12 @@ namespace IMS.WebAPI.Controllers
             }
         }
 
-        [HttpDelete]
-        [Route("DeleteAddress/{id}")]
-        public async Task<GenericBaseResult<bool>> DeleteAddress(string id)
+        [HttpPost]
+        [Route("DeleteAddress")]
+        public async Task<GenericBaseResult<bool>> DeleteAddress([FromBody] DeleteAddressCommand command)
         {
             try
             {
-                var command = new DeleteAddressCommand { Id = id };
                 var res = await _mediator.Send(command);
                 return new GenericBaseResult<bool>(res);
             }
@@ -69,6 +68,7 @@ namespace IMS.WebAPI.Controllers
                 return result;
             }
         }
+
 
         [HttpGet("GetAddressesByUserId/{userId}")]
         public async Task<GenericBaseResult<List<AddressTbl>>> GetAddressesByUserId(string userId)
@@ -83,6 +83,25 @@ namespace IMS.WebAPI.Controllers
             catch (Exception ex)
             {
                 var result = new GenericBaseResult<List<AddressTbl>>(null);
+                result.AddExceptionLog(ex);
+                return result;
+            }
+        }
+
+
+        [HttpGet("GetPrimaryAddressByUserId/{userId}")]
+        public async Task<GenericBaseResult<AddressTbl>> GetPrimaryAddressByUserId(string userId)
+        {
+            try
+            {
+                var query = new GetPrimaryAddressByUserIdQuery(userId);
+                var address = await _mediator.Send(query);
+                return new GenericBaseResult<AddressTbl>(address);
+
+            }
+            catch (Exception ex)
+            {
+                var result = new GenericBaseResult<AddressTbl>(null);
                 result.AddExceptionLog(ex);
                 return result;
             }

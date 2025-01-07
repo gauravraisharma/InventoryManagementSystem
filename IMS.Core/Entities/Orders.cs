@@ -1,4 +1,5 @@
 ﻿using IMS.Core.Common.Entities;
+using IMS.Core.Entities;
 using IMS.Core.Identity;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
@@ -6,6 +7,7 @@ using System.Text.Json;
 public class Orders : BaseAuditableEntity
 {
     public string CustomerId { get; set; }
+    public string? AddressId { get; set; } = "-1";
     public DateTime OrderDate { get; set; }
     public decimal TotalAmount { get; set; } 
     public DateTime? ShipmentDate { get; set; }
@@ -15,6 +17,9 @@ public class Orders : BaseAuditableEntity
 
     [ForeignKey(nameof(CustomerId))]
     public virtual ApplicationUser Customer { get; set; }
+
+    [ForeignKey(nameof(AddressId))]
+    public virtual AddressTbl? AddressTbl { get; set; }
 
     [NotMapped]
     public List<OrderProductDetails> ProductDetails

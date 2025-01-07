@@ -17,6 +17,7 @@
                 <MudTh>Order Date</MudTh>
                 <MudTh>Total Amount</MudTh>
                 <MudTh>Shipment Date</MudTh>
+                <MudTh>Address</MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd @onclick="() => ToggleRowDetails(context)">@context.OrderId</MudTd>
@@ -24,6 +25,7 @@
                 <MudTd>@context.OrderDate.ToString("yyyy-MM-dd HH:mm:ss")</MudTd>
                 <MudTd>@context.TotalAmount</MudTd>
                 <MudTd>@(context.ShipmentDate.HasValue ? context.ShipmentDate.Value.ToString("yyyy-MM-dd") : "N/A")</MudTd>
+                <MudTd>@context.Address.City ,@context.Address.Street , @context.Address.Country, @context.Address.PinCode</MudTd>
             </RowTemplate>
             <ChildRowContent>
                 @if (expandedOrders.Contains(context))
@@ -32,11 +34,13 @@
                         <HeaderContent>
                             <MudTh>Product ID</MudTh>
                             <MudTh>Quantity</MudTh>
+                            <MudTh>Product Size</MudTh>
                             <MudTh>Amount</MudTh>
                         </HeaderContent>
                         <RowTemplate Context="product">
                             <MudTd>@product.ProductId</MudTd>
                             <MudTd>@product.Quantity</MudTd>
+                            <MudTd>@product.ItemSize</MudTd>
                             <MudTd>@product.Amount</MudTd>
                         </RowTemplate>
                     </MudTable>

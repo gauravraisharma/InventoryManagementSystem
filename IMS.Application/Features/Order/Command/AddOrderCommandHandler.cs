@@ -22,7 +22,8 @@ namespace IMS.Application.Features.Order.Command
                 CustomerId = request.CustomerId,
                 OrderDate = request.OrderDate,
                 TotalAmount = request.TotalAmount,
-                ProductDetails = request.ProductDetails
+                ProductDetails = request.ProductDetails,
+                AddressId = request.AddressId
             };
 
             await _orderRepository.AddOrderAsync(order);

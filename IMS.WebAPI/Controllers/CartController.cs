@@ -43,14 +43,23 @@ namespace IMS.WebAPI.Controllers
             return new GenericBaseResult<List<CartDto>>(cartItems);
         }
 
-        [HttpDelete]
-        [Route("DeleteCartItem/{cartId}")]
-        public async Task<GenericBaseResult<bool>> DeleteCartItem(string cartId)
+        [HttpPost]
+        [Route("DeleteCartItem")]
+        public async Task<GenericBaseResult<bool>> DeleteCartItem([FromBody] DeleteCartItemCommand command)
         {
-            var command = new DeleteCartItemCommand { CartId = cartId };
-            var success = await _mediator.Send(command);
-            return new GenericBaseResult<bool>(success);
+            try
+            {
+                var success = await _mediator.Send(command);
+                return new GenericBaseResult<bool>(success);
+            }
+            catch (Exception ex)
+            {
+                var result = new GenericBaseResult<bool>(false);
+                result.AddExceptionLog(ex);
+                return result;
+            }
         }
+
 
         [HttpDelete]
         [Route("DeleteAllCartItemsByUserId/{userId}")]

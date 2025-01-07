@@ -15,14 +15,14 @@ namespace IMS.Infrastructure.Services.Order
 
         public async Task<List<Orders>> GetOrdersByCustomerIdAsync(string customerId)
         {
-            return await _context.Orders
+            return await _context.Orders.Include(it => it.AddressTbl)
                 .Where(order => order.CustomerId == customerId)
                 .ToListAsync();
         }
 
         public async Task<List<Orders>> GetAllOrdersAsync()
         {
-            return await _context.Orders.ToListAsync();
+            return await _context.Orders.Include(it => it.AddressTbl).ToListAsync();
         }
 
         public async Task AddOrderAsync(Orders order)
@@ -39,7 +39,7 @@ namespace IMS.Infrastructure.Services.Order
         {
             try
             {
-                return await _context.Orders
+                return await _context.Orders.Include(it => it.AddressTbl)
                     .FirstOrDefaultAsync(order => order.Id == orderId);
             }
             catch (Exception ex)

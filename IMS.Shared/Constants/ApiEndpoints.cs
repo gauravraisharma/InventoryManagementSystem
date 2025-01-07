@@ -68,6 +68,7 @@
         {
             public static string AddAddress => $"{_baseUrl}api/Address/AddAddress";
             public static string GetAddressByUserID => $"{_baseUrl}api/Address/GetAddressesByUserId";
+            public static string GetPrimaryAddressByUserID => $"{_baseUrl}api/Address/GetPrimaryAddressByUserId";
             public static string DeleteAddress => $"{_baseUrl}api/Address/DeleteAddress";
             public static string UpdateAddress => $"{_baseUrl}api/Address/UpdateAddress";
         }

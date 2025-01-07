@@ -29,6 +29,7 @@ namespace IMS.Application.Features.Order.Queries
                                           user => user.Id,
                                           (order, user) => new OrderDto
                                           {
+                                              Address = order.AddressTbl,
                                               OrderId = order.Id.ToString(),
                                               UserName = user.UserName,
                                               FirstName = user.FirstName,

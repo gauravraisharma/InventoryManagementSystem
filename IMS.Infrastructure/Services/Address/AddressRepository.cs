@@ -30,9 +30,12 @@ public class AddressRepository : IAddressRepository
     }
     public async Task<List<AddressTbl>> GetAddressesByUserIdAsync(string userId)
     {
-        return await _context.Addresses.Where(a => a.UserId == userId).ToListAsync();
+        return await _context.Addresses.Where(a => a.UserId == userId && a.IsDelete == false).ToListAsync();
     }
-
+    public async Task<List<AddressTbl>> GetPrimaryAddressByUserIdAsync(string userId)
+    {
+        return await _context.Addresses.Where(a => a.UserId == userId && a.IsDelete == false && a.IsActive == true).ToListAsync();
+    }
 
     public async Task UpdateAsync(AddressTbl address)
     {

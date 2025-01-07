@@ -108,8 +108,12 @@ namespace IMS.Shared.Services.Cart
         {
             try
             {
-                var requestUrl = $"{ApiEndpoints.Cart.DeleteCartItem}/{cartItemId}";
-                var response = await _httpClient.DeleteAsync(requestUrl);
+                var requestUrl = ApiEndpoints.Cart.DeleteCartItem;
+
+                var command = new { CartId = cartItemId };
+                var content = new StringContent(JsonSerializer.Serialize(command), Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(requestUrl, content);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -141,6 +145,7 @@ namespace IMS.Shared.Services.Cart
                 };
             }
         }
+
         public async Task<ApiResponse<bool>> DeleteAllCartItemsByUserId(string userId)
         {
             try
