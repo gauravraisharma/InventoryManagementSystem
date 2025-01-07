@@ -41,6 +41,7 @@ namespace IMS.Application.Features.Address.Command
                 address.City = request.City;
                 address.Street = request.Street;
                 address.Country = request.Country;
+                address.Country = request.Country;
                 address.IsActive = request.IsActive;
 
                 await _addressRepository.UpdateAsync(address);

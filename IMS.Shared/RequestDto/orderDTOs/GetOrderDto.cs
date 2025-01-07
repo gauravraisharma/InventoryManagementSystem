@@ -14,6 +14,8 @@ namespace IMS.Shared.RequestDto.orderDTOs
         public DateTime OrderDate { get; set; }
         public decimal TotalAmount { get; set; }
         public DateTime? ShipmentDate { get; set; }
+
+        public AddressDTO? Address { get; set; }
         public List<ProductDetailDto> ProductDetails { get; set; }
         public bool IsExpanded { get; set; } = false;
     }
@@ -21,6 +23,7 @@ namespace IMS.Shared.RequestDto.orderDTOs
     {
         public string ProductId { get; set; }
         public string Title { get; set; }
+        public string ItemSize { get; set; }
         public int Quantity { get; set; }
         public decimal Amount { get; set; }
     }
