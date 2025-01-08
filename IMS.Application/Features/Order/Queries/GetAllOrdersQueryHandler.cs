@@ -3,6 +3,7 @@ using IMS.Core.RequestDto;
 using IMS.Infrastructure.Interface.Order;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Stripe.Climate;
 
 namespace IMS.Application.Features.Order.Queries
 {
@@ -29,7 +30,7 @@ namespace IMS.Application.Features.Order.Queries
                                           user => user.Id,
                                           (order, user) => new OrderDto
                                           {
-                                              Address = order.AddressTbl,
+                                              Address = order.AddressTbl == null ? null :order.AddressTbl,
                                               OrderId = order.Id.ToString(),
                                               UserName = user.UserName,
                                               FirstName = user.FirstName,

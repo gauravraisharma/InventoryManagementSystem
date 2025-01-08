@@ -25,7 +25,11 @@
                 <MudTd>@context.OrderDate.ToString("yyyy-MM-dd HH:mm:ss")</MudTd>
                 <MudTd>@context.TotalAmount</MudTd>
                 <MudTd>@(context.ShipmentDate.HasValue ? context.ShipmentDate.Value.ToString("yyyy-MM-dd") : "N/A")</MudTd>
-                <MudTd>@context.Address.City ,@context.Address.Street , @context.Address.Country, @context.Address.PinCode</MudTd>
+                <MudTd >
+                     @(context.Address != null
+                    ? $"{context.Address.City}, {context.Address.Street}, {context.Address.Country}, {context.Address.PinCode}"
+                    : "	N/A")
+                </MudTd>
             </RowTemplate>
             <ChildRowContent>
                 @if (expandedOrders.Contains(context))

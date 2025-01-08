@@ -45,11 +45,20 @@ namespace IMS.WebAPI.Controllers
         [Route("GetAllOrders")]
         public async Task<GenericBaseResult<List<OrderDto>>> GetAllOrders()
         {
-            var orders = await _mediator.Send(new GetAllOrdersQuery());
-            return new GenericBaseResult<List<OrderDto>>(orders)
+            try
             {
-                Message = "Orders retrieved successfully"
-            };
+                var orders = await _mediator.Send(new GetAllOrdersQuery());
+                return new GenericBaseResult<List<OrderDto>>(orders)
+                {
+                    Message = "Orders retrieved successfully"
+                };
+            }
+            catch (Exception ex)
+            {
+                var result = new GenericBaseResult<List<OrderDto>>(null);
+                result.AddExceptionLog(ex);
+                return result;
+            }
         }
 
         [HttpGet]
@@ -83,7 +92,7 @@ namespace IMS.WebAPI.Controllers
                     throw new Exception("User ID not found in the token");
                 }
 
-                var order = await _mediator.Send(new GetAllUserOrdersQuery {UserId = userId });
+                var order = await _mediator.Send(new GetAllUserOrdersQuery { UserId = userId });
                 return new GenericBaseResult<List<OrderDto>>(order)
                 {
                     Message = "User's order retrieved successfully"
@@ -108,12 +117,12 @@ namespace IMS.WebAPI.Controllers
             catch (Exception ex)
             {
                 var result = new GenericBaseResult<string>(null);
-                result.AddExceptionLog(ex); 
-                result.Message = "Error occurred while creating Stripe Checkout session."; 
+                result.AddExceptionLog(ex);
+                result.Message = "Error occurred while creating Stripe Checkout session.";
                 return result;
             }
         }
-       
+
         [HttpGet]
         [Route("StripeSuccess")]
         public async Task<IActionResult> StripeSuccess([FromQuery] string orderDetails, [FromQuery] string userId, [FromQuery] string addressId, [FromQuery] string totalAmount)
@@ -133,11 +142,11 @@ namespace IMS.WebAPI.Controllers
                 var addOrderCommand = new AddOrderCommand(userId, addressId, orderDate, parsedTotalAmount, productDetails);
                 await _mediator.Send(addOrderCommand);
                 var deleteUserCartCommand = new DeleteAllCartItemsByUserIdCommand();
-                deleteUserCartCommand.UserId = userId;  
+                deleteUserCartCommand.UserId = userId;
                 await _mediator.Send(deleteUserCartCommand);
                 return Redirect($"{frontEndUrl}success");
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return Redirect($"{frontEndUrl}cancel");
             }

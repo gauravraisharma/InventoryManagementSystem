@@ -21,6 +21,8 @@
 
 
 <MudPopoverProvider />
+<MudSnackbarProvider />
+
 <div class="order-summary-container">
 	<MudCard Class="pa-5 order-summary-card" Style="max-width: 600px; width: 100%;">
 		<MudText Typo="Typo.h6" Class="mb-1">Order Summary</MudText>
@@ -68,11 +70,16 @@
 				</MudText>
 			}
 
+			<MudDivider Class="my-2" />
+
+			<MudPaper >
+				<MudLink Href="/addresses" Class="ml-2">Add New Address</MudLink>
+			</MudPaper>
+
 			<!-- Scrollable Address List -->
 			@if (Addresses != null && Addresses.Any())
 			{
-				<MudDivider Class="my-2" />
-				<MudText Typo="Typo.body1" Class="mt-2">Select Address:</MudText>
+				<MudText Typo="Typo.body1" Class="mt-0">Select Address:</MudText>
 				<MudRadioGroup T="AddressDTO" @bind-Value="Address" OptionChanged="UpdateDefaultAddress">
 					<MudPaper Class="address-list-container" Style="max-height: 200px; overflow-y: auto;">
 						@foreach (var addr in Addresses)
@@ -83,6 +90,9 @@
 						}
 					</MudPaper>
 				</MudRadioGroup>
+			}
+			else{
+
 			}
 
 			<MudButton Variant="Variant.Filled" Color="Color.Success" Class="mb-2" OnClick="@(() => ProceedToPayment())" FullWidth>
@@ -198,10 +208,18 @@
 		}
 	}
 
+	
 	private async Task<string> CreateStripeCheckoutSession()
 	{
 		try
 		{
+			// Check if primary address is set
+			if (Address == null || Address.Id == null || Address.Id == null) // Consider checking if Address.Id is valid
+			{
+				Snackbar.Add("Please set a primary address before proceeding with payment.", Severity.Warning);
+				return null; // Early return to prevent further execution
+			}
+
 			var orderRequest = new AddOrderDto
 				{
 					CustomerId = Id,
@@ -238,5 +256,7 @@
 			return null;
 		}
 	}
+
+
 }
 
