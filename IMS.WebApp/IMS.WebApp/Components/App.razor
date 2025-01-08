@@ -12,7 +12,6 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
     <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
   @*   <script src="_content/MudBlazor/MudBlazor.min.js"></script> *@
-
     <HeadOutlet @rendermode="new InteractiveServerRenderMode(prerender: false)" />
 </head>
 
@@ -24,30 +23,42 @@
    @*  <script src="_framework/blazor.webassembly.js"></script> *@
 @*     <script src="_framework/blazor.server.js"></script> *@
     <script src="https://js.stripe.com/v3/"></script>
-  
-<script>
-            window.navigatorInterop = {
-            getCurrentPosition: function () {
-                return new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(
-                        (position) => {
-                            resolve({
-                                coords: {
-                                    latitude: position.coords.latitude,
-                                    longitude: position.coords.longitude,
-                                    accuracy: position.coords.accuracy
-                                }
-                            });
-                        },
-                        (error) => {
-                            reject(error.message);
-                        }
-                    );
-                });
-            }
-        };
 
-</script>
+    <script>
+        window.navigatorInterop = {
+          getCurrentPosition: function () {
+            return new Promise((resolve, reject) => {
+              navigator.geolocation.getCurrentPosition(
+                (position) => {
+                  resolve({
+                    coords: {
+                      latitude: position.coords.latitude,
+                      longitude: position.coords.longitude,
+                      accuracy: position.coords.accuracy
+                    }
+                  });
+                },
+                (error) => {
+                  reject(error.message);
+                }
+              );
+            });
+          },
+
+          getScrollPosition: function (element) {
+            return element.scrollTop;
+          },
+
+          getScrollHeight: function (element) {
+            return element.scrollHeight;
+          },
+
+          getClientHeight: function (element) {
+            return element.clientHeight;
+          }
+        };
+    </script>
+
 </body>
 
 </html>

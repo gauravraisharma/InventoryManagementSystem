@@ -132,6 +132,8 @@
     private string searchText = "";
     private List<GetAllProductDto> _products = new();
     private string errorMessage;
+    private int currentPage = 1;
+    private const int PageSize = 20;
     private List<ChartSeries> _barChartSeries = new List<ChartSeries>()
 
     {
@@ -271,7 +273,7 @@
     }
     public async Task GetAllProducts()
     {
-        var response = await ProductService.GetAllProductsAsync(selectedDepartment, selectedCategory, searchText, selectedSort);
+        var response = await ProductService.GetAllProductsAsync(selectedDepartment, selectedCategory, searchText, selectedSort, currentPage, PageSize);
         if (response.IsSuccess)
         {
             _products = response.Result;
