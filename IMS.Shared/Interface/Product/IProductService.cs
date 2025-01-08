@@ -12,7 +12,7 @@ namespace IMS.Shared.Interface.Product
     {
         Task<ApiResponse<GetAllProductDto>> GetProductByIdAsync(string Id);
       
-        Task<ApiResponse<List<GetAllProductDto>>> GetAllProductsAsync(string department,string category,string searchText,string sortBy);
+        Task<ApiResponse<List<GetAllProductDto>>> GetAllProductsAsync(string department, string category, string searchText, string sortBy, int currentPage, int pageSize);
         Task<ApiResponse<ProductResponse>> AddProductAsync(MultipartFormDataContent addProductDto);
     
         Task<ApiResponse<ProductResponse>> UpdateProductAsync( MultipartFormDataContent content);

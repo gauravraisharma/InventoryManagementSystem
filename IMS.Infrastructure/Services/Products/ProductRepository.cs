@@ -25,7 +25,7 @@ namespace IMS.Infrastructure.Services.Product
             context = dbContext;
         }
 
-        public async Task<GenericBaseResult<List<GetProductRequestDto>>> GetAllProductsAsync(string department = null, string category = null, string searchText = null, string sortBy = null)
+        public async Task<GenericBaseResult<List<GetProductRequestDto>>> GetAllProductsAsync(string department = null, string category = null, string searchText = null, string sortBy = null, int? currentPage = 1, int? pageSize = 20)
         {
             try
             {
@@ -53,7 +53,6 @@ namespace IMS.Infrastructure.Services.Product
                     query = query.Where(p => p.Title.Contains(searchText) || p.Description.Contains(searchText));
                 }
 
-                
                 query = sortBy switch
                 {
                     "newest" => query.OrderByDescending(p => p.Created),
@@ -61,36 +60,43 @@ namespace IMS.Infrastructure.Services.Product
                     _ => query
                 };
 
-                var products = await query.Select(p => new GetProductRequestDto
-                {
-                    Id = p.Id,
-                    Title = p.Title,
-                    Description = p.Description,
-                    UnitPrice = p.UnitPrice,
-                    UnitsInStock = p.UnitsInStock,
-                    ProductCode = p.ProductCode,
-                    DepartmentIds = context.DepartmentProductMappings
-                                    .Where(mapping => mapping.ProductId == p.Id)
-                                    .Select(mapping => mapping.DepartmentId)
-                                    .ToList(),
-                    DepartmentNames = context.DepartmentProductMappings
-                                    .Where(mapping => mapping.ProductId == p.Id)
-                                    .Select(mapping => mapping.Department.Name)
-                                    .ToList(),
-                    CategoryNames = context.CategoryProductMappings
-                                    .Where(mapping => mapping.ProductId == p.Id)
-                                    .Select(mapping => mapping.Category.Name)
-                                    .ToList(),
-                    CategoryIds = context.CategoryProductMappings
-                                    .Where(mapping => mapping.ProductId == p.Id)
-                                    .Select(mapping => mapping.CategoryId)
-                                    .ToList(),
-                    ProductImages = p.ProductImages.Select(i => i.Base64Image).ToList(),
-                    ProductSizes = p.ProductSizes.Select(s => s.Size).ToList()
-                }).ToListAsync();
+                var totalItems = await query.CountAsync(); // Total number of items for pagination.
+
+                var paginatedProducts = await query
+                 .Skip(((currentPage ?? 1) - 1) * (pageSize ?? 20))
+                 .Take(pageSize ?? 20)
+                 .Select(p => new GetProductRequestDto
+                 {
+                     Id = p.Id,
+                     Title = p.Title,
+                     Description = p.Description,
+                     UnitPrice = p.UnitPrice,
+                     UnitsInStock = p.UnitsInStock,
+                     ProductCode = p.ProductCode,
+                     DepartmentIds = context.DepartmentProductMappings
+                                     .Where(mapping => mapping.ProductId == p.Id)
+                                     .Select(mapping => mapping.DepartmentId)
+                                     .ToList(),
+                     DepartmentNames = context.DepartmentProductMappings
+                                     .Where(mapping => mapping.ProductId == p.Id)
+                                     .Select(mapping => mapping.Department.Name)
+                                     .ToList(),
+                     CategoryNames = context.CategoryProductMappings
+                                     .Where(mapping => mapping.ProductId == p.Id)
+                                     .Select(mapping => mapping.Category.Name)
+                                     .ToList(),
+                     CategoryIds = context.CategoryProductMappings
+                                     .Where(mapping => mapping.ProductId == p.Id)
+                                     .Select(mapping => mapping.CategoryId)
+                                     .ToList(),
+                     ProductImages = p.ProductImages.Select(i => i.Base64Image).ToList(),
+                     ProductSizes = p.ProductSizes.Select(s => s.Size).ToList()
+                 })
+                 .ToListAsync();
 
                 response.Message = ResponseMessage.Success;
-                response.Result = products;
+                response.Result = paginatedProducts;
+                response.TotalCount = totalItems; // Assuming your GenericBaseResult class supports a TotalCount property for pagination metadata.
                 return response;
             }
             catch (Exception ex)

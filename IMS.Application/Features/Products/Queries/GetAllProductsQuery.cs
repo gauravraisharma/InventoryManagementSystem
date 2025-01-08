@@ -16,6 +16,8 @@ namespace IMS.Application.Features.Products.Queries
         public string? Category { get; set; }
         public string? SearchText { get; set; }
         public string? SortBy { get; set; }
+        public int? currentPage { get; set; }
+        public int? pageSize { get; set; }
     }
 
     public class GetAllProductsQueryHandler : IRequestHandler<GetAllProductsQuery, GenericBaseResult<List<GetProductRequestDto>>>
@@ -38,7 +40,9 @@ namespace IMS.Application.Features.Products.Queries
                 request.Department,
                 request.Category,
                 request.SearchText,
-                request.SortBy);
+                request.SortBy,
+                request.currentPage,
+                request.pageSize);
 
             return products;
         }

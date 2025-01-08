@@ -9,6 +9,7 @@ namespace IMS.Core.Common.Helper
     public class GenericBaseResult<TModel> : BaseResult
     {
         public TModel Result { get; set; }
+        public int TotalCount { get; set; }
 
         public GenericBaseResult(TModel model)
         {
