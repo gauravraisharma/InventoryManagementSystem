@@ -24,19 +24,19 @@
 <MudSnackbarProvider />
 
 <div class="order-summary-container">
-	<MudCard Class="pa-5 order-summary-card" Style="max-width: 600px; width: 100%;">
-		<MudText Typo="Typo.h6" Class="mb-1">Order Summary</MudText>
+	<MudCard Class="pa-4 order-summary-card" Style="max-width: 600px; width: 100%;">
+		<MudText Typo="Typo.h5" Class="mb-3 font-weight-bold">Order Summary</MudText>
 
 		@if (Products != null && Products.Any())
 		{
 			@foreach (var product in Products)
 			{
-				<MudGrid Class="mb-2 tight-spacing">
+				<MudGrid Class="mb-2">
 					<MudItem xs="9">
 						<MudText Typo="Typo.body1" Class="font-weight-bold">@product.ProductName</MudText>
 					</MudItem>
 					<MudItem xs="3" Class="text-right">
-						<MudText Typo="Typo.body1" Class="font-weight-bold">x @product.Quantity</MudText>
+						<MudText Typo="Typo.body1">x @product.Quantity</MudText>
 					</MudItem>
 				</MudGrid>
 			}
@@ -45,58 +45,57 @@
 				<MudItem xs="9">
 					<MudText Typo="Typo.body2" Style="color: gray;">Shipping</MudText>
 				</MudItem>
-				<MudItem xs="3" Class="text-right no-gap">
+				<MudItem xs="3" Class="text-right">
 					<MudText Typo="Typo.body2" Class="font-weight-bold">Free</MudText>
 				</MudItem>
 			</MudGrid>
 
-			<MudDivider Class="my-1" />
+			<MudDivider Class="my-2" />
 
 			<MudGrid Class="mt-1 mb-2">
 				<MudItem xs="9">
 					<MudText Typo="Typo.h6">Total</MudText>
 				</MudItem>
-				<MudItem xs="3" Class="text-right no-gap">
+				<MudItem xs="3" Class="text-right">
 					<MudText Typo="Typo.h6" Class="font-weight-bold">@($"₹{TotalPrice:0.00}")</MudText>
 				</MudItem>
 			</MudGrid>
 
 			@if (Address != null)
 			{
-				<MudDivider Class="my-1" />
-				<MudText Typo="Typo.body1" Class="mt-2">Deliver to:</MudText>
-				<MudText Typo="Typo.body2" Class="font-weight-bold">
-					@Address.Street, @Address.City
-				</MudText>
+				<MudDivider Class="my-2" />
+				<MudText Typo="Typo.body1">Deliver to:</MudText>
+				<MudText Typo="Typo.body2" Class="font-weight-bold">@Address.Street, @Address.City</MudText>
 			}
 
-			<MudDivider Class="my-2" />
+			<MudDivider Class="my-3" />
 
-			<MudPaper >
-				<MudLink Href="/addresses" Class="ml-2">Add New Address</MudLink>
-			</MudPaper>
+			<MudText Typo="Typo.body1">
+				Select Address or
+				<MudLink Href="/addresses" Class="ml-1">Change Address</MudLink>
+			</MudText>
 
-			<!-- Scrollable Address List -->
 			@if (Addresses != null && Addresses.Any())
 			{
-				<MudText Typo="Typo.body1" Class="mt-0">Select Address:</MudText>
-				<MudRadioGroup T="AddressDTO" @bind-Value="Address" OptionChanged="UpdateDefaultAddress">
-					<MudPaper Class="address-list-container" Style="max-height: 200px; overflow-y: auto;">
+				<MudRadioGroup T="AddressDTO" Value="@SelectedAddress" ValueChanged="UpdateDefaultAddress">
+					<MudPaper Class="address-list-container p-2" Style="max-height: 200px; overflow-y: auto; border: 1px solid #ccc; border-radius: 4px;">
 						@foreach (var addr in Addresses)
 						{
-							<MudRadio T="AddressDTO" Value="addr">
-                <MudText Typo="Typo.body2">@addr.Street, @addr.City</MudText>
-            </MudRadio>
+							<MudRadio T="AddressDTO" Value="addr" Class="mb-1">
+								<MudText Typo="Typo.body2">@addr.Street, @addr.City</MudText>
+							</MudRadio>
 						}
 					</MudPaper>
 				</MudRadioGroup>
-			}
-			else{
 
 			}
+			else
+			{
+				<MudText Typo="Typo.body2" Class="mt-2 text-secondary">No addresses available. Please add an address.</MudText>
+			}
 
-			<MudButton Variant="Variant.Filled" Color="Color.Success" Class="mb-2" OnClick="@(() => ProceedToPayment())" FullWidth>
-				Continue to secure payment
+			<MudButton Variant="Variant.Filled" Color="Color.Success" Class="mt-3" OnClick="@(() => ProceedToPayment())" FullWidth>
+				Continue to Secure Payment
 			</MudButton>
 		}
 		else
@@ -104,42 +103,43 @@
 			<MudText Typo="Typo.subtitle1" Class="text-danger text-center">No items to display</MudText>
 		}
 
-		<MudLink Href="/view-cart" Class="cancel-payment-link text-center d-block" Style="color: black; font-weight: bold;">
-			Cancel payment
+		<MudLink Href="/view-cart" Class="text-center d-block mt-3" Style="color: black; font-weight: bold;">
+			Cancel Payment
 		</MudLink>
 	</MudCard>
 </div>
 
+
 <style>
 	.order-summary-container {
-		display: flex;
-		justify-content: center;
-		align-items: flex-start;
-		min-height: 100vh;
-		padding-top: 50px;
-		padding-left: 80px;
-		padding-right: 10px;
+	display: flex;
+	justify-content: center;
+	align-items: flex-start;
+	min-height: 100vh;
+	padding-top: 50px;
+	padding-left: 80px;
+	padding-right: 10px;
 	}
 
 	.order-summary-card {
-		width: 100%;
-		max-width: 550px;
-		box-sizing: border-box;
+	width: 100%;
+	max-width: 550px;
+	box-sizing: border-box;
 	}
 
 	.address-list-container {
-		border: 1px solid #ddd;
-		border-radius: 4px;
-		padding: 8px;
-		margin-top: 8px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	padding: 8px;
+	margin-top: 8px;
 	}
 
 	.cancel-payment-link {
-		margin-top: 20px;
+	margin-top: 20px;
 	}
 
 	.text-center {
-		text-align: center;
+	text-align: center;
 	}
 </style>
 
@@ -149,12 +149,12 @@
 	public string Id { get; set; }
 	private AddressDTO? Address { get; set; }
 	private List<AddressDTO>? Addresses { get; set; }
-
+	AddressDTO SelectedAddress { get; set; }
 	protected override async Task OnInitializedAsync()
 	{
 		Products = CartStateService.GetCartItems();
 		Id = await TokensService.GetUserIdFromTokenAsync();
-		await LoadPrimaryAddress();
+		//await LoadPrimaryAddress();
 		await LoadAllAddress();
 	}
 
@@ -174,6 +174,8 @@
 		if (res.IsSuccess)
 		{
 			Addresses = res.Result;
+			SelectedAddress = Addresses?.FirstOrDefault(addr => addr.IsActive);
+			Address = SelectedAddress;
 			StateHasChanged();
 		}
 	}
@@ -182,8 +184,8 @@
 	{
 		if (selectedAddress != null)
 		{
-			Address = selectedAddress;
-			Snackbar.Add($"Address updated to: {Address.Street}, {Address.City}", Severity.Success);
+			SelectedAddress = selectedAddress; 
+			Address = selectedAddress; 
 		}
 	}
 
@@ -191,6 +193,16 @@
 	{
 		try
 		{
+			if (Addresses != null && Addresses.Any() && !Addresses.Contains(Address))
+			{
+				Snackbar.Add("Please select an address before proceeding.", Severity.Warning);
+				return;
+			}
+			if (Address == null || string.IsNullOrWhiteSpace(Address.Id))
+			{
+				Snackbar.Add("Please select an address before proceeding.", Severity.Warning);
+				return;
+			}
 			var sessionUrl = await CreateStripeCheckoutSession();
 			if (!string.IsNullOrEmpty(sessionUrl))
 			{
@@ -213,12 +225,6 @@
 	{
 		try
 		{
-			// Check if primary address is set
-			if (Address == null || Address.Id == null || Address.Id == null) // Consider checking if Address.Id is valid
-			{
-				Snackbar.Add("Please set a primary address before proceeding with payment.", Severity.Warning);
-				return null; // Early return to prevent further execution
-			}
 
 			var orderRequest = new AddOrderDto
 				{
