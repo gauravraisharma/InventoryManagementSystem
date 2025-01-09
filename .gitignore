@@ -19,3 +19,5 @@
 /IMS.WebApp/IMS.WebApp/obj
 /IMS.WebApp/IMS.WebApp.Client/bin/Debug/net8.0
 /IMS.WebApp/IMS.WebApp.Client/obj
+config.bat
+node_modules
