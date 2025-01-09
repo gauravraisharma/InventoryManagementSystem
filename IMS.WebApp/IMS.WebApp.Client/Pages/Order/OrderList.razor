@@ -1,10 +1,12 @@
 ﻿@page "/order"
+<PageTitle>Order List </PageTitle>
 @inject IOrderService OrderService
 @inject ISnackbar Snackbar
 @using IMS.Shared.Interface.Order
 @using IMS.Shared.RequestDto.orderDTOs
 @using MudBlazor
 
+<MudSnackbarProvider />
 <MudCard>
     <MudCardContent>
         <MudTable Items="orders" Dense="false" Hover="true" Bordered="true" Striped="true" RowHeight="56">

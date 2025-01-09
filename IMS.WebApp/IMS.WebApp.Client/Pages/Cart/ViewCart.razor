@@ -1,4 +1,5 @@
 ﻿@page "/view-cart"
+<PageTitle>View Cart </PageTitle>
 @using IMS.Shared.RequestDto.CartDTOs
 @using IMS.Shared.Services.Shared
 @using IMS.WebApp.Client.Authentication
@@ -11,7 +12,8 @@
 @inject NavigationManager NavigationManager
 @inject AuthStateService AuthStateService
 
-
+<MudSnackbarProvider />
+<MudPopoverProvider />
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
     <MudGrid>
         <!-- Product List -->
@@ -210,7 +212,7 @@
         var response = await CartService.UpdateCart(item.CartId, item.Quantity);
         if (response.IsSuccess)
         {
-            Snackbar.Add("Item Updated successfully", Severity.Success);
+            Snackbar.Add("Item Added successfully", Severity.Success);
 
         }
         else

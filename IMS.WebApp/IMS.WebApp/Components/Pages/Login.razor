@@ -1,4 +1,5 @@
 ﻿@page "/login"
+<PageTitle>Login</PageTitle>
 @using IMS.Shared.Interface.Auth
 @using IMS.WebApp.Client.Authentication
 @using IMS.WebApp.Components.Layout
@@ -48,7 +49,7 @@
                        OnClick="HandleLogin">
                 Sign in
             </MudButton>
-            <MudText Class="mt-4 text-center">Don't have an account? <MudLink Href="#" OnClick="NavigateToSignup" Class="text-theme">Sign Up</MudLink></MudText>
+            <MudText Class="mt-4 text-center">Don't have an account? <MudLink OnClick="NavigateToSignup" Class="text-theme">Sign Up</MudLink></MudText>
             @* <MudButton Variant="Variant.Outlined" *@
             @*            Color="Color.Secondary" *@
             @*            Class="mt-2 w-full" *@
