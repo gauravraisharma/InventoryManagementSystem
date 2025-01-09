@@ -1,13 +1,21 @@
-﻿@using IMS.WebApp.Components.Layout.Shared
+﻿@using Blazored.LocalStorage
+@using IMS.WebApp.Components.Layout.Shared
 @inherits LayoutComponentBase
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 
-
-   <MudThemeProvider />
+<MudThemeProvider />
 <div class="public-page">
     <!-- Fixed Header -->
     <header>
         <Header />
     </header>
+
+    <!-- Breadcrumbs -->
+    <nav class="breadcrumb-nav">
+        <MudBreadcrumbs Items="BreadcrumbItems" Separator=">" />
+    </nav>
 
     <!-- Body Content -->
     <main class="main-content">
@@ -16,53 +24,61 @@
 
     <!-- Fixed Footer -->
     <footer>
-        <Footer/>
+        <Footer />
     </footer>
 </div>
 
+@code {
+    private List<BreadcrumbItem> BreadcrumbItems = new();
 
-<style>
-    .public-page {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
+    protected override async Task OnInitializedAsync()
+    {
+        NavigationManager.LocationChanged += OnLocationChanged;
+        await UpdateBreadcrumbsAsync();
     }
 
-    header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 64px;
-        z-index: 10;
-        background-color: white;
+    private async void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        await UpdateBreadcrumbsAsync();
+        StateHasChanged();
     }
 
-    .main-content {
-        flex: 1;
-        margin-top: 64px;
-        padding: 16px;
-        padding-bottom: 64px;
-        overflow-y: auto;
+    private async Task UpdateBreadcrumbsAsync()
+    {
+        const string storageKey = "lastVisitedUrls";
+        var currentUrl = NavigationManager.Uri;
+
+        if (currentUrl.Contains("/success") || currentUrl.Contains("/cancel")){
+            currentUrl = NavigationManager.BaseUri;
+        }
+        if (currentUrl.Contains("/order-summary") || currentUrl.Contains("/login") || currentUrl.Contains("/signup"))
+        {
+            return;
+        }
+
+        var storedBreadcrumbs = await LocalStorage.GetItemAsync<List<BreadcrumbItem>>(storageKey) ?? new List<BreadcrumbItem>();
+
+        if (storedBreadcrumbs.All(b => b.Href != currentUrl))
+        {
+            var pageTitle = await JSRuntime.InvokeAsync<string>("eval", "document.title");
+
+            storedBreadcrumbs.Add(new BreadcrumbItem(pageTitle, href: currentUrl));
+        }
+        else
+        {
+            int index = storedBreadcrumbs.FindIndex(item => item.Href == currentUrl);
+            if (index != -1)
+            {
+                storedBreadcrumbs.RemoveRange(index + 1, storedBreadcrumbs.Count - (index + 1));
+            }
+
+        }
+        BreadcrumbItems = new List<BreadcrumbItem>(storedBreadcrumbs);
+        await LocalStorage.SetItemAsync(storageKey, storedBreadcrumbs);
     }
 
-    .footer {
-        background-color: #232f3e;
-        color: white;
-        padding: 16px;
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
     }
-
-    .footer-column {
-        flex: 1;
-        min-width: 200px;
-        margin: 8px;
-    }
-
-    .bg-dark {
-        background-color: #232f3e;
-    }
-
-    .text-white {
-        color: #ffffff;
-    }
-</style>
+}

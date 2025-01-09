@@ -1,4 +1,5 @@
 ﻿@page "/success"
+<PageTitle>Success</PageTitle>
 @rendermode InteractiveServer
 @using IMS.Shared.Interface.Cart
 @using IMS.Shared.Interface.Order
@@ -47,7 +48,7 @@
 
     public void Back()
     {
-        NavigationManager.NavigateTo("/product");
+        NavigationManager.NavigateTo("/");
     }
   
 }

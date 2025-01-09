@@ -1,4 +1,5 @@
 ﻿@page "/order-summary"
+<PageTitle>Order Summary </PageTitle>
 @rendermode InteractiveServer
 @inject CartStateService CartStateService
 @inject IOrderService OrderService
@@ -72,7 +73,7 @@
 
 			<MudText Typo="Typo.body1">
 				Select Address or
-				<MudLink Href="/addresses" Class="ml-1">Change Address</MudLink>
+				<MudLink Href="/addresses" Class="ml-1">Add new Address</MudLink>
 			</MudText>
 
 			@if (Addresses != null && Addresses.Any())
@@ -195,12 +196,12 @@
 		{
 			if (Addresses != null && Addresses.Any() && !Addresses.Contains(Address))
 			{
-				Snackbar.Add("Please select an address before proceeding.", Severity.Warning);
+				Snackbar.Add("Please select an address", Severity.Warning);
 				return;
 			}
 			if (Address == null || string.IsNullOrWhiteSpace(Address.Id))
 			{
-				Snackbar.Add("Please select an address before proceeding.", Severity.Warning);
+				Snackbar.Add("Please select an address", Severity.Warning);
 				return;
 			}
 			var sessionUrl = await CreateStripeCheckoutSession();
