@@ -11,5 +11,6 @@
         Task SetPreTokenToSessionAsync(string token);
         Task<string> GetPreTokenFromSessionAsync();
         Task RemoveTokenAsync();
+        Task RemoveBreadcrumbAsync();
     }
 }

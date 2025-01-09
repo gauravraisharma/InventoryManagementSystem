@@ -2,7 +2,7 @@
 @using IMS.WebApp.Client.Pages.Products
 @using IMS.WebApp.Client.Authentication
 @inject AuthStateService AuthStateService
-
+<PageTitle>Home Page</PageTitle>
 @if(AuthStateService.UserRole != "admin")
 {
     <ProductList />

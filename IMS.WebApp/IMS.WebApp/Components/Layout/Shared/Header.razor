@@ -213,12 +213,13 @@
     {
         if (!NavigationManager.Uri.EndsWith("/product", StringComparison.OrdinalIgnoreCase))
         {
-            NavigationManager.NavigateTo("/product");
+            NavigationManager.NavigateTo("/");
         }
     }
     private async Task SignOut()
     {
         await TokenService.RemoveTokenAsync();
+        await TokenService.RemoveBreadcrumbAsync();
         Username = null;  
         NavigationManager.NavigateTo("/",true);
         AuthStateService.NotifyAuthenticationStateChanged();

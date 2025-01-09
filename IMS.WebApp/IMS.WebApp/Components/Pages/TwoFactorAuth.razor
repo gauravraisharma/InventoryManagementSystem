@@ -1,4 +1,6 @@
-﻿@using IMS.Shared.Interface.Code
+﻿@page "/validate"
+<PageTitle>Validate</PageTitle>
+@using IMS.Shared.Interface.Code
 @using IMS.WebApp.Client.Authentication
 @inject NavigationManager NavigationManager
 @inject AuthStateService AuthStateService
@@ -7,7 +9,6 @@
 @inject Blazored.SessionStorage.ISessionStorageService _sessionStorageService
 @inject NavigationManager NavigationManager
 
-@page "/validate"
 
 <MudContainer MaxWidth="MaxWidth.Small" Class="mt-6">
 	<MudPaper Class="pa-10 login-card">
@@ -81,7 +82,7 @@
 </style>
 
 @code {
-	private string Email { get; set; } = string.Empty; // Set this to the logged-in user's email
+	private string Email { get; set; } = string.Empty; 
 	private string Code { get; set; } = string.Empty;
 	private bool IsCodeSent { get; set; } = false;
 	private string StatusMessage { get; set; } = string.Empty;
@@ -139,12 +140,12 @@
 
 				if (role == "user")
 				{
-					NavigationManager.NavigateTo("/product", true);
+					NavigationManager.NavigateTo("/", true);
 					AuthStateService.NotifyAuthenticationStateChanged();
 				}
 				else if (role == "admin")
 				{
-					NavigationManager.NavigateTo("/product", true);
+					NavigationManager.NavigateTo("/", true);
 					AuthStateService.NotifyAuthenticationStateChanged();
 				}
 			}

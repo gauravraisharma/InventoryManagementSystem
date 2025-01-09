@@ -1,4 +1,5 @@
 ﻿@page "/addresses"
+<PageTitle> Address </PageTitle>
 @using IMS.Shared.Interface.Address
 @using IMS.Shared.RequestDto
 @using IMS.WebApp.Client.Authentication
@@ -62,14 +63,13 @@
 
     private async Task LoadAddresses()
     {
-        var response = await AddressService.GetAddressesByUserIdAsync(UserId); // Replace with actual userId
+        var response = await AddressService.GetAddressesByUserIdAsync(UserId); 
         if (response.IsSuccess)
         {
             Addresses = response.Result;
         }
         else
         {
-            // Handle error
         }
     }
 
@@ -88,8 +88,6 @@
             var newAddress = (AddressDTO)result.Data;
             newAddress.IsActive = false;
             Addresses.Add(newAddress);
-
-            // Call API to refresh the address list after adding a new address
             await LoadAddresses();
         }
     }
@@ -120,14 +118,13 @@
 
         if (confirmResult.HasValue && confirmResult.Value)
         {
-            var deleteResponse = await AddressService.DeleteAddressAsync(address.Id); // Assuming address has an Id property
+            var deleteResponse = await AddressService.DeleteAddressAsync(address.Id); 
             if (deleteResponse.IsSuccess)
             {
                 Addresses.Remove(address);
             }
             else
             {
-                // Handle error
             }
         }
     }

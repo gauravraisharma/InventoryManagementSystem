@@ -1,9 +1,11 @@
 ﻿@page "/customer"
+<PageTitle>Customer List </PageTitle>
 @using IMS.Shared.Interface.Auth
 @using IMS.Shared.RequestDto.UserDTOs
 @inject IAuthService AuthService
 @inject ISnackbar Snackbar
 
+<MudSnackbarProvider />
 <MudPaper Elevation="4" Class="centered-table-container">
     <MudTable Items="customers" Hover="true" SortLabel="Sort by" Striped="true" Dense="true" Bordered="true">
         <HeaderContent>
