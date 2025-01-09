@@ -1,4 +1,5 @@
 ﻿@page "/addresses"
+<PageTitle> Address </PageTitle>
 @using IMS.Shared.Interface.Address
 @using IMS.Shared.RequestDto
 @using IMS.WebApp.Client.Authentication
@@ -10,24 +11,26 @@
 <MudDialogProvider />
 <MudPopoverProvider />
 <MudContainer MaxWidth="MaxWidth.Medium">
-    <MudText Typo="Typo.h4" Class="mb-4">Manage Addresses</MudText>
+    <div class="d-flex justify-space-between align-center">
+    <MudText Typo="Typo.h4" Class="section-title">Manage Addresses</MudText>
 
     <!-- Button to open the add address dialog -->
     <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OpenAddAddressDialog">
         Add New Address
     </MudButton>
+    </div>
 
     <MudGrid Class="mt-4">
         @foreach (var address in Addresses)
         {
-            <MudItem xs="12" sm="6" md="4">
-                <MudCard>
-                    <MudCardContent>
+            <MudItem xs="12" sm="12" md="12">
+                <MudCard Class="card-item  flex-row align-start">
+                    <MudCardContent Class="flex-1">
                         <MudText Typo="Typo.h5">@address.Title</MudText>
                         <MudText Typo="Typo.h6">@address.City, @address.Country</MudText>
                         <MudText Typo="Typo.subtitle2">@address.Street, @address.PinCode</MudText>
                     </MudCardContent>
-                    <MudCardActions>
+                    <MudCardActions Class="pa-4">
                         <MudButton Variant="Variant.Outlined" Class="mr-2" Color="Color.Primary" Disabled="@address.IsActive" OnClick="() => MakeActive(address)">
                             @if (address.IsActive)
                             {
@@ -49,7 +52,19 @@
         }
     </MudGrid>
 </MudContainer>
+<style>
+    .card-item {
+        box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+        border-radius: 10px;
+        border: 1px solid #eaeaea;
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
 
+    .section-title {
+        font-weight: 500;
+    }
+    </style>
 @code {
     private List<AddressDTO> Addresses = new();
     public string UserId { get; set; }
@@ -62,14 +77,13 @@
 
     private async Task LoadAddresses()
     {
-        var response = await AddressService.GetAddressesByUserIdAsync(UserId); // Replace with actual userId
+        var response = await AddressService.GetAddressesByUserIdAsync(UserId); 
         if (response.IsSuccess)
         {
             Addresses = response.Result;
         }
         else
         {
-            // Handle error
         }
     }
 
@@ -88,8 +102,6 @@
             var newAddress = (AddressDTO)result.Data;
             newAddress.IsActive = false;
             Addresses.Add(newAddress);
-
-            // Call API to refresh the address list after adding a new address
             await LoadAddresses();
         }
     }
@@ -120,14 +132,13 @@
 
         if (confirmResult.HasValue && confirmResult.Value)
         {
-            var deleteResponse = await AddressService.DeleteAddressAsync(address.Id); // Assuming address has an Id property
+            var deleteResponse = await AddressService.DeleteAddressAsync(address.Id); 
             if (deleteResponse.IsSuccess)
             {
                 Addresses.Remove(address);
             }
             else
             {
-                // Handle error
             }
         }
     }

@@ -10,6 +10,7 @@
 @using IMS.Shared.RequestDto.ProductDTOs
 @using System.ComponentModel.DataAnnotations
 
+<MudSnackbarProvider />
 <MudDialog>
     @*   <TitleContent>
         Add PRODUCTS
@@ -253,6 +254,8 @@
     private List<GetAllProductDto> _products = new();
     private List<UploadedFile> _uploadedFiles = new(); // Holds processed file data
     private bool showValidation = false;
+    private int currentPage = 1;
+    private const int PageSize = 20;
     private async Task UploadFiles(IBrowserFile file)
     {
         if (file != null)
@@ -440,7 +443,7 @@
 
     public async Task GetAllProducts()
     {
-        var response = await ProductService.GetAllProductsAsync(selectedDepartment, selectedCategory, searchText, selectedSort);
+        var response = await ProductService.GetAllProductsAsync(selectedDepartment, selectedCategory, searchText, selectedSort, currentPage, PageSize);
         if (response.IsSuccess)
         {
             _products = response.Result;

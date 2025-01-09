@@ -15,12 +15,12 @@ namespace IMS.Shared.Services.Product
             _httpClient = httpClient;
         }
 
-        public async Task<ApiResponse<List<GetAllProductDto>>> GetAllProductsAsync(string department, string category,string searchText, string sortBy)
+        public async Task<ApiResponse<List<GetAllProductDto>>> GetAllProductsAsync(string department, string category, string searchText, string sortBy, int currentPage, int pageSize)
         {
             try
             {
                 // Construct the query string
-                var query = $"?department={department}&category={category}&searchText={searchText}&sortBy={sortBy}";
+                var query = $"?department={department}&category={category}&searchText={searchText}&sortBy={sortBy}&currentPage={currentPage}&pageSize={pageSize}";
 
                 var response = await _httpClient.GetAsync($"{ApiEndpoints.Product.Get}{query}");
                 if (response.IsSuccessStatusCode)
@@ -43,7 +43,6 @@ namespace IMS.Shared.Services.Product
                 };
             }
         }
-
 
         public async Task<ApiResponse<GetAllProductDto>> GetProductByIdAsync(string Id)
         {

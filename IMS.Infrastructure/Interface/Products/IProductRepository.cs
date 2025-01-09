@@ -16,7 +16,11 @@ namespace IMS.Infrastructure.Interface.Products
        string? department = null,
        string? category = null,
        string? searchText = null,
-       string? sortBy = null);
+       string? sortBy = null,
+       int? currentPage=1,
+       int? pageSize=20);
+
+
         Task<GenericBaseResult<GetProductRequestDto>> GetProductByIdAsync(string productId);
         Task<GenericBaseResult<DeleteProductDto>> DeleteProductByIdAsync(string productId);
         Task<GenericBaseResult<AddProductRequestDto>> AddAsync(AddProductRequestDto product);

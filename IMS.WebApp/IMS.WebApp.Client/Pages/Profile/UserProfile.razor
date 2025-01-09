@@ -1,4 +1,5 @@
 ﻿@page "/userProfile"
+<PageTitle>My Profile </PageTitle>
 @using IMS.Shared.Interface.Auth
 @using IMS.Shared.Interface.Code
 @using IMS.WebApp.Client.Authentication
@@ -8,33 +9,33 @@
 @inject ISnackbar Snackbar
 
 <MudPopoverProvider />
-<MudPaper Class="profile-container" Elevation="4">
+<MudPaper Class="profile-container card-item" Elevation="4">
     <MudText Typo="Typo.h5" Align="Align.Center" Class="profile-title">User Profile</MudText>
 
     <MudForm>
-        <MudItem xs="12" Class="form-group">
-            <MudText Typo="Typo.body2" Color="Color.Default">Username</MudText>
-            <MudTextField T="string" Value="@Username" Disabled Class="form-control" />
+        <MudItem xs="12" Class="form-group mb-5">
+            <MudText Typo="Typo.body2" Color="Color.Default" Class="mb-2">Username</MudText>
+            <MudTextField Variant="Variant.Outlined" T="string" Value="@Username" Disabled Class="form-control" />
         </MudItem>
 
         <MudGrid>
-            <MudItem xs="6" Class="form-group">
-                <MudText Typo="Typo.body2" Color="Color.Default">First Name</MudText>
-                <MudTextField T="string" @bind-Value="FirstName" Placeholder="Enter your first name" Class="form-control" />
+            <MudItem xs="6" Class="form-group mb-5">
+                <MudText Typo="Typo.body2" Color="Color.Default" Class="mb-2">First Name</MudText>
+                <MudTextField Variant="Variant.Outlined" T="string" @bind-Value="FirstName" Placeholder="Enter your first name" Class="form-control" />
             </MudItem>
-            <MudItem xs="6" Class="form-group">
-                <MudText Typo="Typo.body2" Color="Color.Default">Last Name</MudText>
-                <MudTextField T="string" @bind-Value="LastName" Placeholder="Enter your last name" Class="form-control" />
+            <MudItem xs="6" Class="form-group mb-5">
+                <MudText Typo="Typo.body2" Color="Color.Default" Class="mb-2">Last Name</MudText>
+                <MudTextField Variant="Variant.Outlined" T="string" @bind-Value="LastName" Placeholder="Enter your last name" Class="form-control" />
             </MudItem>
         </MudGrid>
 
-        <MudItem xs="12" Class="form-group">
-            <MudText Typo="Typo.body2" Color="Color.Default">Email</MudText>
+        <MudItem xs="12" Class="form-group mb-5">
+            <MudText Typo="Typo.body2" Color="Color.Default" Class="mb-2">Email</MudText>
             <MudGrid Class="email-field-group">
-                <MudItem xs="9">
-                    <MudTextField T="string" @bind-Value="Email" Placeholder="Enter your email" Disabled="@(!IsEditingEmail)" Class="form-control" />
+                <MudItem xs="12">
+                    <MudTextField Variant="Variant.Outlined" T="string" @bind-Value="Email" Placeholder="Enter your email" Disabled="@(!IsEditingEmail)" Class="form-control" />
                 </MudItem>
-                <MudItem xs="3">
+                <MudItem xs="12" Class="pt-0">
                     @if (!IsEditingEmail)
                     {
                         <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@EnableEmailEditing" Class="email-edit-btn">
@@ -66,8 +67,8 @@
         @if (IsTwoFactorRequired)
         {
             <MudItem xs="12" Class="form-group">
-                <MudText Typo="Typo.body2" Color="Color.Default">Verification Code</MudText>
-                <MudTextField T="string" @bind-Value="VerificationCode" Placeholder="Enter verification code" Class="form-control" />
+                <MudText Typo="Typo.body2" Color="Color.Default" Class="mb-2">Verification Code</MudText>
+                <MudTextField Variant="Variant.Outlined" T="string" @bind-Value="VerificationCode" Placeholder="Enter verification code" Class="form-control" />
                 <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="@VerifyCode" Class="verify-code-btn">
                     Verify Code
                 </MudButton>
@@ -75,8 +76,8 @@
         }
 
         <MudItem xs="12" Class="form-group">
-            <MudText Typo="Typo.body2" Color="Color.Default">Phone</MudText>
-            <MudTextField T="string" @bind-Value="PhoneNumber" Placeholder="Enter your phone number" Class="form-control" />
+            <MudText Typo="Typo.body2" Color="Color.Default" Class="mb-2">Phone</MudText>
+            <MudTextField Variant="Variant.Outlined" T="string" @bind-Value="PhoneNumber" Placeholder="Enter your phone number" Class="form-control" />
         </MudItem>
 
         @* <MudItem xs="12" Class="form-group"> *@
@@ -103,6 +104,13 @@
 </MudPaper>
 
 <style>
+    .card-item {
+        box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+        border-radius: 10px;
+        border: 1px solid #eaeaea;
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
     .profile-container {
     max-width: 600px;
     margin: 20px auto;
@@ -111,6 +119,7 @@
 
     .profile-title {
     margin-bottom: 20px;
+    font-weight: 500;
     }
 
     .form-group {

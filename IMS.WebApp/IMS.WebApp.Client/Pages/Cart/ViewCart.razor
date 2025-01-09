@@ -1,4 +1,5 @@
 ﻿@page "/view-cart"
+<PageTitle>View Cart </PageTitle>
 @using IMS.Shared.RequestDto.CartDTOs
 @using IMS.Shared.Services.Shared
 @using IMS.WebApp.Client.Authentication
@@ -11,18 +12,19 @@
 @inject NavigationManager NavigationManager
 @inject AuthStateService AuthStateService
 
-
+<MudSnackbarProvider />
+<MudPopoverProvider />
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
     <MudGrid>
         <!-- Product List -->
         <MudItem xs="12" md="8">
-            <MudCard Class="p-3">
-                <MudText Typo="Typo.h5" Class="mb-3">Shopping Cart</MudText>
+            <div>
+                <MudText Typo="Typo.h5" Class="section-title">Shopping Cart</MudText>
                 @if (cart != null && cart.Any())
                 {
                     @foreach (var item in cart)
                     {
-                        <MudPaper Class="d-flex align-center p-2 mb-2">
+                        <MudPaper Class="card-item d-flex align-center">
                             <MudCarousel TData="string" AutoCycle="true" Class="mr-3" Style="height: 200px; width: 200px;">
                                 <Items>
                                     @foreach (var imageUrl in item.ProductImageUrls)
@@ -36,28 +38,33 @@
                                 </Items>
                             </MudCarousel>
 
-                            <MudStack>
-                                <MudText Typo="Typo.h6" hidden >@item.CartId</MudText>
-                                <MudText Typo="Typo.h6">@item.ProductName</MudText>
-                                <MudText Typo="Typo.subtitle1">Size: @item.ProductSize</MudText>
-                                <MudText Typo="Typo.subtitle2" Class="text-success">In Stock</MudText>
+                            <MudStack class="flex-1">
+                                <div class="d-flex align-center gap-3">
+                                    <MudText Typo="Typo.h6">@item.ProductName</MudText>
+                                    <MudText Typo="Typo.subtitle2" Class="stock-badge">In Stock</MudText>
+                                </div>
+
+                                <MudText Typo="Typo.h6" hidden>@item.CartId</MudText>
+                                <MudText Typo="Typo.subtitle1"><strong>Size:</strong> @item.ProductSize</MudText>
                                 <MudText Typo="Typo.body1">
-                                    <span class="font-weight-bold">@($"₹{item.UnitPrice:0.00}")</span>
+                                    <span class="font-weight-bold price-text">@($"₹{item.UnitPrice:0.00}")</span>
                                 </MudText>
-                                <MudGrid Justify="Justify.FlexStart" AlignItems="AlignItems.Center">
+                                <div class="d-flex justify-space-between">
+                                <MudGrid Justify="Justify.FlexStart" Class="align-center">
                                     <MudItem>
-                                        <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="() => UpdateQuantity(item, -1)">-</MudButton>
+                                        <MudButton Variant="Variant.Text" Color="Color.Secondary" Class="cart-action" OnClick="() => UpdateQuantity(item, -1)">-</MudButton>
                                     </MudItem>
                                     <MudItem>
                                         <MudText>@item.Quantity</MudText>
                                     </MudItem>
                                     <MudItem>
-                                        <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="() => UpdateQuantity(item, 1)">+</MudButton>
-                                    </MudItem>
-                                    <MudItem>
-                                        <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="() => RemoveItem(item.CartId)">Delete</MudButton>
+                                        <MudButton Variant="Variant.Text" Color="Color.Secondary" Class="cart-action" OnClick="() => UpdateQuantity(item, 1)">+</MudButton>
                                     </MudItem>
                                 </MudGrid>
+                                <MudItem Class="mr-3">
+                                    <MudButton Variant="Variant.Text" Color="Color.Error" Class="delete-btn" OnClick="() => RemoveItem(item.CartId)">Delete</MudButton>
+                                </MudItem>
+                                </div>
                             </MudStack>
                         </MudPaper>
                     }
@@ -66,25 +73,25 @@
                 {
                     <MudText Typo="Typo.subtitle1" Class="text-danger">No items in the cart</MudText>
                 }
-            </MudCard>
+            </div>
         </MudItem>
 
         <!-- Cart Summary -->
         <MudItem xs="12" md="4">
-            <MudCard Class="p-3">
-                <MudText Typo="Typo.h6">Cart Summary</MudText>
-                <MudDivider Class="my-2" />
+            <div>
+                <MudText Typo="Typo.h5" Class="section-title">Cart Summary</MudText>
+            <MudCard Class="card-item">
                 @if (cart != null && cart.Any())
                 {
                     var totalItems = cart.Sum(i => i.Quantity);
                     var totalPrice = cart.Sum(i => i.TotalPrice);
-                    <MudStack Spacing="2">
-                        <MudText Typo="Typo.body1">
+                    <MudStack Spacing="3" Class="pt-5">
+                            <MudText Typo="Typo.body1" Class="px-3">
                             Subtotal (@totalItems item(s)):
                             <span class="text-danger">@($"₹{totalPrice:0.00}")</span>
                         </MudText>
-                        <MudText Typo="Typo.subtitle2" Class="text-success">Free Delivery Available</MudText>
-                        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="@(() =>ProceedToBuy())">Proceed to Buy</MudButton>
+                            <MudText Typo="Typo.subtitle2" Class="text-success px-3">Free Delivery Available</MudText>
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true"  Class="mt-12" OnClick="@(() =>ProceedToBuy())">Proceed to Buy</MudButton>
                     </MudStack>
                 }
                 else
@@ -92,10 +99,53 @@
                     <MudText Typo="Typo.subtitle1" Class="text-danger">No items to summarize</MudText>
                 }
             </MudCard>
+
+            </div>
         </MudItem>
     </MudGrid>
 </MudContainer>
 
+<style>
+    .card-item {
+        box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+        border-radius: 10px;
+        border: 1px solid #eaeaea;
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+    .section-title {
+        font-weight: 500;
+        margin-bottom: 20px;
+    }
+    .px-3 {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+    .pt-5 {
+        padding-top: 20px;
+    }
+    .mt-12 {
+        margin-top: 60px;
+    }
+    .mud-button-text.cart-action {
+        background: #efefef;
+        min-width: 40px;
+        color: black;
+        font-size: 20px;
+        line-height: 22px;
+    }
+    .stock-badge{
+        background: #dddae9;
+        padding: 4px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+    }
+    .price-text {
+            font-size: 28px;
+    font-weight: 700;
+    }
+
+</style>
 @code {
     private string errorMessage;
     public string Id { get; set; }
@@ -210,7 +260,7 @@
         var response = await CartService.UpdateCart(item.CartId, item.Quantity);
         if (response.IsSuccess)
         {
-            Snackbar.Add("Item Updated successfully", Severity.Success);
+            Snackbar.Add("Item Added successfully", Severity.Success);
 
         }
         else

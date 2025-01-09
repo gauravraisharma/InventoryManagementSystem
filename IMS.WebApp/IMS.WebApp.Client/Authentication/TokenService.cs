@@ -164,5 +164,11 @@ namespace IMS.WebApp.Client.Authentication
                 return null;
             }
         }
+
+        public async Task RemoveBreadcrumbAsync()
+        {
+            const string storageKey = "lastVisitedUrls";
+            await _localStorage.RemoveItemAsync(storageKey);
+        }
     }
 }

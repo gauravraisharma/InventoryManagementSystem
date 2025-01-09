@@ -1,10 +1,12 @@
 ﻿@page "/order"
+<PageTitle>Order List </PageTitle>
 @inject IOrderService OrderService
 @inject ISnackbar Snackbar
 @using IMS.Shared.Interface.Order
 @using IMS.Shared.RequestDto.orderDTOs
 @using MudBlazor
 
+<MudSnackbarProvider />
 <MudCard>
     <MudCardContent>
         <MudTable Items="orders" Dense="false" Hover="true" Bordered="true" Striped="true" RowHeight="56">
@@ -25,7 +27,11 @@
                 <MudTd>@context.OrderDate.ToString("yyyy-MM-dd HH:mm:ss")</MudTd>
                 <MudTd>@context.TotalAmount</MudTd>
                 <MudTd>@(context.ShipmentDate.HasValue ? context.ShipmentDate.Value.ToString("yyyy-MM-dd") : "N/A")</MudTd>
-                <MudTd>@context.Address.City ,@context.Address.Street , @context.Address.Country, @context.Address.PinCode</MudTd>
+                <MudTd >
+                     @(context.Address != null
+                    ? $"{context.Address.City}, {context.Address.Street}, {context.Address.Country}, {context.Address.PinCode}"
+                    : "	N/A")
+                </MudTd>
             </RowTemplate>
             <ChildRowContent>
                 @if (expandedOrders.Contains(context))

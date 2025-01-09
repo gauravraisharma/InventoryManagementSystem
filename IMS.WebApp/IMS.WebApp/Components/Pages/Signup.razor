@@ -1,4 +1,5 @@
 ﻿@page "/signup"
+<PageTitle>Sign Up</PageTitle>
 @inject NavigationManager NavigationManager
 @using IMS.Shared.Interface.Auth
 @inject IAuthService AuthService
@@ -93,13 +94,8 @@
                        OnClick="HandleSignup">
                 Sign Up
             </MudButton>
-            <MudText Class="mt-4 text-center">Already have an account? <MudLink Href="#" OnClick="NavigateToLogin" Class="text-theme">Sign In</MudLink></MudText>
-            @* <MudButton Variant="Variant.Outlined" *@
-            @*            Color="Color.Secondary" *@
-            @*            Class="mt-2" *@
-            @*            OnClick="NavigateToLogin"> *@
-            @*     Back to Login *@
-            @* </MudButton> *@
+            <MudText Class="mt-4 text-center">Already have an account? <MudLink OnClick="NavigateToLogin" Class="text-theme">Sign In</MudLink></MudText>
+           
         </MudForm>
     </MudPaper>
 </MudContainer>
