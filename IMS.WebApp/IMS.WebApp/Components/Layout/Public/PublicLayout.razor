@@ -14,7 +14,7 @@
 
     <!-- Breadcrumbs -->
     <nav class="breadcrumb-nav">
-        <MudBreadcrumbs Items="BreadcrumbItems" Separator=">" />
+        <MudBreadcrumbs Items="BreadcrumbItems" Separator="->" />
     </nav>
 
     <!-- Body Content -->
@@ -62,7 +62,12 @@
         {
             var pageTitle = await JSRuntime.InvokeAsync<string>("eval", "document.title");
 
-            storedBreadcrumbs.Add(new BreadcrumbItem(pageTitle, href: currentUrl));
+            if (currentUrl == NavigationManager.BaseUri){
+                storedBreadcrumbs.Add(new BreadcrumbItem("", href: currentUrl, icon: Icons.Material.Filled.Home));
+            }
+            else{
+                storedBreadcrumbs.Add(new BreadcrumbItem(pageTitle, href: currentUrl));
+            }
         }
         else
         {

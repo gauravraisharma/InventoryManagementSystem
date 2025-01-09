@@ -25,7 +25,7 @@
 <MudSnackbarProvider />
 
 <div class="order-summary-container">
-	<MudCard Class="pa-4 order-summary-card" Style="max-width: 600px; width: 100%;">
+	<MudCard Class="pa-4 order-summary-card card-item" Style="max-width: 600px; width: 100%;">
 		<MudText Typo="Typo.h5" Class="mb-3 font-weight-bold">Order Summary</MudText>
 
 		@if (Products != null && Products.Any())
@@ -33,20 +33,20 @@
 			@foreach (var product in Products)
 			{
 				<MudGrid Class="mb-2">
-					<MudItem xs="9">
+					<MudItem xs="6">
 						<MudText Typo="Typo.body1" Class="font-weight-bold">@product.ProductName</MudText>
 					</MudItem>
-					<MudItem xs="3" Class="text-right">
+					<MudItem xs="6" Class="text-right">
 						<MudText Typo="Typo.body1">x @product.Quantity</MudText>
 					</MudItem>
 				</MudGrid>
 			}
 
 			<MudGrid Class="mb-1">
-				<MudItem xs="9">
+				<MudItem xs="6">
 					<MudText Typo="Typo.body2" Style="color: gray;">Shipping</MudText>
 				</MudItem>
-				<MudItem xs="3" Class="text-right">
+				<MudItem xs="6" Class="text-right">
 					<MudText Typo="Typo.body2" Class="font-weight-bold">Free</MudText>
 				</MudItem>
 			</MudGrid>
@@ -54,10 +54,10 @@
 			<MudDivider Class="my-2" />
 
 			<MudGrid Class="mt-1 mb-2">
-				<MudItem xs="9">
+				<MudItem xs="6">
 					<MudText Typo="Typo.h6">Total</MudText>
 				</MudItem>
-				<MudItem xs="3" Class="text-right">
+				<MudItem xs="6" Class="text-right">
 					<MudText Typo="Typo.h6" Class="font-weight-bold">@($"₹{TotalPrice:0.00}")</MudText>
 				</MudItem>
 			</MudGrid>
@@ -95,7 +95,7 @@
 				<MudText Typo="Typo.body2" Class="mt-2 text-secondary">No addresses available. Please add an address.</MudText>
 			}
 
-			<MudButton Variant="Variant.Filled" Color="Color.Success" Class="mt-3" OnClick="@(() => ProceedToPayment())" FullWidth>
+			<MudButton Variant="Variant.Filled" Color="Color.Success" Class="mt-5" OnClick="@(() => ProceedToPayment())" FullWidth>
 				Continue to Secure Payment
 			</MudButton>
 		}
@@ -113,34 +113,51 @@
 
 <style>
 	.order-summary-container {
-	display: flex;
-	justify-content: center;
-	align-items: flex-start;
-	min-height: 100vh;
-	padding-top: 50px;
-	padding-left: 80px;
-	padding-right: 10px;
+		display: flex;
+		justify-content: center;
+		align-items: flex-start;
+		min-height: calc(100vh - 140px);
+		padding: 50px 80px;
 	}
 
 	.order-summary-card {
-	width: 100%;
-	max-width: 550px;
-	box-sizing: border-box;
+		width: 100%;
+		max-width: 550px;
+		box-sizing: border-box;
 	}
 
 	.address-list-container {
-	border: 1px solid #ddd;
-	border-radius: 4px;
-	padding: 8px;
-	margin-top: 8px;
+		border: 1px solid #ddd;
+		border-radius: 4px;
+		padding: 8px;
+		margin-top: 8px;
 	}
 
 	.cancel-payment-link {
-	margin-top: 20px;
+		margin-top: 20px;
 	}
 
 	.text-center {
-	text-align: center;
+		text-align: center;
+	}
+
+	.text-right {
+		text-align: right;
+	}
+
+	.card-item {
+		box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+		border-radius: 10px;
+		border: 1px solid #eaeaea;
+		margin-bottom: 20px;
+		overflow: hidden;
+	}
+
+	@@media (max-width: 540px) {
+		.order-summary-container {
+			padding: 20px 10px;
+			min-height: unset;
+		}
 	}
 </style>
 
