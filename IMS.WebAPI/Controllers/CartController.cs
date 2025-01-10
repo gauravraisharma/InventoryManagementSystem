@@ -26,7 +26,7 @@ namespace IMS.WebAPI.Controllers
             return new GenericBaseResult<string>(cartId);
         }
 
-        [HttpPut]
+        [HttpPost]
         [Route("EditCart")]
         public async Task<GenericBaseResult<bool>> EditCart(EditCartCommand command)
         {
@@ -61,11 +61,11 @@ namespace IMS.WebAPI.Controllers
         }
 
 
-        [HttpDelete]
-        [Route("DeleteAllCartItemsByUserId/{userId}")]
-        public async Task<GenericBaseResult<bool>> DeleteAllCartItemsByUserId(string userId)
+        [HttpPost]
+        [Route("DeleteAllCartItemsByUserId")]
+        public async Task<GenericBaseResult<bool>> DeleteAllCartItemsByUserId([FromBody] DeleteAllCartItemsByUserIdCommand command)
         {
-            var command = new DeleteAllCartItemsByUserIdCommand { UserId = userId };
+            
             var success = await _mediator.Send(command);
             return new GenericBaseResult<bool>(success);
         }
