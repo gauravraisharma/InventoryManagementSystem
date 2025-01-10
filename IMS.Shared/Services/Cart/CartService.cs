@@ -84,7 +84,7 @@ namespace IMS.Shared.Services.Cart
             };
 
             var content = new StringContent(JsonSerializer.Serialize(loginPayload), Encoding.UTF8, "application/json");
-            var response = await _httpClient.PutAsync(ApiEndpoints.Cart.UpdateCart, content);
+            var response = await _httpClient.PostAsync(ApiEndpoints.Cart.UpdateCart, content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -150,8 +150,10 @@ namespace IMS.Shared.Services.Cart
         {
             try
             {
-                var requestUrl = $"{ApiEndpoints.Cart.DeleteAllCartItemsByUserId}/{userId}";
-                var response = await _httpClient.DeleteAsync(requestUrl);
+                var command = new { UserId = userId };
+                var content = new StringContent(JsonSerializer.Serialize(command), Encoding.UTF8, "application/json");
+                var requestUrl = $"{ApiEndpoints.Cart.DeleteAllCartItemsByUserId}";
+                var response = await _httpClient.PostAsync(requestUrl,content);
 
                 if (response.IsSuccessStatusCode)
                 {
