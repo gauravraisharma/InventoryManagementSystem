@@ -52,13 +52,13 @@
     </MudGrid>
 
     <!-- Products Section -->
-    <MudGrid>
-        <MudItem xs="2">
+    <MudGrid Class="product-listing">
+        <MudItem lg="2" sm="12">
             <!-- Filters Section -->
             <div>
                 <MudText Typo="Typo.h5" Class="section-title">Filters</MudText>
                 <MudGrid Class="mt-4">
-                    <MudItem xs="12">
+                    <MudItem lg="12" sm="3" xs="12">
                         <MudTextField T="string"
                         Label="Search"
                         Variant="Variant.Outlined"
@@ -68,7 +68,7 @@
                         @bind-Value:after="@(() => ResetAndLoadProducts())"
                         Dense="true" />
                     </MudItem>
-                    <MudItem xs="12">
+                    <MudItem lg="12" sm="3" xs="12">
                         <MudSelect T="string"
                         Label="Department"
                         Variant="Variant.Outlined"
@@ -82,7 +82,7 @@
                             }
                         </MudSelect>
                     </MudItem>
-                    <MudItem xs="12">
+                    <MudItem lg="12" sm="3" xs="12">
                         <MudSelect T="string"
                         Label="Category"
                         Variant="Variant.Outlined"
@@ -96,7 +96,7 @@
                             }
                         </MudSelect>
                     </MudItem>
-                    <MudItem xs="12">
+                    <MudItem lg="12" sm="3" xs="12">
                         <MudSelect T="string"
                         Label="Sort By"
                         Variant="Variant.Outlined"
@@ -111,7 +111,7 @@
             </div>
         </MudItem>
 
-        <MudItem xs="10">
+        <MudItem lg="10" sm="12">
             <div>
                 <MudText Typo="Typo.h5" Class="section-title">Products</MudText>
                 <MudGrid Class="mt-4 mud-grid-product" @onscroll="OnScrollHandler" style="height:70vh; overflow-y: scroll;">
@@ -180,6 +180,9 @@
 
 
 <style>
+    .product-listing {
+        margin-bottom: 100px;
+    }
     .custom-dialog {
     max-width: 800px;
     width: 90%;
@@ -228,6 +231,7 @@
     .section-title {
     font-weight: 500;
     }
+}
 </style>
 
 

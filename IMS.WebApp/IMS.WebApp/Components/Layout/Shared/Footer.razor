@@ -2,10 +2,10 @@
     <MudText Typo="Typo.body2">© 2024 Your Company</MudText>
 </MudPaper>
  *@
-<MudPaper Elevation="2" Class="px-14 py-6 bg-dark text-white">
+<MudPaper Elevation="2" Class="px-14 py-6 bg-dark text-white footer">
     <MudContainer>
     <MudGrid Class="mt-4">
-                    <MudItem xs="12" sm="3">
+                    <MudItem xs="12" md="3">
         <!-- Column 1: Get to Know Us -->
         <div class="footer-column">
             <MudText Typo="Typo.subtitle1" Class="title">Get to Know Us</MudText>
@@ -17,7 +17,7 @@
             </div>
         </div>
         </MudItem>
-            <MudItem xs="12" sm="3">
+            <MudItem xs="12" md="3">
         <!-- Column 2: Connect with Us -->
         <div class="footer-column">
             <MudText Typo="Typo.subtitle1" Class="title">Connect with Us</MudText>
@@ -28,7 +28,7 @@
             </div>
         </div>
         </MudItem>
-            <MudItem xs="12" sm="3">
+            <MudItem xs="12" md="3">
         <!-- Column 3: Make Money with Us -->
         <div class="footer-column">
             <MudText Typo="Typo.subtitle1" Class="title">Make Money with Us</MudText>
@@ -43,7 +43,7 @@
             </div>
         </div>
         </MudItem>
-            <MudItem xs="12" sm="3">
+            <MudItem xs="12" md="3">
         <!-- Column 4: Let Us Help You -->
         <div class="footer-column">
             <MudText Typo="Typo.subtitle1" Class="title">Let Us Help You</MudText>
@@ -96,6 +96,12 @@
 
     .text-white {
         color: #ffffff;
+    }
+
+    @@media (max-width: 575.98px) {        
+        .footer {
+            padding: 0px !important;
+        }
     }
 
 </style>        
