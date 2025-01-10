@@ -9,9 +9,9 @@
 <div id="nav-belt" class="d-flex align-center justify-content-between w-100">
     <!-- Left Section -->
     <div class="nav-left d-flex align-center gap-5">
-        <img src="/images/logo-white.png" alt="App Logo" style="width: 200px;" @onclick="NavigateToProductList" />
+        <img src="/images/logo-white.png" alt="App Logo" class="header-logo" @onclick="NavigateToProductList" />
        @*  <MudText Typo="Typo.body1" Style="color: white;" Class="d-flex align-center justify-center gap-1"><MudIcon Icon="@Icons.Material.Outlined.Map" Title="Icon" /> Delivering to Dehradun 248001</MudText> *@
-        <MudText Typo="Typo.body1" Style="color: white;" Class="d-flex align-center justify-center gap-1" @onclick="OnLocationClick">
+        <MudText Typo="Typo.body1" Style="color: white;" Class="d-flex align-center justify-center gap-1 location" @onclick="OnLocationClick">
             <MudIcon Icon="@Icons.Material.Outlined.Map" Title="Icon" />
             @if (IsLoading)
             {
@@ -36,6 +36,7 @@
         <div class="search-bar">
             <MudTextField Variant="Variant.Outlined" T="string" Placeholder="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search"/>
         </div>
+        <div class="profile-item d-flex align-center gap-2">
         @if (IsAuthenticated)
         {
             <!-- Dropdown for Signed-In User -->
@@ -76,13 +77,14 @@
 
             <MudText Typo="Typo.body1" Class="d-flex align-center justify-center gap-1"><MudIcon Icon="@Icons.Material.Outlined.ShoppingCart" Title="Icon" /> Cart</MudText>
         </NavLink>
+        </div>
     </div>
 </div>
 
 <style>
     #nav-belt {
     background-color: darkslateblue;
-    height: 60px;
+    min-height: 60px;
     font-size: 14px;
     position: relative;
     padding: 12px 20px;
@@ -111,6 +113,52 @@
 
     .search-bar .mud-input.mud-input-outlined:focus-within .mud-input-outlined-border {
     border-color: rgb(255 255 255 / 54%);
+    }
+    .header-logo {
+        width: 200px;
+    }
+
+    @@media (max-width: 1024.98px) {
+        .search-bar .mud-input-control {
+            width: 100%;
+        }
+    }
+
+    @@media (max-width: 768.98px) {
+        .header-logo {
+            width: 160px;
+        }
+        #nav-belt {
+            flex-direction: column;
+        }
+
+        .nav-right {
+            margin-right: auto;
+            margin-top: 10px;
+        }
+    }
+
+    @@media (max-width: 575.98px) {
+        .location span {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 200px;
+        }
+        .nav-left {
+            display: block !important;
+            text-align: center;
+        }
+
+        .nav-right {
+            display: block !important;
+            text-align: center;
+            width: 100%;
+        }
+        .profile-item {
+            margin-top: 10px;
+            justify-content: center;
+        }
     }
 </style>
 
