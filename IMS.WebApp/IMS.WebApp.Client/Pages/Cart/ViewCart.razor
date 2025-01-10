@@ -52,7 +52,7 @@
                                 <div class="d-flex justify-space-between">
                                 <MudGrid Justify="Justify.FlexStart" Class="align-center">
                                     <MudItem>
-                                        <MudButton Variant="Variant.Text" Color="Color.Secondary" Class="cart-action" OnClick="() => UpdateQuantity(item, -1)">-</MudButton>
+                                            <MudButton Variant="Variant.Text" Color="Color.Secondary" Disabled="@(item.Quantity == 1)" Class="cart-action" OnClick="() => UpdateQuantity(item, -1)">-</MudButton>
                                     </MudItem>
                                     <MudItem>
                                         <MudText>@item.Quantity</MudText>
@@ -255,12 +255,21 @@
 
     private async Task  UpdateQuantity(CartDto item, int change)
     {
+        int previousQuantity = item.Quantity;
         item.Quantity = Math.Max(1, item.Quantity + change);
         item.TotalPrice = item.Quantity * item.UnitPrice;
         var response = await CartService.UpdateCart(item.CartId, item.Quantity);
         if (response.IsSuccess)
         {
-            Snackbar.Add("Item Added successfully", Severity.Success);
+           
+            if (change > 0)
+            {
+                Snackbar.Add("Item added successfully", Severity.Success);
+            }
+            else if (change < 0 && previousQuantity > 1)
+            {
+                Snackbar.Add("Item removed successfully", Severity.Success);
+            }
 
         }
         else
