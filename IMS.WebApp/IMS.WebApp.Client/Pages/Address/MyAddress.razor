@@ -10,6 +10,7 @@
 
 <MudDialogProvider />
 <MudPopoverProvider />
+<div class="content-wrapper">
 <MudContainer MaxWidth="MaxWidth.Medium">
     <div class="d-flex justify-space-between align-center">
     <MudText Typo="Typo.h4" Class="section-title">Manage Addresses</MudText>
@@ -24,7 +25,7 @@
         @foreach (var address in Addresses)
         {
             <MudItem xs="12" sm="12" md="12">
-                <MudCard Class="card-item  flex-row align-start">
+                <MudCard Class="card-item flex-row align-start">
                     <MudCardContent Class="flex-1">
                         <MudText Typo="Typo.h5">@address.Title</MudText>
                         <MudText Typo="Typo.h6">@address.City, @address.Country</MudText>
@@ -52,6 +53,8 @@
         }
     </MudGrid>
 </MudContainer>
+</div>
+
 <style>
     .card-item {
         box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
@@ -63,6 +66,10 @@
 
     .section-title {
         font-weight: 500;
+    }
+
+    .content-wrapper {
+        min-height: calc(100vh - 120px);
     }
     </style>
 @code {
