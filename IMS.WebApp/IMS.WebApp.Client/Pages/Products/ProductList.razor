@@ -75,7 +75,7 @@
                         @bind-Value="selectedDepartment"
                         @bind-Value:after="@(() => ResetAndLoadProducts())"
                         Dense="true">
-                            <MudSelectItem Value="@("all")">Pick a Department</MudSelectItem>
+                            <MudSelectItem Value="@("All")"></MudSelectItem>
                             @foreach (var department in _departments)
                             {
                                 <MudSelectItem Value="@department.Name">@department.Name</MudSelectItem>
@@ -89,7 +89,7 @@
                         @bind-Value="selectedCategory"
                         @bind-Value:after="@(() => ResetAndLoadProducts())"
                         Dense="true">
-                            <MudSelectItem Value="@("all")">Pick a Category</MudSelectItem>
+                            <MudSelectItem Value="@("All")"></MudSelectItem>
                             @foreach (var category in _categories)
                             {
                                 <MudSelectItem Value="@category.Name">@category.Name</MudSelectItem>
@@ -142,12 +142,12 @@
                                                 @string.Join(", ", product.DepartmentNames)
                                             </MudText>
                                         </div>
-                                        <div>
+                                       @*  <div>
                                             <MudText Typo="Typo.body2" Class="sub-title">@product.Description</MudText>
-                                        </div>
+                                        </div> *@
                                     </div>
                                 </MudCardContent>
-                                <MudCardActions Class="d-flex justify-space-between">
+                                <MudCardActions Class="d-flex">
                                     @if (AuthStateService.UserRole == "admin")
                                     {
                                         <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="() => OpenEditProductDialogAsync(product.Id)">
@@ -238,8 +238,8 @@
 @code {
     [Parameter]
     public string productId { get; set; }
-    private string selectedDepartment = "all";
-    private string selectedCategory = "all";
+    private string selectedDepartment = "All";
+    private string selectedCategory = "All";
     private string selectedSort = "newest";
     private string searchText = "";
     private List<GetAllProductDto> _products = new();
