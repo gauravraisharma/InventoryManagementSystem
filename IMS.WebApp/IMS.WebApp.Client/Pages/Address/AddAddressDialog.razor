@@ -4,21 +4,106 @@
 @inject IDialogService DialogService
 
 
-<MudContainer MaxWidth="MaxWidth.Large" Class="mt-6">
-    <MudDialogContent>
-        <MudForm @bind-IsValid="IsValid">
-            <MudTextField @bind-Value="Address.Title" Label="Title" Required="true" />
-            <MudTextField @bind-Value="Address.City" Label="City" Required="true" />
-            <MudTextField @bind-Value="Address.Street" Label="Street" Required="true" />
-            <MudTextField @bind-Value="Address.PinCode" Label="PinCode" Required="true" />
-            <MudTextField @bind-Value="Address.Country" Label="Country" Required="true" />
-        </MudForm>
-    </MudDialogContent>
-    <MudDialogActions>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="!IsValid" OnClick="Save">Save</MudButton>
-        <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
-    </MudDialogActions>
-</MudContainer>
+
+<MudDialog>
+    <DialogContent>
+        <MudContainer MaxWidth="MaxWidth.Large" Class="mt-3 pa-0">
+            <MudCard Elevation="0">
+                <MudCardContent Class="pa-0">
+                    <EditForm Model="Address" OnValidSubmit="Save" FormName="AddressForm">
+                        <DataAnnotationsValidator />
+                        <MudGrid>
+                            <MudItem xs="12">
+                                <div>
+                                    <label class="mb-2">Title</label>
+                                <MudTextField @bind-Value="Address.Title"
+                                              Variant="Variant.Outlined"
+                                              Placeholder="Enter Title"
+                                              HelperText="Examples: Home, Work"
+                                              Required="true" />
+                                              </div>
+                            </MudItem>
+                            <MudItem xs="12" sm="6">
+                                <div>
+                                    <label class="mb-2">City</label>
+                                <MudTextField @bind-Value="Address.City"
+                                              Variant="Variant.Outlined"
+                                              Placeholder="Enter City"
+                                              Required="true" />
+                                              </div>
+                            </MudItem>
+                            <MudItem xs="12" sm="6">
+                                <div>
+                                    <label class="mb-2">Street</label>
+                                <MudTextField @bind-Value="Address.Street"
+                                              Variant="Variant.Outlined"
+                                              Placeholder="Enter Street"
+                                              Required="true" />
+                                              </div>
+                            </MudItem>
+                            <MudItem xs="12" sm="6">
+                                <div>
+                                    <label class="mb-2">Pin Code</label>
+                                <MudTextField @bind-Value="Address.PinCode"
+                                              Variant="Variant.Outlined"
+                                              Placeholder="Enter Pin Code"
+                                              Required="true" />
+                                              </div>
+                            </MudItem>
+                            <MudItem xs="12" sm="6">
+                                <div>
+                                    <label class="mb-2">Country</label>
+                                <MudTextField @bind-Value="Address.Country"
+                                              Variant="Variant.Outlined"
+                                              Placeholder="Enter Country"
+                                              Required="true" />
+                                              </div>
+                            </MudItem>
+                        </MudGrid>
+
+                        <div class="d-flex justify-end mt-5">
+                            <MudButton Variant="Variant.Text"                                       
+                                       Class="btn-theme btn-border"
+                                       OnClick="Cancel">
+                                Cancel
+                            </MudButton>
+                            <MudButton ButtonType="ButtonType.Submit" Class="btn-theme ml-2">
+                                Save
+                            </MudButton>
+                        </div>
+                    </EditForm>
+                </MudCardContent>
+            </MudCard>
+        </MudContainer>
+    </DialogContent>
+</MudDialog>
+
+<style>
+    .btn-theme {
+        background: darkslateblue;
+        color: #fff;
+        text-transform: capitalize;
+        padding: 8px 16px;
+        font-size: 18px;
+    }
+
+    .btn-theme:hover {
+         background: #FFD700;
+        color: #000;
+    }
+
+    .btn-theme.btn-border {
+        background: #fff;
+        color: darkslateblue;
+        border: 1px solid darkslateblue;
+    }
+
+        .btn-theme.btn-border:hover {
+            background: #FFD700;
+        color: #000;
+            border: 1px solid #FFD700;
+        }
+  </style>
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
@@ -28,11 +113,11 @@
 
     private async Task Save()
     {
-        var response = await AddressService.AddAddressAsync(UserId, Address.City, Address.Country, Address.Street,Address.Title,Address.PinCode);
+        var response = await AddressService.AddAddressAsync(UserId, Address.City, Address.Country, Address.Street, Address.Title, Address.PinCode);
 
         if (response.IsSuccess)
         {
-            MudDialog.Close(DialogResult.Ok(Address)); 
+            MudDialog.Close(DialogResult.Ok(Address));
         }
         else
         {

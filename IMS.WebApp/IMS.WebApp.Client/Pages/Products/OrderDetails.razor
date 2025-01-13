@@ -5,7 +5,7 @@
 @using IMS.Shared.Interface.Order
 @using IMS.Shared.RequestDto.orderDTOs
 <MudPopoverProvider />
-<h3>Order Details</h3>
+
 
 @if (order == null)
 {
@@ -13,14 +13,17 @@
 }
 else
 {
-    <MudCard>
+    <div class="content-wrapper">
+    <MudContainer MaxWidth="MaxWidth.Medium">
+        <MudText Typo="Typo.h4" Class="section-title mb-5">Order Details</MudText>
+    <MudCard Class="card-item">
         <MudCardContent>
-            <MudText Typo="Typo.h5" GutterBottom="true">Order ID: @order.OrderId</MudText>
-            <MudText Typo="Typo.body1">Order Date: @order.OrderDate.ToShortDateString()</MudText>
-                <MudText Typo="Typo.body1">Total Price: ₹@order.TotalAmount.ToString("N2")</MudText>
+                <MudText Typo="Typo.h6" GutterBottom="true"><strong>Order ID:</strong> @order.OrderId</MudText>
+                <MudText Typo="Typo.body1"><strong>Order Date:</strong> @order.OrderDate.ToShortDateString()</MudText>
+                <MudText Typo="Typo.body1"><strong>Total Price:</strong> ₹@order.TotalAmount.ToString("N2")</MudText>
             <MudText Typo="Typo.body1">
-    Address: @(order.Address != null 
-        ? $"{order.Address.City}, {order.Address.Street}, {order.Address.Country}, {order.Address.PinCode}" 
+                    <strong>Address:</strong> @(order.Address != null
+                ? $"{order.Address.City}, {order.Address.Street}, {order.Address.Country}, {order.Address.PinCode}" 
         : "Address not available")
 </MudText>
         </MudCardContent>
@@ -42,11 +45,30 @@ else
                 </RowTemplate>
             </MudTable>
         </MudCardContent>
-    </MudCard>
+        </MudCard>
+        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" @onclick="NavigateBack">Back to Orders</MudButton>
+
+    </MudContainer>
+    </div>
 }
 
-<MudButton Variant="Variant.Outlined" Color="Color.Secondary" @onclick="NavigateBack">Back to Orders</MudButton>
 
+<style>
+    .card-item {
+        box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+        border-radius: 10px;
+        border: 1px solid #eaeaea;
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+
+    .section-title {
+        font-weight: 500;
+    }
+    .content-wrapper {
+        min-height: calc(100vh - 120px);
+    }
+</style>
 @code {
     [Parameter]
     public string EncodedId { get; set; }
