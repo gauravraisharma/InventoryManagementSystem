@@ -23,7 +23,7 @@
 @using System.Text
 @using System.Text.Json
 
-
+<MudProgressCircular />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
@@ -142,7 +142,7 @@
                                                 @string.Join(", ", product.DepartmentNames)
                                             </MudText>
                                         </div>
-                                       @*  <div>
+                                        @*  <div>
                                             <MudText Typo="Typo.body2" Class="sub-title">@product.Description</MudText>
                                         </div> *@
                                     </div>
@@ -170,7 +170,9 @@
                 </MudGrid>
                 @if (_isLoadingMore)
                 {
-                    <MudProgressCircular Class="mt-4" Size="Size.Small" Color="Color.Primary" />
+                     <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                             <MudProgressCircular Color="Color.Secondary" Indeterminate="true" Size="Size.Large" />
+                      </div>
                 }
             </div>
         </MudItem>
@@ -181,7 +183,7 @@
 
 <style>
     .product-listing {
-        margin-bottom: 100px;
+    margin-bottom: 100px;
     }
     .custom-dialog {
     max-width: 800px;
@@ -231,7 +233,7 @@
     .section-title {
     font-weight: 500;
     }
-}
+    }
 </style>
 
 
@@ -262,8 +264,11 @@
         if (scrollTop + clientHeight >= scrollHeight - 5 && !_isLoadingMore)
         {
             _isLoadingMore = true;
+            StateHasChanged();
+            await Task.Delay(2000);
             await LoadMoreProducts();
             _isLoadingMore = false;
+            StateHasChanged();
         }
     }
 
