@@ -31,19 +31,25 @@
         </MudItem>
             <MudItem xs="12" md="3">
         <!-- Column 3: Make Money with Us -->
-        <div class="footer-column">
-            <MudText Typo="Typo.subtitle1" Class="title">Make Money with Us</MudText>
-            <div class="list-items">
-            <MudText Typo="Typo.body2">Sell on tackingStuff</MudText>
-            <MudText Typo="Typo.body2">Sell under tackingStuff Accelerator</MudText>
-            <MudText Typo="Typo.body2">Protect and Build Your Brand</MudText>
-            <MudText Typo="Typo.body2">tackingStuff Global Selling</MudText>
-            <img src="/images/stripe-logo-white.png" alt="App Logo" style="max-width: 100px; width: 100%;margin: 0 auto;cursor: pointer" />
-            @* <MudText Typo="Typo.body2">Supply to tackingStuff</MudText> *@
-            @* <MudText Typo="Typo.body2">Become an Affiliate</MudText> *@
-            @* <MudText Typo="Typo.body2">Fulfillment by tackingStuff</MudText> *@
-            </div>
-        </div>
+                <div class="footer-column">
+                    <MudText Typo="Typo.subtitle1" Class="title">Make Money with Us</MudText>
+                    <div class="list-items">
+                        <MudText Typo="Typo.body2">Sell on tackingStuff</MudText>
+                        <MudText Typo="Typo.body2">Sell under tackingStuff Accelerator</MudText>
+                        <MudText Typo="Typo.body2">Protect and Build Your Brand</MudText>
+                        <MudText Typo="Typo.body2">tackingStuff Global Selling</MudText>
+                    </div>
+
+                    <!-- Payment Methods Section -->
+                    <MudText Typo="Typo.subtitle2" Class="payment-header mb-3">We Accept Payments Via</MudText>
+                    <div class="d-flex gap-3">
+                        <img src="/images/masterCard-logo.png" alt="MasterCard" class="brand-logo" />
+
+                        <img src="/images/stripe-logo.png" alt="Stripe" class="brand-logo" />
+
+                        <img src="/images/visa-logo.png" alt="Visa" class="brand-logo" />
+                    </div>
+                </div>
         </MudItem>
             <MudItem xs="12" md="3">
         <!-- Column 4: Let Us Help You -->
@@ -68,6 +74,9 @@
 </MudPaper>
 
 <style>
+    .brand-logo {
+        max-width: 33.3%;
+    }
     .footer-column {
         flex: 1;
         margin-right: 16px;
