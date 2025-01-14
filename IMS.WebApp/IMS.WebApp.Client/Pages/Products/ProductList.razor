@@ -114,7 +114,7 @@
         <MudItem lg="10" sm="12">
             <div>
                 <MudText Typo="Typo.h5" Class="section-title">Products</MudText>
-                <MudGrid Class="mt-4 mud-grid-product" @onscroll="OnScrollHandler" style="height:70vh; overflow-y: scroll;">
+                <MudGrid Class="mt-4 mud-grid-product" @onscroll="OnScrollHandler" style="height:70vh; overflow-y: scroll;scrollbar-width: none !important;">
                     @foreach (var product in _products)
                     {
                         <MudItem xs="12" sm="6" md="4" lg="3">
