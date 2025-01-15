@@ -162,7 +162,7 @@
         var res = await AuthService.Register(model.FirstName, model.LastName, model.Username, model.Email, model.Password);
         if (res.IsSuccess)
         {
-            NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo("/",true);
         }
         else
         {
@@ -172,14 +172,14 @@
 
     private void NavigateToLogin()
     {
-        NavigationManager.NavigateTo("/login");
+        NavigationManager.NavigateTo("/login",true);
     }
 
     private void NavigateToProductList()
     {
         if (!NavigationManager.Uri.EndsWith("/product", StringComparison.OrdinalIgnoreCase))
         {
-            NavigationManager.NavigateTo("/product");
+            NavigationManager.NavigateTo("/product",true);
         }
     }
     private string ValidateEmail(string email)

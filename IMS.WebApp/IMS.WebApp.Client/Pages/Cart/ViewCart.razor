@@ -165,7 +165,7 @@
             IsAuthenticated = authState.User.Identity.IsAuthenticated;
             if (!IsAuthenticated)
             {
-                NavigationManager.NavigateTo("/login");
+                NavigationManager.NavigateTo("/login",true);
                 return;
             }
 
@@ -204,7 +204,7 @@
                 }
                 else
                 {
-                    errorMessage = response.Message ?? "Failed to fetch product details.";
+                    errorMessage = response.Message ?? "Failed to fetch cart details.";
                 }
             }
 
@@ -249,7 +249,7 @@
             }
             else
             {
-                errorMessage = response.Message ?? "Failed to fetch product details.";
+                errorMessage = response.Message ?? "Failed to fetch cart details.";
             }
         }
         catch (Exception ex)
@@ -301,6 +301,6 @@
     public async Task ProceedToBuy()
     {
         CartStateService.SetCartItems(cart);
-        NavigationManager.NavigateTo("/order-summary");
+        NavigationManager.NavigateTo("/order-summary",true);
     }
 }
