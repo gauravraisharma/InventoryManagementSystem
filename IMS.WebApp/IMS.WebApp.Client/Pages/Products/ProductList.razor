@@ -34,41 +34,32 @@
 
     @if (showBanner)
     {
-        <!-- Top Text Outside Banner -->
+      @*   <!-- Top Text Outside Banner -->
         <MudText Typo="Typo.h4" Color="Color.Primary" Class="text-center mb-2" Style="font-weight: bold; color: #333;">
             FLAT ₹400 OFF On Your 1st Purchase !
-        </MudText>
+        </MudText> *@
 
         <!-- Banner Section -->
         <MudItem xs="12">
-            <MudPaper Elevation="4" Square="true" Class="d-flex banner-container"
-                      Style="position: relative; padding: 50px; overflow: hidden;">
-                <!-- Background Image -->
-                <img src="/images/stripe-logo-white.png" alt="Banner Background"
-                     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;">
-
-                <!-- Left Side Text -->
-                <div class="d-flex flex-column justify-center"
-                     Style="flex: 1; color: white; padding: 20px; position: relative; z-index: 1;">
-                    <MudText Typo="Typo.h3" Color="Color.Primary" Style="font-weight: bold;">
-                        RIGHT TO<br />FASHION SALE<br />JAN 13-19
-                    </MudText>
-                </div>
-
-                <!-- Right Side Content -->
-                <div class="d-flex flex-column justify-center align-center"
-                     Style="flex: 1; color: white; padding: 20px; position: relative; z-index: 1;">
-                    <MudText Typo="Typo.h4" Color="Color.Primary" Style="font-weight: bold;">50-80% Off</MudText>
-                    <MudText Typo="Typo.h5" Color="Color.Primary" Class="text-center mb-3">
-                        Celebrate India, Celebrate Fashion
-                    </MudText>
-                    <MudButton Variant="Variant.Filled" Color="Color.Secondary"
-                               Style="padding: 5px 15px;" @onclick="OnBannerClick">
-                        Shop Now
-                    </MudButton>
-                </div>
-            </MudPaper>
-        </MudItem>
+    <MudPaper Elevation="4" Square="true" Class="d-flex banner-container"
+              Style="position: relative; padding: 50px; overflow: hidden;">
+       <MudGrid Class="align-center">
+           <MudItem md="8">
+                <MudText Typo="Typo.h4" Class="text-center mb-2 banner-title">
+                    FLAT ₹400 OFF On Your <span class="highlight-text">1st Purchase !</span>
+                </MudText>
+                <MudText Typo="Typo.h4" Class="banner-subtitle">
+                    Your Ultimate Shopping Adventure Awaits!
+                    Dive into a World of Premium Products and Incredible Deals.
+                    Experience Unmatched Value Like Never Before—Shop Today and Transform the Way You Shop!
+                </MudText>
+                <MudButton class="banner-btn btn-theme btn-yellow">
+                    Shop Now
+                </MudButton>
+           </MudItem>
+       </MudGrid>
+    </MudPaper>
+      </MudItem>
 
     }
     <!-- Header Section -->
@@ -96,7 +87,6 @@
         <MudItem lg="2" sm="12">
             <!-- Filters Section -->
             <div>
-                <MudText Typo="Typo.h5" Class="section-title">Filters</MudText>
                 <MudGrid Class="mt-4">
                     <MudItem lg="12" sm="3" xs="12">
                         <MudTextField T="string"
@@ -153,7 +143,6 @@
 
         <MudItem lg="10" sm="12">
             <div>
-                <MudText Typo="Typo.h5" Class="section-title">Products</MudText>
                 <MudGrid Class="mt-4 mud-grid-product" @onscroll="OnScrollHandler" style="height:70vh; overflow-y: scroll;scrollbar-width: none !important;">
                     @foreach (var product in _products)
                     {
@@ -222,56 +211,90 @@
 
 
 <style>
+    .banner-container {
+        box-shadow: none;
+        background-image: url('images/banner-img.png');
+        background-size: cover;
+        margin-bottom: 60px;
+        height: 360px;
+        background-position: right;
+    }
+
+    .banner-title {
+        font-size: 50px;
+        color: #fff;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .banner-subtitle {
+        font-size: 18px;
+        font-weight: 400;
+        color: #fff;
+        line-height: 30px;
+    }
+
+    .banner-btn.btn-theme.btn-yellow {
+        width: auto;
+        padding: 10px 30px;
+        margin-top: 32px;
+        font-size: 18px;
+    }
+
+    .highlight-text {
+        color: #35194e;
+    }
+
     .product-listing {
-    margin-bottom: 100px;
+        margin-bottom: 100px;
     }
     .custom-dialog {
-    max-width: 800px;
-    width: 90%;
+        max-width: 800px;
+        width: 90%;
     }
     .list-card {
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: none;
-    border: 1px solid #e6e6e6;
-    height: 450px;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: none;
+        border: 1px solid #e6e6e6;
+        height: 450px;
     }
-    .list-card .title {
-    font-size: 20px;
-    line-height: normal;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    position: relative;
-    }
+        .list-card .title {
+            font-size: 20px;
+            line-height: normal;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            position: relative;
+        }
 
-    .list-card .sub-title {
-    font-size: 14px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    position: relative;
-    }
-    .list-card .price {
-    font-size: 26px;
-    font-weight: 600;
-    }
+        .list-card .sub-title {
+            font-size: 14px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            position: relative;
+        }
+        .list-card .price {
+            font-size: 26px;
+            font-weight: 600;
+        }
     .btn-theme.btn-yellow {
-    width: 100%;
-    background: #FFD700;
-    color: #000;
-    text-transform: capitalize;
-    border: 1px solid #FFD700;
+        width: 100%;
+        background: #FFD700;
+        color: #000;
+        text-transform: capitalize;
+        border: 1px solid #FFD700;
     }
 
-    .btn-theme.btn-yellow:hover {
-    background: #fff;
-    border: 1px solid #FFD700;
-    }
+        .btn-theme.btn-yellow:hover {
+            background: #fff;
+            border: 1px solid #FFD700;
+        }
     .section-title {
-    font-weight: 500;
+        font-weight: 500;
     }
     }
 </style>
@@ -402,7 +425,7 @@
     private void NavigateToProductDetails(string id)
     {
         var encodedId = Convert.ToBase64String(Encoding.UTF8.GetBytes(id));
-        NavigationManager.NavigateTo($"/product-details/{encodedId}");
+        NavigationManager.NavigateTo($"/product-details/{encodedId}", true);
     }
     private async Task DeleteProductDetails(string id)
     {
