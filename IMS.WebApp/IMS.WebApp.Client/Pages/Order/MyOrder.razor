@@ -8,7 +8,6 @@
 @inject ITokenService TokenService
 
 <MudPopoverProvider />
-<h3>My Orders</h3>
 
 @if (orders == null)
 {
@@ -20,26 +19,49 @@ else if (!orders.Any())
 }
 else
 {
+    <div class="content-wrapper">
+    <MudContainer MaxWidth="MaxWidth.Medium">
+        <MudText Typo="Typo.h4" Class="section-title mb-5">My Orders</MudText>
     <MudGrid>
         @foreach (var order in orders)
         {
-            <MudItem xs="12" sm="6" md="4">
-                <MudCard>
+            <MudItem xs="12" sm="12" md="12">
+                    <MudCard Class="card-item flex-row ">
                     <MudCardContent>
-                        <MudText Typo="Typo.h6" hidden GutterBottom="true">Order ID: @order.OrderId</MudText>
-                        <MudText Typo="Typo.body1">Quantity: @order.ProductDetails.Sum(iterator => iterator.Quantity)</MudText>
-                        <MudText Typo="Typo.body1">Price: @order.ProductDetails.Sum(iterator => iterator.Amount)</MudText>
-                        <MudText Typo="Typo.body1">Order Date: @order.OrderDate.ToShortDateString()</MudText>
+                            <MudText Typo="Typo.h6" hidden GutterBottom="true" Class="mb-2"><strong>Order ID:</strong> @order.OrderId</MudText>
+                            <MudText Typo="Typo.body1" Class="mb-2"><strong>Quantity:</strong> @order.ProductDetails.Sum(iterator => iterator.Quantity)</MudText>
+                            <MudText Typo="Typo.body1" Class="mb-2"><strong>Price:</strong> @order.ProductDetails.Sum(iterator => iterator.Amount)</MudText>
+                            <MudText Typo="Typo.body1"><strong>Order Date:</strong> @order.OrderDate.ToShortDateString()</MudText>
                     </MudCardContent>
                     <MudCardActions>
-                        <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="() => ViewDetails(order.OrderId)">View Details</MudButton>
+                        <MudButton Variant="Variant.Filled" Class="mr-3" Color="Color.Primary" @onclick="() => ViewDetails(order.OrderId)">View Details</MudButton>
                     </MudCardActions>
                 </MudCard>
             </MudItem>
         }
     </MudGrid>
+    </MudContainer>
+</div>
 }
 
+
+<style>
+    .card-item {
+        box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+        border-radius: 10px;
+        border: 1px solid #eaeaea;
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+
+    .section-title {
+        font-weight: 500;
+    }
+
+    .content-wrapper {
+        min-height: calc(100vh - 120px);
+    }
+</style>
 @code {
     private List<GetOrderDto> orders;
 
@@ -62,6 +84,6 @@ else
 
     private void ViewDetails(string orderId)
     {
-        Navigation.NavigateTo($"/order-details/{orderId}");
+        Navigation.NavigateTo($"/order-details/{orderId}",true);
     }
 }

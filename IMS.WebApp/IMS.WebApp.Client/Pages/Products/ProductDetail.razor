@@ -157,11 +157,11 @@
     font-size: 18px;
     }
 
-    .btn-theme.btn-border {
-    background: darkslateblue;
-    color: #darkslateblue;
-    }
-
+        .btn-theme.btn-border {
+            background: darkslateblue;
+            color: #fff !important;
+            cursor: pointer !important;
+        }
     .btn-theme:hover {
     background: #FFD700;
     #fff;
@@ -358,7 +358,7 @@
         catch
         {
 
-            NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo("/",true);
         }
     }
     private void SelectSize(string size)
@@ -369,7 +369,7 @@
     {
         if (!IsAuthenticated)
         {
-            NavigationManager.NavigateTo("/login");
+            NavigationManager.NavigateTo("/login",true);
             return;
         }
 
@@ -391,7 +391,7 @@
         if (result.IsSuccess)
         {
             Snackbar.Add("Item added to cart successfully", Severity.Success);
-            NavigationManager.NavigateTo("/view-cart");
+            NavigationManager.NavigateTo("/view-cart",true);
         }
         else
         {
@@ -407,7 +407,7 @@
     }
     private void ProceedToBuy()
     {
-        NavigationManager.NavigateTo("/view-cart");
+        NavigationManager.NavigateTo("/view-cart",true);
     }
 
 }

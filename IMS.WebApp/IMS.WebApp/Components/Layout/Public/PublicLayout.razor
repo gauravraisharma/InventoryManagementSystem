@@ -48,7 +48,8 @@
         const string storageKey = "lastVisitedUrls";
         var currentUrl = NavigationManager.Uri;
 
-        if (currentUrl.Contains("/success") || currentUrl.Contains("/cancel")){
+        if (currentUrl.Contains("/success") || currentUrl.Contains("/cancel"))
+        {
             currentUrl = NavigationManager.BaseUri;
         }
         if (currentUrl.Contains("/order-summary") || currentUrl.Contains("/login") || currentUrl.Contains("/signup"))
@@ -62,10 +63,12 @@
         {
             var pageTitle = await JSRuntime.InvokeAsync<string>("eval", "document.title");
 
-            if (currentUrl == NavigationManager.BaseUri){
+            if (currentUrl == NavigationManager.BaseUri)
+            {
                 storedBreadcrumbs.Add(new BreadcrumbItem("", href: currentUrl, icon: Icons.Material.Filled.Home));
             }
-            else{
+            else
+            {
                 storedBreadcrumbs.Add(new BreadcrumbItem(pageTitle, href: currentUrl));
             }
         }
@@ -78,10 +81,25 @@
             }
 
         }
-        BreadcrumbItems = new List<BreadcrumbItem>(storedBreadcrumbs);
+
+        if (storedBreadcrumbs.Count == 1)
+        {
+            var baseUrl = storedBreadcrumbs.FirstOrDefault()?.Href;
+            if (baseUrl == NavigationManager.BaseUri)
+            {
+                BreadcrumbItems = new List<BreadcrumbItem>();
+            }
+            else
+            {
+                BreadcrumbItems = new List<BreadcrumbItem>(storedBreadcrumbs);
+            }
+        }
+        else
+        {
+            BreadcrumbItems = new List<BreadcrumbItem>(storedBreadcrumbs);
+        }
         await LocalStorage.SetItemAsync(storageKey, storedBreadcrumbs);
     }
-
     public void Dispose()
     {
         NavigationManager.LocationChanged -= OnLocationChanged;
