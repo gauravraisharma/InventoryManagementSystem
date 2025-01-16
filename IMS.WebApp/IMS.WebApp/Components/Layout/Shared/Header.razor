@@ -3,7 +3,13 @@
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 @inject IJSRuntime JSRuntime
+@inject CartStateService CartStateService
+@using IMS.Shared.Interface.Cart
+@using IMS.Shared.Services.Shared
+@inject ICartService CartService
+@inject ISnackbar Snackbar
 @using IMS.Shared.Common
+@using IMS.Shared.RequestDto.CartDTOs
 @using IMS.WebApp.Client.Authentication
 
 <div id="nav-belt" class="d-flex align-center justify-content-between w-100">
@@ -75,6 +81,10 @@
         <!-- Cart Link -->
             <NavLink class="ml-4 text-decoration-none" Style="color: aliceblue;" @onclick="RedirectToCart">
 
+                @if (IsAuthenticated && CartStateService.CartItemCount > 0)
+                {
+                    <span class="cart-count">@CartStateService.CartItemCount</span>
+                }
             <MudText Typo="Typo.body1" Class="d-flex align-center justify-center gap-1"><MudIcon Icon="@Icons.Material.Outlined.ShoppingCart" Title="Icon" /> Cart</MudText>
         </NavLink>
         </div>
@@ -88,6 +98,10 @@
     font-size: 14px;
     position: relative;
     padding: 12px 20px;
+    }
+
+    .cart-count {
+        color: red;
     }
 
     .nav-right {
@@ -169,6 +183,7 @@
     private bool IsLoading { get; set; } = true;
     private bool _locationFetched = false;
 
+    private List<CartDto> cart = new List<CartDto>();
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthStateService.GetAuthenticationStateAsync();
@@ -176,6 +191,7 @@
         if (IsAuthenticated)
         {
             Username = await TokenService.GetUserNameFromTokenAsync();
+           await LoadCart();
         }
     }
 
@@ -186,6 +202,36 @@
             _locationFetched = true;
             await FetchUserLocationAsync();
             StateHasChanged();  
+        }
+    }
+    private async Task LoadCart()
+    {
+        cart.Clear();
+        var userId = await TokenService.GetUserIdFromTokenAsync();
+        if (!string.IsNullOrEmpty(userId))
+        {
+            var response = await CartService.GetCartDetailsByUserIdAsync(userId);
+            if (response.IsSuccess && response.Result != null)
+            {
+                cart = response.Result.Select(items => new CartDto
+                    {
+                        CartId = items.CartId,
+                        ProductName = items.ProductName,
+                        Quantity = items.Quantity,
+                        TotalPrice = items.TotalPrice,
+                        UnitPrice = items.UnitPrice,
+                        ProductImageUrls = items.ProductImageUrls,
+                        ProductSize = items.ProductSize
+                    }).ToList();
+
+                // CartStateService.SetCartItems(cart);
+                CartStateService.SetCartItemCount(cart.Count);
+
+            }
+            else
+            {
+                Snackbar.Add(response.Message ?? "Failed to fetch cart details.", Severity.Error);
+            }
         }
     }
 

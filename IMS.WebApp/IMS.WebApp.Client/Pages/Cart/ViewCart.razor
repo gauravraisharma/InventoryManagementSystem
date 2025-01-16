@@ -290,7 +290,9 @@
         {
             Snackbar.Add("Item Removed Successfully", Severity.Success);
             await GetUserCartDetailsByUserIdAsync();
-
+            CartStateService.SetCartItems(cart);
+            CartStateService.SetCartItemCount(cart.Count);
+            NavigationManager.NavigateTo(NavigationManager.Uri, true);
         }
         else
         {
