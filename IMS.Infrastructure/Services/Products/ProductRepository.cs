@@ -32,7 +32,7 @@ namespace IMS.Infrastructure.Services.Product
                 var response = new GenericBaseResult<List<GetProductRequestDto>>(new List<GetProductRequestDto>());
 
                 var query = context.Products.AsQueryable();
-                if (!string.IsNullOrEmpty(department) && department != "all")
+                if (!string.IsNullOrEmpty(department) && department != "All")
                 {
                     query = query.Where(p => context.DepartmentProductMappings
                                     .Where(mapping => mapping.Department.Name == department)
@@ -40,7 +40,7 @@ namespace IMS.Infrastructure.Services.Product
                                     .Contains(p.Id));
                 }
 
-                if (!string.IsNullOrEmpty(category) && category != "all")
+                if (!string.IsNullOrEmpty(category) && category != "All")
                 {
                     query = query.Where(p => context.CategoryProductMappings
                                     .Where(mapping => mapping.Category.Name == category)
